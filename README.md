@@ -4,7 +4,6 @@ A pastebin for Markdown. Allows creation and sharing of Markdown instantly, and 
 
 Easily and freely self-hostable on Cloudflare Workers.
 
-[Demo Instance](https://flrbin.yourdomain.dev/)
 
 ## TODO
 - [ ] Add SQLite for self-hosting on bare metal
