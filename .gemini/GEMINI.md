@@ -234,31 +234,6 @@ pnpm run kv:create
 - Check file paths in static directory
 - Verify Cloudflare Workers assets feature is enabled
 
+
 ## Future Development
-
-### Planned Features
-- SQLite support for self-hosting
-- Docker containerization
-- Code syntax highlighting
-- Edit history tracking
-- User authentication (optional)
-
-### Technical Debt
-- ES6 modules for frontend
-- Improved error handling
-- Better TypeScript coverage
-- Unit test coverage
-
-## Integration Patterns
-
-### Custom Deployments
-- Replace KV with other storage backends
-- Add authentication middleware
-- Customize UI themes and branding
-- Implement custom markdown extensions
-
-### API Extensions
-- RESTful API for programmatic access
-- Webhook support for integrations
-- Export formats (PDF, HTML)
-- Import from external sources
+ check README.md for todo list
