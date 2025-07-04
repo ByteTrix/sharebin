@@ -29,14 +29,58 @@ const MIMES: Record<string, string> = {
 
 const XSS_OPTIONS = {
   whiteList: {
+    // Headings
     h1: ['id'],
     h2: ['id'],
     h3: ['id'],
     h4: ['id'],
     h5: ['id'],
     h6: ['id'],
+    // Text formatting
+    p: [],
+    br: [],
+    strong: [],
+    b: [],
+    em: [],
+    i: [],
+    u: [],
+    s: [],
+    del: [],
+    ins: [],
+    mark: [],
+    small: [],
+    sub: [],
+    sup: [],
+    // Links
+    a: ['href', 'title', 'target'],
+    // Lists
+    ul: [],
+    ol: ['start', 'type'],
+    li: [],
+    // Quotes and code
+    blockquote: [],
+    code: ['class'],
+    pre: ['class'],
+    // Tables
+    table: ['class'],
+    thead: [],
+    tbody: [],
+    tr: [],
+    th: ['align', 'colspan', 'rowspan'],
+    td: ['align', 'colspan', 'rowspan'],
+    // Images
+    img: ['src', 'alt', 'title', 'width', 'height'],
+    // Dividers
+    hr: [],
+    // Task lists
     input: ['disabled', 'type', 'checked'],
+    // Containers
+    div: ['class'],
+    span: ['class'],
   },
+  stripIgnoreTag: false,
+  stripIgnoreTagBody: false,
+  allowCommentTag: false,
 };
 
 function createParser() {
