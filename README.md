@@ -7,7 +7,7 @@ Easily and freely self-hostable on Cloudflare Workers.
 ## TODO
 ### Core Features
 
-- [ ] edit history
+- [x] edit history
 
 ### Future Roadmap (v2.0+)
 

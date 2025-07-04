@@ -121,7 +121,9 @@ export const homePage = ({
   <script src="/editor.js"></script>
 `, mode);
 
-export const pastePage = ({ id = '', html = '', title = '', mode = '' } = {}) => layout(title, `
+import { PasteRevision } from './storage';
+
+export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions = [] }: { id?: string; html?: string; title?: string; mode?: string; revisions?: PasteRevision[] } = {}) => layout(title, `
   <main>
     <div class="paste-container">
       ${html}
@@ -131,6 +133,20 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '' } = {}) =>
       <a class="btn" href="/${id}/edit">edit</a>
       <a class="btn" href="/${id}/delete">delete</a>
     </div>
+    ${_if(revisions.length > 0, `
+      <div class="revision-history">
+        <h3>Revision History</h3>
+        <ul>
+          ${revisions.map(rev => `
+            <li>
+              <a href="/${id}/raw?revision=${rev.timestamp}">
+                ${new Date(rev.timestamp).toLocaleString()}
+              </a>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    `)}
   </main>
 `, mode);
 

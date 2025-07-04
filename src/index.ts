@@ -207,7 +207,8 @@ export default {
         html = xss(html, XSS_OPTIONS);
         if (!title) title = id;
 
-        contents = pastePage({ id, html, title, mode: MODE });
+        const revisions = await storage.getRevisions(id);
+        contents = pastePage({ id, html, title, mode: MODE, revisions });
         status = 200;
       } else {
         contents = errorPage(MODE);
@@ -270,21 +271,37 @@ export default {
       });
     });
 
-    app.get('/:id/raw', async (_req, params) => {
+    app.get('/:id/raw', async (req, params) => {
       let contents = '';
       let status = 200;
       let contentType = 'text/plain';
       const id = params.id as string ?? '';
-      const res = await storage.get(id);
+      const url = new URL(req.url);
+      const revisionTimestamp = url.searchParams.get('revision');
 
-      if (res.value !== null) {
-        const { paste } = res.value;
-        contents = paste;
-        status = 200;
+      if (revisionTimestamp) {
+        const revisions = await storage.getRevisions(id);
+        const revision = revisions.find(rev => rev.timestamp === parseInt(revisionTimestamp, 10));
+        if (revision) {
+          contents = revision.paste;
+          status = 200;
+        } else {
+          contents = errorPage(MODE);
+          status = 404;
+          contentType = 'text/html';
+        }
       } else {
-        contents = errorPage(MODE);
-        status = 404;
-        contentType = 'text/html';
+        const res = await storage.get(id);
+
+        if (res.value !== null) {
+          const { paste } = res.value;
+          contents = paste;
+          status = 200;
+        } else {
+          contents = errorPage(MODE);
+          status = 404;
+          contentType = 'text/html';
+        }
       }
 
       return new Response(contents, {
@@ -388,6 +405,7 @@ export default {
             mode: MODE,
           });
         } else {
+          await storage.saveRevision(id, existing.paste); // Save current version as a revision
           await storage.set(id, { ...existing, paste });
           headers.set('location', '/' + id);
         }
