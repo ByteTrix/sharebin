@@ -5,8 +5,8 @@
 **flrbin** is a modern, self-hostable Markdown pastebin service built for Cloudflare Workers. It allows users to create, share, and manage Markdown documents with advanced features like custom URLs, edit protection, and automatic cleanup in demo mode.
 
 ### Key Characteristics
-- **Technology Stack**: TypeScript, Cloudflare Workers, KV Storage
-- **Purpose**: Markdown document sharing and collaboration
+- **Technology Stack**: Cloudflare Workers, KV Storage
+- **Purpose**: Markdown document sharing
 - **Deployment**: Cloudflare Workers (serverless)
 - **Storage**: Cloudflare KV (key-value store)
 - **Frontend**: Vanilla JavaScript with CodeMirror editor
