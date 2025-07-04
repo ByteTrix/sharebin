@@ -7,6 +7,7 @@ Easily and freely self-hostable on Cloudflare Workers.
 ## TODO
 ### Core Features
 
+- [x] add cloudflare worker and kv
 - [x] edit history
 
 ### Future Roadmap (v2.0+)
