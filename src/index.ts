@@ -1,4 +1,5 @@
 import xss from 'xss';
+
 import { Marked } from 'marked';
 import { CloudflareEnv, getEnv } from './env';
 import { Router } from './router';
@@ -28,8 +29,6 @@ const MIMES: Record<string, string> = {
 
 const XSS_OPTIONS = {
   whiteList: {
-    ...xss.whiteList,
-    // allow heading elements to have `id=` attributes
     h1: ['id'],
     h2: ['id'],
     h3: ['id'],
@@ -140,30 +139,10 @@ export default {
       });
     });
 
-    app.get('/guide', async () => {
-      // For Cloudflare Workers, we'll need to include the guide content or fetch it
-      const guideMd = `# Guide
-
-## Welcome to flrbin
-
-This is a simple markdown pastebin service.
-
-### Features
-
-- Write markdown content
-- Share via custom URLs
-- Edit and delete posts
-- Syntax highlighting
-
-### Usage
-
-1. Write your markdown in the editor
-2. Optionally set a custom URL
-3. Save and share!
-`;
-      
+    app.get('/guide', async (req) => {
+      const guideMd = await fetch(new URL('/guide.md', req.url)).then(res => res.text());
       const parse = createParser();
-      const { html, title } = parse(guideMd, { toc: false });
+      const { html, title } = parse(guideMd);
 
       return new Response(guidePage({ html, title, mode: MODE }), {
         status: 200,

@@ -1,6 +1,6 @@
 # flrbin guide
 
-`flrbin` is a [Markdown](https://en.wikipedia.org/wiki/Markdown) pastebin. It is heavily inspired by [rentry.co](https://rentry.co), but is [free and open-source](https://github.com/kevinfiol/flrbin), and easily self-hostable.
+`flrbin` is a [Markdown](https://en.wikipedia.org/wiki/Markdown) pastebin. It is heavily inspired by [rentry.co](https://rentry.co), but is [free and open-source](https://github.com/kvnlabs/flrbin), and easily self-hostable.
 
 `flrbin` uses [marked.js](https://marked.js.org/#specifications) for Markdown parsing, and thus supports all features of marked.js.
 

@@ -57,7 +57,7 @@ const layout = (title: string, content: string, mode?: string) => `
       <div class="footer-links">
         <a href="/">new</a>
         <a href="/guide">guide</a>
-        <a href="https://github.com/kevinfiol/flrbin">source</a>
+        <a href="https://github.com/kvnlabs/flrbin">source</a>
       </div>
     </footer>
     <script src="/theme-switch.js"></script>
