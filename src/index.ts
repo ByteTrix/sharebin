@@ -40,19 +40,6 @@ const XSS_OPTIONS = {
   },
 };
 
-// Static files will be served directly by Cloudflare
-const STATIC_FILES = new Set([
-  '/cm-markdown.min.js',
-  '/cm-sublime.min.js',
-  '/codemirror.min.css',
-  '/codemirror.min.js',
-  '/editor.js',
-  '/favicon.ico',
-  '/main.css',
-  '/marked.min.js',
-  '/theme-switch.js',
-]);
-
 function createParser() {
   const tocItems: TocItem[] = [];
 
@@ -140,20 +127,11 @@ function buildNestedList(items: TocItem[] = [], level: number) {
 
 export default {
   async fetch(request: Request, env: CloudflareEnv, ctx: any): Promise<Response> {
+
     const { MODE, DEMO_CLEAR_INTERVAL, KV } = getEnv(env);
     const storage = createStorage(KV);
     const generateId = uid();
     const app = new Router();
-
-    // Serve static files
-    app.get('*', async (req) => {
-      const url = new URL(req.url);
-      
-      if (STATIC_FILES.has(url.pathname)) {
-        // For now, return 404 - static files should be served by Cloudflare's static asset serving
-        return new Response('Static file not found', { status: 404 });
-      }
-    });
 
     app.get('/', () => {
       return new Response(homePage({ mode: MODE }), {
