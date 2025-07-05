@@ -139,7 +139,7 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
         <ul>
           ${revisions.map(rev => `
             <li>
-              <a href="/${id}/raw?revision=${rev.timestamp}">
+              <a href="/${id}/edit?revision=${rev.timestamp}">
                 ${new Date(rev.timestamp).toLocaleString()}
               </a>
             </li>

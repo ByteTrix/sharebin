@@ -223,20 +223,42 @@ export default {
       });
     });
 
-    app.get('/:id/edit', async (_req, params) => {
+    app.get('/:id/edit', async (req, params) => {
       let contents = '';
       let status = 200;
       const id = params.id as string ?? '';
-      const res = await storage.get(id);
+      const url = new URL(req.url);
+      const revisionTimestamp = url.searchParams.get('revision');
 
-      if (res.value !== null) {
-        const { editCode, paste } = res.value;
-        const hasEditCode = Boolean(editCode);
-        contents = editPage({ id, paste, hasEditCode, mode: MODE });
-        status = 200;
+      let pasteContent = '';
+      let hasEditCode = false;
+
+      if (revisionTimestamp) {
+        const revisions = await storage.getRevisions(id);
+        const revision = revisions.find(rev => rev.timestamp === parseInt(revisionTimestamp, 10));
+        if (revision) {
+          pasteContent = revision.paste;
+          // For historical revisions, we don't have an edit code associated directly
+          // with the revision itself, so we'll use the current paste's edit code status.
+          const currentPaste = await storage.get(id);
+          hasEditCode = Boolean(currentPaste.value?.editCode);
+        } else {
+          contents = errorPage(MODE);
+          status = 404;
+        }
       } else {
-        contents = errorPage(MODE);
-        status = 404;
+        const res = await storage.get(id);
+        if (res.value !== null) {
+          pasteContent = res.value.paste;
+          hasEditCode = Boolean(res.value.editCode);
+        } else {
+          contents = errorPage(MODE);
+          status = 404;
+        }
+      }
+
+      if (status !== 404) {
+        contents = editPage({ id, paste: pasteContent, hasEditCode, mode: MODE });
       }
 
       return new Response(contents, {
