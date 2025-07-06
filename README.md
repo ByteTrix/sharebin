@@ -15,7 +15,7 @@ Easily and freely self-hostable on Cloudflare Workers.
 #### 🚀 Modern Markdown Engine
 - [x] **Multi-Syntax Support**: Upgrade to micromark/remark ecosystem
   - [x] GitHub Flavored Markdown (GFM)
-  - [] Math equations with micromark-extension-math (KaTeX/MathJax)
+  - [ ] Math equations with micromark-extension-math (KaTeX/MathJax)
   - [ ] Mermaid diagrams support
   - [ ] MDX support for interactive components
   - [x] Definition lists, footnotes, and task lists
