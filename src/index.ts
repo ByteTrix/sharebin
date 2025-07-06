@@ -1,10 +1,10 @@
 import xss from 'xss';
 
-import { Marked } from 'marked';
 import { CloudflareEnv, getEnv } from './env';
 import { Router } from './router';
 import { Paste, createStorage } from './storage';
 import { handleScheduled } from './cron';
+import { ModernMarkdownProcessor } from './markdown';
 import {
   deletePage,
   editPage,
@@ -13,13 +13,6 @@ import {
   homePage,
   pastePage,
 } from './templates';
-
-interface TocItem {
-  level: number;
-  text: string;
-  anchor: string;
-  subitems: TocItem[];
-}
 
 const MIMES: Record<string, string> = {
   'js': 'text/javascript',
@@ -50,13 +43,13 @@ const XSS_OPTIONS = {
     mark: [],
     small: [],
     sub: [],
-    sup: [],
+    sup: ['id', 'data-footnote-ref'], // Footnote references
     // Links
-    a: ['href', 'title', 'target'],
+    a: ['href', 'title', 'target', 'data-footnote-ref', 'data-footnote-backref', 'id'],
     // Lists
     ul: [],
-    ol: ['start', 'type'],
-    li: [],
+    ol: ['start', 'type'], // Includes footnote lists
+    li: ['id', 'data-footnote-def'], // Includes footnote list items
     // Quotes and code
     blockquote: [],
     code: ['class'],
@@ -77,6 +70,8 @@ const XSS_OPTIONS = {
     // Containers
     div: ['class'],
     span: ['class'],
+    // Footnotes (GitHub Flavored Markdown)
+    section: ['data-footnotes', 'class'],
   },
   stripIgnoreTag: false,
   stripIgnoreTagBody: false,
@@ -84,32 +79,32 @@ const XSS_OPTIONS = {
 };
 
 function createParser() {
-  const tocItems: TocItem[] = [];
-
-  const renderer = {
-    heading(text: string, level: number) {
-      const anchor = createSlug(text);
-      const newItem = { level, text, anchor, subitems: [] };
-
-      tocItems.push(newItem);
-      return `<h${level} id="${anchor}"><a href="#${anchor}">${text}</a></h${level}>`;
-    },
+  const processor = new ModernMarkdownProcessor();
+  
+  return async (markdown: string) => {
+    const result = await processor.process(markdown, { 
+      toc: true,  // Re-enable TOC generation
+      codeHighlighting: true 
+    });
+    return { 
+      title: result.title, 
+      html: result.html 
+    };
   };
+}
 
-  const marked = new Marked({ renderer, breaks: true });
-  const parse = (markdown: string, { toc = true } = {}) => {
-    let html = marked.parse(markdown) as string;
-    const title = tocItems[0] ? tocItems[0].text : '';
+function uid() {
+  // https://github.com/lukeed/uid
+  // MIT License
+  // Copyright (c) Luke Edwards <luke.edwards05@gmail.com> (lukeed.com)
+  let IDX = 36, HEX = '';
+  while (IDX--) HEX += IDX.toString(36);
 
-    if (toc) {
-      const tocHtml = buildToc(tocItems);
-      if (tocHtml) html = html.replace(/\[\[\[TOC\]\]\]/g, tocHtml);
-    }
-
-    return { title, html };
+  return () => {
+    let str = '', num = 6;
+    while (num--) str += HEX[Math.random() * 36 | 0];
+    return str;
   };
-
-  return parse;
 }
 
 function createSlug(text = '') {
@@ -127,45 +122,6 @@ function createSlug(text = '') {
   }
 
   return '';
-}
-
-function uid() {
-  // https://github.com/lukeed/uid
-  // MIT License
-  // Copyright (c) Luke Edwards <luke.edwards05@gmail.com> (lukeed.com)
-  let IDX = 36, HEX = '';
-  while (IDX--) HEX += IDX.toString(36);
-
-  return () => {
-    let str = '', num = 6;
-    while (num--) str += HEX[Math.random() * 36 | 0];
-    return str;
-  };
-}
-
-function buildToc(items: TocItem[] = []) {
-  let html = '';
-
-  while (items.length > 0) {
-    html += buildNestedList(items, 1);
-  }
-
-  return html ? `<div class="toc">${html}</div>` : html;
-}
-
-function buildNestedList(items: TocItem[] = [], level: number) {
-  let html = '<ul>';
-
-  while (items.length > 0 && items[0].level === level) {
-    const item = items.shift();
-    if (item) html += `<li><a href="#${item.anchor}">${item.text}</a></li>`;
-  }
-
-  while (items.length > 0 && items[0].level > level) {
-    html += buildNestedList(items, level + 1);
-  }
-
-  return html + '</ul>';
 }
 
 export default {
@@ -186,7 +142,7 @@ export default {
     app.get('/guide', async (req) => {
       const guideMd = await fetch(new URL('/guide.md', req.url)).then(res => res.text());
       const parse = createParser();
-      const { html, title } = parse(guideMd);
+      const { html, title } = await parse(guideMd);
 
       return new Response(guidePage({ html, title, mode: MODE }), {
         status: 200,
@@ -203,7 +159,7 @@ export default {
       if (res.value !== null) {
         const { paste } = res.value;
         const parse = createParser();
-        let { html, title } = parse(paste);
+        let { html, title } = await parse(paste);
         html = xss(html, XSS_OPTIONS);
         if (!title) title = id;
 
@@ -332,6 +288,35 @@ export default {
           'content-type': contentType,
         },
       });
+    });
+
+    app.post('/preview', async (req) => {
+      try {
+        const body = await req.json() as { content?: string };
+        const content = body.content || '';
+        
+        if (!content.trim()) {
+          return new Response('', {
+            status: 200,
+            headers: { 'content-type': 'text/html' },
+          });
+        }
+
+        const parse = createParser();
+        const { html } = await parse(content);
+        const sanitizedHtml = xss(html, XSS_OPTIONS);
+
+        return new Response(sanitizedHtml, {
+          status: 200,
+          headers: { 'content-type': 'text/html' },
+        });
+      } catch (error) {
+        console.error('Preview error:', error);
+        return new Response('Preview error', {
+          status: 500,
+          headers: { 'content-type': 'text/plain' },
+        });
+      }
     });
 
     app.post('/save', async (req) => {

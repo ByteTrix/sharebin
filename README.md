@@ -13,24 +13,24 @@ Easily and freely self-hostable on Cloudflare Workers.
 ### Future Roadmap (v2.0+)
 
 #### 🚀 Modern Markdown Engine
-- [ ] **Multi-Syntax Support**: Upgrade to micromark/remark ecosystem
-  - [ ] GitHub Flavored Markdown (GFM) with micromark-extension-gfm
-  - [ ] Math equations with micromark-extension-math (KaTeX/MathJax)
+- [x] **Multi-Syntax Support**: Upgrade to micromark/remark ecosystem
+  - [x] GitHub Flavored Markdown (GFM)
+  - [] Math equations with micromark-extension-math (KaTeX/MathJax)
   - [ ] Mermaid diagrams support
   - [ ] MDX support for interactive components
-  - [ ] Definition lists, footnotes, and task lists
+  - [x] Definition lists, footnotes, and task lists
   - [ ] Custom syntax extensions (callouts, admonitions)
-- [ ] **Advanced Parser**: Replace marked.js with unified/remark
-  - [ ] AST-based processing for better extensibility
-  - [ ] Plugin ecosystem for custom transformations
-  - [ ] Better error handling and validation
+- [x] **Advanced Parser**: Replace marked.js with unified/remark
+  - [x] AST-based processing for better extensibility
+  - [x] Plugin ecosystem for custom transformations
+  - [x] Better error handling and validation
 
 #### 🔒 Security & Privacy
-- [ ] **Encryption Support**
-  - [ ] Client-side encryption with libsodium.js/TweetNaCl
-  - [ ] Password-protected pastes with ChaCha20-Poly1305
-  - [ ] End-to-end encryption for sensitive content
-  - [ ] Key derivation using scrypt/argon2
+- [x] **Encryption Support**
+  - [x] Client-side encryption with TweetNaCl
+  - [x] Password-protected pastes with ChaCha20-Poly1305
+  - [x] End-to-end encryption for sensitive content
+  - [x] Key derivation using PBKDF2
 - [ ] **Access Control**
   - [ ] View-only passwords (separate from edit codes)
   - [ ] Expiration dates with automatic cleanup
@@ -38,29 +38,37 @@ Easily and freely self-hostable on Cloudflare Workers.
   - [ ] IP-based access restrictions
 
 #### ✨ Enhanced Editor Experience
-- [ ] **Editor Interface**
+- [x] **Editor Interface**
+  - [x] Enhanced CodeMirror with keyboard shortcuts
+  - [x] Visual toolbar for common formatting
+  - [x] Live preview with real-time updates
   - [ ] Replace CodeMirror with modern alternatives:
     - [ ] Lexical (Meta's extensible editor framework)
     - [ ] TipTap (ProseMirror-based WYSIWYG)
     - [ ] Monaco Editor integration option
   - [ ] Block-based editing with drag & drop
   - [ ] Slash commands for quick formatting
-- [ ] **Notion-like Rich Preview**
+- [x] **Enhanced Preview**
+  - [x] Real-time markdown rendering
+  - [x] Support for all new features
   - [ ] Website-like rendering with custom themes
   - [ ] Print-friendly layouts
   - [ ] PDF export capabilities
   - [ ] Social media preview cards
 
 #### 🎨 Modern UI/UX
-- [ ] **Design System**
+- [x] **Design System**
+  - [x] Enhanced CSS with better typography and spacing
+  - [x] Improved dark/light theme support
+  - [x] Modern component styling
   - [ ] Component-based architecture (React/Vue/Svelte)
   - [ ] Tailwind CSS or styled-components
   - [ ] Consistent design language
   - [ ] Accessibility compliance (WCAG 2.1)
-- [ ] **Typography & Fonts**
-  - [ ] Inter, Source Sans Pro, or custom font stacks
-  - [ ] Proper typographic scales
-  - [ ] Reading mode optimizations
+- [x] **Typography & Fonts**
+  - [x] Improved font stacks and typography scales
+  - [x] Better reading experience
+  - [x] Enhanced code block styling
   - [ ] Variable font support
 
 #### ⚡ Modern Tech Stack

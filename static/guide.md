@@ -4,33 +4,13 @@ Welcome to the `flrbin` guide! `flrbin` is a powerful and flexible [Markdown](ht
 
 `flrbin` distinguishes itself as a [free and open-source](https://github.com/kvnlabs/flrbin) solution that is easily self-hostable.
 
-Leveraging [marked.js](https://marked.js.org/#specifications) for robust Markdown parsing, `flrbin` supports a comprehensive set of Markdown features, allowing you to format your text with ease and precision.
+Leveraging modern Markdown processing with **GitHub Flavored Markdown (GFM)** support, `flrbin` supports a comprehensive set of Markdown features including tables, task lists, math equations, and syntax highlighting, allowing you to format your text with ease and precision.
 
 This guide provides an in-depth overview of Markdown syntax supported by `flrbin`, adapted with modifications from [learnxinyminutes](https://learnxinyminutes.com/docs/markdown/). 
 Whether you're a seasoned Markdown user or just starting, this guide will help you create well-structured and visually appealing pastes.
 
-<div class="toc">
-   <ul>
-      <li><a href="#flrbin-guide">flrbin Guide: Mastering Your Markdown Pastes</a></li>
-      <ul>
-        <li><a href="#custom-urls">Custom URLs</a></li>
-        <li><a href="#edit-codes">Edit Codes</a></li>
-        <li><a href="#html-elements">HTML Elements</a></li>
-        <li><a href="#headings">Headings</a></li>
-        <li><a href="#simple-text-styles">Simple text styles</a></li>
-        <li><a href="#paragraphs">Paragraphs</a></li>
-        <li><a href="#blockquotes">Blockquotes</a></li>
-        <li><a href="#lists">Lists</a></li>
-        <li><a href="#task-lists">Task Lists</a></li>
-        <li><a href="#code-blocks">Code Blocks</a></li>
-        <li><a href="#horizontal-rule">Horizontal rule</a></li>
-        <li><a href="#links">Links</a></li>
-        <li><a href="#table-of-contents">Table of Contents</a></li>
-        <li><a href="#images">Images</a></li>
-        <li><a href="#tables">Tables</a></li>
-      </ul>
-   </ul>
-</div>
+[[[TOC]]]
+
 
 ## Custom URLs
 
@@ -45,6 +25,63 @@ To control access and modifications to your paste, you can set a custom edit cod
 
 *   **Protection:** Providing an edit code safeguards your paste from unauthorized edits and deletions.
 *   **Public Access:** If an edit code is not provided, your paste can be edited or deleted by anyone with access to the URL.
+
+## 🔒 Client-Side Encryption
+
+`flrbin` now supports **client-side encryption** for sensitive content. Your data is encrypted in your browser before being sent to the server, ensuring maximum privacy.
+
+### How It Works
+
+*   **Strong Encryption:** Uses ChaCha20-Poly1305 encryption with PBKDF2 key derivation
+*   **Password-Based:** You set a password that's never sent to the server
+*   **Secure:** Even server administrators cannot read your encrypted content
+*   **Recovery:** ⚠️ **If you lose the password, the paste cannot be recovered**
+
+### Using Encryption
+
+1. When creating a paste, check the "🔒 Encrypt this paste with a password" option
+2. Enter a strong password (minimum 8 characters)
+3. Optionally use the 🎲 button to generate a secure password
+4. Save your paste - it will be encrypted before submission
+5. Share the paste URL and password separately for maximum security
+
+### Decrypting Pastes
+
+When viewing an encrypted paste:
+1. A decryption prompt will appear automatically
+2. Enter the correct password
+3. The content will be decrypted in your browser
+4. Edit the decrypted content normally
+
+## ✨ Enhanced Editor Features
+
+The editor now includes powerful features to enhance your writing experience:
+
+### Keyboard Shortcuts
+
+*   **Ctrl+B** - Bold selected text (`**bold**`)
+*   **Ctrl+I** - Italic selected text (`*italic*`)
+*   **Ctrl+K** - Insert link (`[text](url)`)
+*   **Ctrl+Shift+C** - Inline code (`` `code` ``)
+*   **Ctrl+Shift+L** - Insert list item (`- item`)
+*   **Ctrl+Shift+T** - Insert table template
+*   **Ctrl+Shift+M** - Insert math block (`$$..$$`)
+
+### Toolbar
+
+Use the visual toolbar above the editor for quick formatting:
+*   **Bold**, **Italic**, **Code** formatting
+*   🔗 **Link** insertion
+*   • **List** creation
+*   📊 **Table** templates
+*   ∑ **Math** equation blocks
+*   **# Headings** and **❝ Quotes**
+
+### Live Preview
+
+*   Switch to the **Preview** tab to see your rendered Markdown
+*   Real-time updates as you type
+*   Full support for all new features including math and tables
 
 ## HTML Elements
 
@@ -310,6 +347,86 @@ You can specify the programming language immediately after the opening fence (e.
 *   Specify the language for fenced code blocks to enable proper syntax highlighting.
 *   Ensure your code examples are correct and easy to understand.
 
+## 📐 Math Equations
+
+`flrbin` now supports mathematical expressions using **KaTeX**, allowing you to render beautiful mathematical notation in your pastes. This is perfect for academic content, scientific documentation, or any content that requires mathematical expressions.
+
+### Inline Math
+
+For mathematical expressions within a paragraph, use single dollar signs (`$`):
+
+```md
+The quadratic formula is $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$.
+
+Einstein's famous equation is $E = mc^2$.
+```
+
+### Display Math
+
+For larger mathematical expressions that should be displayed on their own line and centered, use double dollar signs (`$$`):
+
+```md
+$$
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+$$
+
+$$
+\begin{bmatrix}
+a & b \\
+c & d
+\end{bmatrix}
+\begin{bmatrix}
+x \\
+y
+\end{bmatrix}
+=
+\begin{bmatrix}
+ax + by \\
+cx + dy
+\end{bmatrix}
+$$
+```
+
+### Common Mathematical Notation
+
+Here are some examples of mathematical notation you can use:
+
+**Greek Letters:**
+```md
+$\alpha$, $\beta$, $\gamma$, $\Gamma$, $\pi$, $\Pi$, $\phi$, $\varphi$, $\mu$, $\Phi$
+```
+
+**Fractions and Roots:**
+```md
+$\frac{1}{2}$, $\frac{x+1}{x-1}$, $\sqrt{x}$, $\sqrt[3]{x}$, $\sqrt[n]{x}$
+```
+
+**Superscripts and Subscripts:**
+```md
+$x^2$, $x^{n+1}$, $x_1$, $x_{i,j}$, $a_n^2$
+```
+
+**Sums and Integrals:**
+```md
+$\sum_{i=1}^{n} x_i$, $\int_0^1 f(x) dx$, $\prod_{i=1}^{n} x_i$
+```
+
+**Set Notation:**
+```md
+$\{1, 2, 3\}$, $x \in S$, $A \cup B$, $A \cap B$, $A \subset B$
+```
+
+**Logic and Relations:**
+```md
+$\forall x$, $\exists y$, $\neg p$, $p \land q$, $p \lor q$, $p \implies q$
+```
+
+**Best Practices for Math:**
+*   Use inline math (`$...$`) for simple expressions within text
+*   Use display math (`$$...$$`) for complex equations that need emphasis
+*   Test your equations in the preview to ensure they render correctly
+*   Reference the [KaTeX documentation](https://katex.org/docs/supported.html) for comprehensive syntax support
+
 ## Horizontal Rule
 
 ## Horizontal Rule
@@ -393,14 +510,14 @@ You can manually create a table of contents by linking to your headings. Markdow
 
 ### Automatic Table of Contents
 
-`flrbin` offers a convenient way to automatically generate a table of contents using the `[[[TOC]]]` token. This feature dynamically creates a TOC based on all headings in your document, simplifying the process for you.
+`flrbin` offers a convenient way to automatically generate a table of contents using the `[ [[TOC]] ]`(added space because it'll generate toc here) token. This feature dynamically creates a TOC based on all headings in your document, simplifying the process for you.
 
 For example, by simply typing this:
 
 ```md
 Here is the table of contents:
 
-[[[TOC]]]
+`[/[[TOC]]]` <- remove '/', this will generate toc
 ```
 
 `flrbin` will automatically generate a comprehensive table of contents containing all headings found within your document.

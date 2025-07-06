@@ -33,6 +33,8 @@ const layout = (title: string, content: string, mode?: string) => `
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="/codemirror.min.css">
+    <link rel="stylesheet" href="/highlight-light.min.css" media="(prefers-color-scheme: light)">
+    <link rel="stylesheet" href="/highlight-dark.min.css" media="(prefers-color-scheme: dark)">
     <link rel="stylesheet" href="/main.css">
     <title>
       ${title || 'flrbin'}
@@ -63,6 +65,9 @@ const layout = (title: string, content: string, mode?: string) => `
       </div>
     </footer>
     <script src="/theme-switch.js"></script>
+    <script src="/nacl.min.js"></script>
+    <script src="/nacl-util.min.js"></script>
+    <script src="/crypto.js"></script>
   </body>
   </html>
 `;
@@ -107,6 +112,33 @@ export const homePage = ({
         </div>
       </div>
 
+      <div class="encryption-section">
+        <label>
+          <input type="checkbox" id="enableEncryption" name="enableEncryption" />
+          <span class="encryption-label">🔒 Encrypt this paste with a password</span>
+        </label>
+        <div id="encryptionOptions" class="encryption-options" style="display: none;">
+          <div class="input-group">
+            <div>
+              <input
+                type="password"
+                id="encryptionPassword"
+                name="encryptionPassword"
+                placeholder="Encryption password"
+                minlength="8"
+              />
+            </div>
+            <div>
+              <button type="button" id="generatePassword" title="Generate secure password">🎲</button>
+            </div>
+          </div>
+          <small class="encryption-note">
+            Strong encryption using ChaCha20-Poly1305. Password is never sent to the server.
+            <br>⚠️ If you lose the password, the paste cannot be recovered.
+          </small>
+        </div>
+      </div>
+
       <div class="button-group">
         <button type="submit">
           save
@@ -114,11 +146,11 @@ export const homePage = ({
       </div>
     </form>
   </main>
-  <script src="/marked.min.js"></script>
   <script src="/codemirror.min.js"></script>
   <script src="/cm-markdown.min.js"></script>
   <script src="/cm-sublime.min.js"></script>
   <script src="/editor.js"></script>
+  <script src="/encryption-ui.js"></script>
 `, mode);
 
 import { PasteRevision } from './storage';
@@ -196,11 +228,11 @@ export const editPage = (
       </div>
     </form>
   </main>
-  <script src="/marked.min.js"></script>
   <script src="/codemirror.min.js"></script>
   <script src="/cm-markdown.min.js"></script>
   <script src="/cm-sublime.min.js"></script>
   <script src="/editor.js"></script>
+  <script src="/encryption-ui.js"></script>
 `, mode);
 
 export const deletePage = (

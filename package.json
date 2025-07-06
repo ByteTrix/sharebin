@@ -12,13 +12,21 @@
   },
   "packageManager": "pnpm@9.0.0",
   "dependencies": {
-    "marked": "^12.0.0",
-    "xss": "^1.0.14",
-    "lz-string": "^1.5.0"
+    "lz-string": "^1.5.0",
+    "rehype-highlight": "^7.0.2",
+    "rehype-stringify": "^10.0.1",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1",
+    "unified": "^11.0.5",
+    "xss": "^1.0.14"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240129.0",
-    "wrangler": "^4.23.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "wrangler": "^4.23.0"
   }
 }
