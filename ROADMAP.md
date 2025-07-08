@@ -7,8 +7,9 @@
 ## Future Roadmap (v2.0+)
 
 ### 🚀 Modern Markdown Engine
-- [ ] **Multi-Syntax Support**: Upgrade to micromark/remark ecosystem
+- [ ] **Multi-Syntax Support**:
   - [x] GitHub Flavored Markdown (GFM)
+  - [ ] Add copy button to code block
   - [ ] Math equations (KaTeX/MathJax)
   - [ ] Mermaid diagrams support
   - [ ] MDX support for interactive components
@@ -51,7 +52,7 @@
   - [x] Enhanced CSS with better typography and spacing
   - [x] Improved dark/light theme support
   - [x] Modern component styling
-  - [ ] Consistent design language
+  - [x] Consistent design language
   - [ ] Accessibility compliance (WCAG 2.1)
 - [x] **Typography & Fonts**
   - [x] Improved font stacks and typography scales
