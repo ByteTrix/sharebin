@@ -189,6 +189,11 @@
       if (response.ok) {
         const html = await response.text();
         previewContainer.innerHTML = html;
+        
+        // Add the document-content class to ensure proper styling
+        if (!previewContainer.classList.contains('document-content')) {
+          previewContainer.classList.add('document-content');
+        }
       } else {
         // Show error message if server preview fails
         previewContainer.innerHTML = `<div style="color: var(--error-color); padding: var(--spacing-4); border: 1px solid var(--error-color); border-radius: 0.375rem; margin: var(--spacing-4);">

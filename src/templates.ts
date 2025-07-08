@@ -457,13 +457,15 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
       </div>
 
       <!-- Document Content -->
-      <div class="document-content">
-        ${html}
+      <div class="notion-container">
+        <div class="document-content">
+          ${html}
+        </div>
       </div>
 
       <!-- Floating Revision Panel -->
       ${_if(revisions.length > 0, `
-        <div class="revision-panel" id="revisionPanel" style="display: none;">
+        <div class="revision-panel" id="revisionPanel">
           <div class="revision-panel-header">
             <h3>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -480,19 +482,14 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
           <div class="revision-list">
             ${revisions.map((rev, index) => `
               <div class="revision-entry">
-                <div class="revision-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z"/>
-                  </svg>
-                </div>
                 <div class="revision-info">
-                  <div class="revision-title" data-user-version="${revisions.length - index}">Loading...</div>
-                  <div class="revision-date" data-timestamp="${rev.timestamp}">
+                  <span class="revision-title" data-user-version="${revisions.length - index}">Loading...</span>
+                  <span class="revision-date" data-timestamp="${rev.timestamp}">
                     <span class="date-relative">Loading...</span>
                     <span class="date-absolute">Loading...</span>
-                  </div>
+                  </span>
                 </div>
-                <a href="/${id}/edit?revision=${rev.timestamp}" class="revision-action">
+                <a href="/${id}/edit?revision=${rev.timestamp}" class="revision-action" title="Edit this revision">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
                   </svg>
@@ -619,9 +616,16 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
     // Toggle revision history panel
     function toggleRevisionHistory() {
       const panel = document.getElementById('revisionPanel');
+      const body = document.body;
       if (panel) {
-        const isVisible = panel.style.display !== 'none';
-        panel.style.display = isVisible ? 'none' : 'block';
+        const isVisible = panel.classList.contains('show');
+        if (isVisible) {
+          panel.classList.remove('show');
+          body.classList.remove('revision-panel-open');
+        } else {
+          panel.classList.add('show');
+          body.classList.add('revision-panel-open');
+        }
       }
     }
 

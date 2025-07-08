@@ -3,6 +3,8 @@
 ## Core Features
 - [x] Cloudflare Worker and KV storage
 - [x] Edit history and revisions
+- [ ] Proper Keyboard Shortcuts
+- [ ] image render, embedded video preview
 
 ## Future Roadmap (v2.0+)
 
