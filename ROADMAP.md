@@ -3,6 +3,8 @@
 ## Core Features
 - [x] Cloudflare Worker and KV storage
 - [x] Edit history and revisions
+- [ ] fix spacing in between elements
+- [ ] show the language used in codeblock 
 - [ ] Proper Keyboard Shortcuts
 - [ ] image render, embedded video preview
 
