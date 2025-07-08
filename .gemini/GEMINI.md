@@ -1,4 +1,4 @@
-# flrbin Project - Comprehensive Guide for Gemini AI
+# flrbin Project
 
 ## Project Overview
 
