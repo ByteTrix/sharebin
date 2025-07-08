@@ -32,80 +32,114 @@ const Editor = (paste = '') => `
         <div class="shortcut-group">
           <h4>Text Formatting</h4>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>B</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>B</kbd>
+            </div>
             <span>Bold text</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>I</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>I</kbd>
+            </div>
             <span>Italic text</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>K</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>K</kbd>
+            </div>
             <span>Insert link</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>\`</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>\`</kbd>
+            </div>
             <span>Inline code</span>
           </div>
         </div>
         <div class="shortcut-group">
           <h4>Navigation</h4>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>G</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>G</kbd>
+            </div>
             <span>Go to line</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>F</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>F</kbd>
+            </div>
             <span>Find text</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>H</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>H</kbd>
+            </div>
             <span>Find & replace</span>
           </div>
           <div class="shortcut-item">
-            <kbd>F11</kbd>
+            <div class="shortcut-keys">
+              <kbd>F11</kbd>
+            </div>
             <span>Fullscreen editor</span>
           </div>
         </div>
         <div class="shortcut-group">
           <h4>Lists & Structure</h4>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>
+            </div>
             <span>Bullet list</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd>
+            </div>
             <span>Numbered list</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>></kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>></kbd>
+            </div>
             <span>Quote block</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd>
+            </div>
             <span>Heading</span>
           </div>
         </div>
         <div class="shortcut-group">
           <h4>Editor Control</h4>
           <div class="shortcut-item">
-            <kbd>Tab</kbd>
+            <div class="shortcut-keys">
+              <kbd>Tab</kbd>
+            </div>
             <span>Increase indent</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Shift</kbd> + <kbd>Tab</kbd>
+            <div class="shortcut-keys">
+              <kbd>Shift</kbd> + <kbd>Tab</kbd>
+            </div>
             <span>Decrease indent</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>A</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>A</kbd>
+            </div>
             <span>Select all</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>S</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>S</kbd>
+            </div>
             <span>Save paste</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>/</kbd>
+            <div class="shortcut-keys">
+              <kbd>Ctrl</kbd> + <kbd>/</kbd>
+            </div>
             <span>Show/hide shortcuts</span>
           </div>
         </div>

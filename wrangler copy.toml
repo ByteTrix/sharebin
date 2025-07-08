@@ -11,7 +11,7 @@ DEMO_CLEAR_INTERVAL = "5"
 
 [[kv_namespaces]]
 binding = "KV"
-id = "flrbin"
+id = "12768"
 preview_id = "123" #make sure to update this before deployment
 
 [triggers]

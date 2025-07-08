@@ -364,15 +364,20 @@
 
   function toggleShortcutsModal() {
     if (shortcutsModal) {
-      const isVisible = shortcutsModal.style.display !== 'none';
-      shortcutsModal.style.display = isVisible ? 'none' : 'flex';
+      const isVisible = shortcutsModal.style.display === 'flex';
       
-      if (!isVisible) {
-        // Focus the modal for accessibility
-        shortcutsModal.focus();
-      } else {
-        // Return focus to editor
+      if (isVisible) {
+        shortcutsModal.style.display = 'none';
         editor.focus();
+      } else {
+        shortcutsModal.style.display = 'flex';
+        // Focus the modal for accessibility
+        setTimeout(() => {
+          const closeButton = shortcutsModal.querySelector('#close-shortcuts');
+          if (closeButton) {
+            closeButton.focus();
+          }
+        }, 100);
       }
     }
   }

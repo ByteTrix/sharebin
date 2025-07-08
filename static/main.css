@@ -1296,15 +1296,15 @@ kbd {
     margin: 1rem 0;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    background: var(--input-bg, var(--bg-color));
-    color: var(--text-color);
+    background: var(--dark-bg-color);
+    color: var(--color);
     font-size: 1rem;
 }
 
 .decryption-modal input:focus {
     outline: none;
-    border-color: var(--primary-color, #007bff);
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    border-color: var(--link-color);
+    box-shadow: 0 0 0 2px rgba(139, 126, 200, 0.25);
 }
 
 .modal-buttons {
@@ -1324,32 +1324,32 @@ kbd {
 }
 
 .modal-buttons #decryptBtn {
-    background: var(--primary-color, #007bff);
-    color: white;
+    background: var(--link-color);
+    color: var(--bg-color);
 }
 
 .modal-buttons #decryptBtn:hover {
-    background: var(--primary-hover, #0056b3);
+    background: var(--link-hover-color);
 }
 
 .modal-buttons #decryptBtn:disabled {
-    background: var(--disabled-bg, #6c757d);
+    background: var(--faint-color);
     cursor: not-allowed;
 }
 
 .modal-buttons #cancelDecryptBtn {
-    background: var(--secondary-bg, #6c757d);
-    color: white;
+    background: var(--faint-color);
+    color: var(--bg-color);
 }
 
 .modal-buttons #cancelDecryptBtn:hover {
-    background: var(--secondary-hover, #545b62);
+    background: var(--color);
 }
 
 .decrypt-note {
     display: block;
     margin-top: 1rem;
-    color: var(--text-secondary);
+    color: var(--faint-color);
     font-style: italic;
     font-size: 0.875rem;
 }
@@ -1369,6 +1369,147 @@ kbd {
     animation: spin 1s linear infinite;
     margin-left: 5px;
 }
+
+/* Shortcuts Modal */
+.shortcuts-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1002;
+    opacity: 0;
+    animation: fadeIn 0.3s ease forwards;
+}
+
+.shortcuts-modal-content {
+    background: var(--bg-color);
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 700px;
+    max-height: 80vh;
+    width: 90%;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    transform: scale(0.9);
+    animation: modalShow 0.3s ease forwards;
+    overflow-y: auto;
+}
+
+.shortcuts-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.shortcuts-modal-header h3 {
+    margin: 0;
+    color: var(--color);
+    font-size: 1.5rem;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--faint-color);
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+    background-color: var(--faint-bg-color);
+}
+
+.shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.shortcut-group {
+    background: var(--faint-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.shortcut-group h4 {
+    margin: 0 0 1rem 0;
+    color: var(--color);
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--link-color);
+    padding-bottom: 0.5rem;
+}
+
+.shortcut-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.shortcut-item:last-child {
+    border-bottom: none;
+}
+
+.shortcut-item span {
+    color: var(--faint-color);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.shortcut-keys {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+kbd {
+    background: var(--code-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 1px 0 rgba(255,255,255,0.1) inset;
+    color: var(--color);
+    display: inline-block;
+    font-family: var(--monospace);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 4px 6px;
+    white-space: nowrap;
+    margin: 0 1px;
+    min-width: 1.5em;
+    text-align: center;
+}
+
+.shortcuts-note {
+    background: var(--dark-bg-color);
+    border: 1px solid var(--link-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    color: var(--color);
+    border-left: 4px solid var(--link-color);
+}
+
+.shortcuts-note p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Remove the old dark mode overrides since we're using the main theme variables */
 
 /* Animations */
 @keyframes fadeIn {
@@ -1437,4 +1578,308 @@ kbd {
   border-color: var(--info-color, #17a2b8);
   background-color: var(--info-bg, #d1ecf1);
   color: var(--info-text, #0c5460);
+}
+
+/* Paste container should use the same styling as preview container */
+.paste-container {
+    min-height: 300px;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    background-color: var(--bg-color);
+    padding: var(--spacing-4);
+    padding-left: calc(var(--spacing-4) + 49px); /* Match line number gutter width */
+    overflow-y: auto;
+    max-height: none; /* Allow full height for paste content */
+    font-family: var(--sans-serif);
+    line-height: 1.6;
+    color: var(--color);
+}
+
+/* Apply all preview container styles to paste container */
+.paste-container h1,
+.paste-container h2,
+.paste-container h3,
+.paste-container h4,
+.paste-container h5,
+.paste-container h6 {
+    margin: 24px 0 16px 0;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--color);
+    font-family: var(--sans-serif);
+}
+
+.paste-container h1 {
+    font-size: 2em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.3em;
+}
+
+.paste-container h2 {
+    font-size: 1.5em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.3em;
+}
+
+.paste-container h3 {
+    font-size: 1.25em;
+}
+
+.paste-container h4 {
+    font-size: 1em;
+}
+
+.paste-container h5 {
+    font-size: 0.875em;
+}
+
+.paste-container h6 {
+    font-size: 0.85em;
+    color: var(--faint-color);
+}
+
+.paste-container p {
+    margin: 16px 0;
+    line-height: 1.6;
+    color: var(--color);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.paste-container strong {
+    font-weight: 600;
+    color: var(--color);
+}
+
+.paste-container em {
+    font-style: italic;
+    color: var(--color);
+}
+
+.paste-container a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+.paste-container a:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+}
+
+.paste-container code {
+    background-color: var(--code-bg-color);
+    color: var(--color);
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    border-radius: 6px;
+    font-family: var(--monospace);
+    border: 1px solid var(--border-color);
+}
+
+.paste-container pre {
+    background-color: var(--code-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 85%;
+    line-height: 1.45;
+    overflow: auto;
+    padding: 16px;
+    margin: 16px 0;
+    font-family: var(--monospace);
+}
+
+.paste-container pre code {
+    background: transparent;
+    border: 0;
+    display: inline;
+    max-width: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    line-height: inherit;
+    word-wrap: normal;
+    font-size: 100%;
+}
+
+.paste-container blockquote {
+    margin: 16px 0;
+    padding: 0 1em;
+    color: var(--faint-color);
+    border-left: 0.25em solid var(--border-color);
+    font-style: normal;
+}
+
+.paste-container blockquote p {
+    margin: 16px 0;
+}
+
+.paste-container ul,
+.paste-container ol {
+    margin: 16px 0;
+    padding-left: 2em;
+}
+
+.paste-container ul {
+    list-style-type: disc;
+}
+
+.paste-container ol {
+    list-style-type: decimal;
+}
+
+.paste-container li {
+    margin: 0.25em 0;
+    line-height: 1.6;
+}
+
+.paste-container li p {
+    margin: 16px 0;
+}
+
+.paste-container li > ul,
+.paste-container li > ol {
+    margin: 0;
+}
+
+.paste-container hr {
+    height: 0.25em;
+    padding: 0;
+    margin: 24px 0;
+    background-color: var(--border-color);
+    border: 0;
+    border-radius: 2px;
+}
+
+.paste-container table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    margin: 16px 0;
+    width: 100%;
+}
+
+.paste-container table th,
+.paste-container table td {
+    padding: 6px 13px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+    line-height: 1.6;
+}
+
+.paste-container table th {
+    font-weight: 600;
+    background-color: var(--faint-bg-color);
+}
+
+.paste-container table tr:nth-child(2n) {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="d"] .paste-container table tr:nth-child(2n) {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.paste-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin: 16px 0;
+    box-sizing: content-box;
+}
+
+/* Task lists */
+.paste-container .task-list-item {
+    list-style: none;
+    margin: 0.25em 0;
+    position: relative;
+    padding-left: 0;
+}
+
+.paste-container .task-list-item input[type="checkbox"] {
+    margin: 0 8px 0 -20px;
+    position: relative;
+    top: 2px;
+    width: 16px;
+    height: 16px;
+}
+
+.paste-container .task-list-item.checked {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+/* Math equations */
+.paste-container .katex {
+    font-size: 1.1em;
+}
+
+.paste-container .katex-display {
+    margin: 16px 0;
+    text-align: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* Definition lists */
+.paste-container dl {
+    margin: 16px 0;
+}
+
+.paste-container dt {
+    font-weight: 600;
+    margin-top: 16px;
+    font-style: italic;
+}
+
+.paste-container dd {
+    margin-left: 0;
+    padding-left: 16px;
+    margin-bottom: 16px;
+}
+
+/* Strikethrough */
+.paste-container del,
+.paste-container s {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+/* Mark/highlight */
+.paste-container mark {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 0.125em 0.25em;
+    border-radius: 3px;
+}
+
+[data-theme="d"] .paste-container mark {
+    background-color: #664d03;
+    color: #fff3cd;
+}
+
+/* Keyboard keys */
+.paste-container kbd {
+    background-color: var(--code-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 var(--border-color);
+    color: var(--color);
+    display: inline-block;
+    font-family: var(--monospace);
+    font-size: 11px;
+    line-height: 10px;
+    padding: 3px 5px;
+    vertical-align: middle;
+}
+
+/* Footnotes */
+.paste-container .footnotes {
+    margin-top: 32px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 16px;
+    font-size: 0.9em;
+}
+
+.paste-container .footnotes ol {
+    padding-left: 16px;
 }
