@@ -56,14 +56,32 @@
       'Ctrl-K': function(cm) {
         insertLink(cm);
       },
-      'Ctrl-Shift-C': function(cm) {
+      'Ctrl-`': function(cm) {
         wrapSelection(cm, '`', '`');
       },
       'Ctrl-Shift-L': function(cm) {
         insertListItem(cm);
       },
+      'Ctrl-Shift-O': function(cm) {
+        insertNumberedList(cm);
+      },
+      'Ctrl-Shift-.': function(cm) {
+        insertQuote(cm);
+      },
+      'Ctrl-Shift-H': function(cm) {
+        insertHeading(cm);
+      },
+      'Ctrl-S': function(cm) {
+        // Save the form
+        if (editorForm) {
+          editorForm.submit();
+        }
+      },
       'Ctrl-Shift-T': function(cm) {
         insertTable(cm);
+      },
+      'Ctrl-/': function(cm) {
+        toggleShortcutsModal();
       }
     }
   });
@@ -119,6 +137,35 @@
 | Cell 4   | Cell 5   | Cell 6   |`;
     
     cm.replaceSelection(table);
+  }
+
+  function insertNumberedList(cm) {
+    const cursor = cm.getCursor();
+    const line = cm.getLine(cursor.line);
+    
+    if (line.trim() === '') {
+      cm.replaceRange('1. ', cursor);
+    } else {
+      cm.replaceRange('\n1. ', { line: cursor.line, ch: line.length });
+    }
+  }
+
+  function insertQuote(cm) {
+    const cursor = cm.getCursor();
+    const line = cm.getLine(cursor.line);
+    
+    if (!line.startsWith('>')) {
+      cm.replaceRange('> ', { line: cursor.line, ch: 0 });
+    }
+  }
+
+  function insertHeading(cm) {
+    const cursor = cm.getCursor();
+    const line = cm.getLine(cursor.line);
+    
+    if (!line.startsWith('#')) {
+      cm.replaceRange('## ', { line: cursor.line, ch: 0 });
+    }
   }
 
   // Enhanced preview with server-side markdown processing
@@ -307,8 +354,68 @@
     }
   }
 
-  // Create toolbar
-  createToolbar();
+  // Toolbar disabled for cleaner interface
+  // Users can use keyboard shortcuts for formatting
+  // createToolbar();
+
+  // Shortcuts modal functionality
+  const shortcutsModal = document.getElementById('shortcuts-modal');
+  const closeShortcutsBtn = document.getElementById('close-shortcuts');
+
+  function toggleShortcutsModal() {
+    if (shortcutsModal) {
+      const isVisible = shortcutsModal.style.display !== 'none';
+      shortcutsModal.style.display = isVisible ? 'none' : 'flex';
+      
+      if (!isVisible) {
+        // Focus the modal for accessibility
+        shortcutsModal.focus();
+      } else {
+        // Return focus to editor
+        editor.focus();
+      }
+    }
+  }
+
+  function closeShortcutsModal() {
+    if (shortcutsModal) {
+      shortcutsModal.style.display = 'none';
+      editor.focus();
+    }
+  }
+
+  // Event listeners for modal
+  if (closeShortcutsBtn) {
+    closeShortcutsBtn.addEventListener('click', closeShortcutsModal);
+  }
+
+  if (shortcutsModal) {
+    // Close modal when clicking outside content
+    shortcutsModal.addEventListener('click', function(e) {
+      if (e.target === shortcutsModal) {
+        closeShortcutsModal();
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && shortcutsModal.style.display === 'flex') {
+        closeShortcutsModal();
+      }
+    });
+  }
+
+  // Make toggleShortcutsModal available globally for debugging
+  window.toggleShortcutsModal = toggleShortcutsModal;
+
+  // Add click handler for footer shortcuts hint
+  const shortcutsHint = document.querySelector('.shortcuts-hint');
+  if (shortcutsHint) {
+    shortcutsHint.addEventListener('click', function(e) {
+      e.preventDefault();
+      toggleShortcutsModal();
+    });
+  }
 
   function debounce(cb, wait) {
     let timer;

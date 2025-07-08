@@ -1,0 +1,22 @@
+name = "flrbin"
+main = "src/index.ts"
+compatibility_date = "2024-01-15"
+compatibility_flags = ["nodejs_compat"]
+
+
+
+[vars]
+MODE = "prod"
+DEMO_CLEAR_INTERVAL = "5"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "flrbin"
+preview_id = "123" #make sure to update this before deployment
+
+[triggers]
+crons = ["* * * * *"]
+
+[assets]
+directory = "./static"
+

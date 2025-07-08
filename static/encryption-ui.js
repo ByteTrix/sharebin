@@ -56,47 +56,9 @@
       const password = encryptionPassword.value;
       
       if (enableEncryption && password) {
-        e.preventDefault();
-        
-        try {
-          // Get the content from the editor
-          const content = window.cmEditor ? window.cmEditor.getValue() : document.getElementById('pasteTextArea').value;
-          
-          if (!content.trim()) {
-            showNotification('Please enter some content to encrypt.', 'error');
-            return;
-          }
-
-          showNotification('Encrypting paste...', 'info');
-          
-          // Encrypt the content
-          const encryptedContent = await window.flrbinCrypto.encrypt(content, password);
-          
-          // Replace the textarea content with encrypted version
-          const textarea = document.getElementById('pasteTextArea');
-          textarea.value = `🔒 ENCRYPTED PASTE 🔒\n\n${encryptedContent}`;
-          
-          // Update editor if present
-          if (window.cmEditor) {
-            window.cmEditor.setValue(textarea.value);
-          }
-          
-          // Clear password field for security
-          encryptionPassword.value = '';
-          encryptionCheckbox.checked = false;
-          encryptionOptions.style.display = 'none';
-          
-          showNotification('Paste encrypted successfully! Submitting...', 'success');
-          
-          // Submit the form with encrypted content
-          setTimeout(() => {
-            this.submit();
-          }, 1000);
-          
-        } catch (error) {
-          console.error('Encryption error:', error);
-          showNotification(`Encryption failed: ${error.message}`, 'error');
-        }
+        // For server-side encryption, let the form submit normally with the password
+        // The server will handle the encryption
+        console.log('Form will be submitted with encryption enabled');
       }
       // If encryption is not enabled, form submits normally
     });
@@ -129,62 +91,87 @@
     `;
     
     document.body.appendChild(modal);
-    
+
     const decryptBtn = modal.querySelector('#decryptBtn');
     const cancelBtn = modal.querySelector('#cancelDecryptBtn');
     const passwordInput = modal.querySelector('#decryptPassword');
-    
+
     // Focus password input
     passwordInput.focus();
-    
+
     // Handle Enter key
     passwordInput.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         decryptBtn.click();
       }
     });
-    
+
     decryptBtn.addEventListener('click', async () => {
       const password = passwordInput.value;
       if (!password) {
         showNotification('Please enter a password.', 'error');
+        passwordInput.classList.add('shake');
+        passwordInput.addEventListener('animationend', () => {
+          passwordInput.classList.remove('shake');
+        }, { once: true });
         return;
       }
-      
+
+      // Add loading spinner
+      decryptBtn.disabled = true;
+      decryptBtn.innerHTML = 'Decrypting... <span class="spinner"></span>';
+      passwordInput.classList.remove('shake'); // Remove shake if it was there
+
       try {
-        showNotification('Decrypting...', 'info');
-        
         // Extract encrypted data (remove the header)
         const encryptedData = encryptedContent.replace(/^🔒 ENCRYPTED PASTE 🔒\s*\n+/, '');
-        
+
         // Decrypt
         const decryptedContent = await window.flrbinCrypto.decrypt(encryptedData, password);
-        
+
         // Update editor/textarea
         if (window.cmEditor) {
           window.cmEditor.setValue(decryptedContent);
         } else if (document.getElementById('pasteTextArea')) {
           document.getElementById('pasteTextArea').value = decryptedContent;
         }
-        
+
         showNotification('Paste decrypted successfully!', 'success');
-        modal.remove();
-        
+        // Trigger closing animation before removal
+        modal.classList.add('closing');
+        modal.addEventListener('animationend', () => {
+          modal.remove();
+        }, { once: true });
+
       } catch (error) {
         console.error('Decryption error:', error);
         showNotification('Decryption failed. Check your password.', 'error');
+        passwordInput.classList.add('shake');
+        passwordInput.addEventListener('animationend', () => {
+          passwordInput.classList.remove('shake');
+        }, { once: true });
         passwordInput.select();
+      } finally {
+        decryptBtn.disabled = false;
+        decryptBtn.innerHTML = 'Decrypt'; // Reset button text
       }
     });
-    
+
     cancelBtn.addEventListener('click', () => {
-      modal.remove();
+      // Trigger closing animation before removal
+      modal.classList.add('closing');
+      modal.addEventListener('animationend', () => {
+        modal.remove();
+      }, { once: true });
     });
-    
+
     // Close on outside click
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
-        modal.remove();
+        modal.classList.add('closing');
+        modal.addEventListener('animationend', () => {
+          modal.remove();
+        }, { once: true });
       }
     });
   }
@@ -193,16 +180,26 @@
     // Remove existing notifications
     const existing = document.querySelectorAll('.notification');
     existing.forEach(n => n.remove());
-    
+
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.textContent = message;
-    
+
     document.body.appendChild(notification);
     
+    // Trigger animation
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
+
     // Auto-remove after 4 seconds
     setTimeout(() => {
-      notification.remove();
+      notification.classList.remove('show');
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 300);
     }, 4000);
   }
 

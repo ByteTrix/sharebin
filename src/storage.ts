@@ -3,6 +3,7 @@ import { compress, decompress } from 'lz-string';
 export interface Paste {
   paste: string;
   editCode?: string;
+  isEncrypted?: boolean;
 }
 
 export interface PasteRevision {

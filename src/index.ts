@@ -5,6 +5,7 @@ import { Router } from './router';
 import { Paste, createStorage } from './storage';
 import { handleScheduled } from './cron';
 import { ModernMarkdownProcessor } from './markdown';
+import { ServerEncryption, EncryptedData } from './encryption';
 import {
   deletePage,
   editPage,
@@ -12,6 +13,7 @@ import {
   guidePage,
   homePage,
   pastePage,
+  passwordPromptPage,
 } from './templates';
 
 const MIMES: Record<string, string> = {
@@ -150,21 +152,76 @@ export default {
       });
     });
 
-    app.get('/:id', async (_req, params) => {
+    app.get('/:id', async (req, params) => {
       let contents = '';
       let status = 200;
       const id = params.id as string ?? '';
       const res = await storage.get(id);
 
       if (res.value !== null) {
-        const { paste } = res.value;
-        const parse = createParser();
-        let { html, title } = await parse(paste);
-        html = xss(html, XSS_OPTIONS);
-        if (!title) title = id;
+        const { paste, isEncrypted } = res.value;
+        
+        // Check if this is an encrypted paste that needs password
+        if (isEncrypted) {
+          // Check if user has provided password in cookie
+          const cookies = req.headers.get('cookie') || '';
+          const sessionCookie = cookies
+            .split(';')
+            .find(c => c.trim().startsWith(`decrypt-session-${id}=`));
+          
+          if (!sessionCookie) {
+            // Show password prompt
+            contents = passwordPromptPage({ id, mode: MODE });
+            return new Response(contents, {
+              status: 200,
+              headers: { 'content-type': 'text/html' },
+            });
+          }
+          
+          const sessionPassword = sessionCookie.split('=')[1];
+          
+          // Try to decrypt with session password
+          try {
+            if (ServerEncryption.isEncryptedData(JSON.parse(paste))) {
+              const encryptedData = JSON.parse(paste) as EncryptedData;
+              const decryptedPaste = await ServerEncryption.decrypt(encryptedData, sessionPassword);
+              
+              const parse = createParser();
+              let { html, title } = await parse(decryptedPaste);
+              html = xss(html, XSS_OPTIONS);
+              if (!title) title = id;
 
-        const revisions = await storage.getRevisions(id);
-        contents = pastePage({ id, html, title, mode: MODE, revisions });
+              const revisions = await storage.getRevisions(id);
+              contents = pastePage({ id, html, title, mode: MODE, revisions, isEncrypted: true });
+            } else {
+              throw new Error('Invalid encrypted data format');
+            }
+          } catch (error) {
+            // Invalid password, show prompt again
+            contents = passwordPromptPage({ id, mode: MODE, error: 'Invalid password' });
+            return new Response(contents, {
+              status: 200,
+              headers: { 'content-type': 'text/html' },
+            });
+          }
+        } else {
+          // Regular unencrypted paste
+          const parse = createParser();
+          let { html, title } = await parse(paste);
+          html = xss(html, XSS_OPTIONS);
+          if (!title) title = id;
+
+          const revisions = await storage.getRevisions(id);
+          contents = pastePage({ 
+            id, 
+            html, 
+            title, 
+            mode: MODE, 
+            revisions, 
+            isEncrypted: false
+          });
+        }
+        
         status = 200;
       } else {
         contents = errorPage(MODE);
@@ -188,6 +245,7 @@ export default {
 
       let pasteContent = '';
       let hasEditCode = false;
+      let isEncrypted = false;
 
       if (revisionTimestamp) {
         const revisions = await storage.getRevisions(id);
@@ -198,6 +256,7 @@ export default {
           // with the revision itself, so we'll use the current paste's edit code status.
           const currentPaste = await storage.get(id);
           hasEditCode = Boolean(currentPaste.value?.editCode);
+          isEncrypted = Boolean(currentPaste.value?.isEncrypted);
         } else {
           contents = errorPage(MODE);
           status = 404;
@@ -207,6 +266,35 @@ export default {
         if (res.value !== null) {
           pasteContent = res.value.paste;
           hasEditCode = Boolean(res.value.editCode);
+          isEncrypted = Boolean(res.value.isEncrypted);
+          
+          // If it's encrypted, we need to decrypt it for editing
+          if (isEncrypted) {
+            const cookies = req.headers.get('cookie') || '';
+            const sessionCookie = cookies
+              .split(';')
+              .find(c => c.trim().startsWith(`decrypt-session-${id}=`));
+            
+            if (sessionCookie) {
+              const sessionPassword = sessionCookie.split('=')[1];
+              try {
+                const encryptedData = JSON.parse(pasteContent) as EncryptedData;
+                pasteContent = await ServerEncryption.decrypt(encryptedData, sessionPassword);
+              } catch (error) {
+                // Can't decrypt, redirect to view page for password prompt
+                return new Response('', {
+                  status: 302,
+                  headers: { 'location': `/${id}` },
+                });
+              }
+            } else {
+              // No session, redirect to view page for password prompt
+              return new Response('', {
+                status: 302,
+                headers: { 'location': `/${id}` },
+              });
+            }
+          }
         } else {
           contents = errorPage(MODE);
           status = 404;
@@ -328,13 +416,42 @@ export default {
 
       const form = await req.formData();
       const customUrl = form.get('url') as string;
-      const paste = form.get('paste') as string;
+      let paste = form.get('paste') as string;
       const slug = createSlug(customUrl);
+      const enableEncryption = form.get('enableEncryption') === 'on';
+      const encryptionPassword = form.get('encryptionPassword') as string;
 
       let editCode: string | undefined = form.get('editcode') as string;
       if (typeof editCode === 'string') {
         editCode = editCode.trim() || undefined;
       }
+
+      // Handle encryption
+      let isEncrypted = false;
+      
+      if (enableEncryption && encryptionPassword) {
+        // Always use server-side encryption
+        try {
+          const encryptedData = await ServerEncryption.encrypt(paste, encryptionPassword);
+          paste = JSON.stringify(encryptedData);
+          isEncrypted = true;
+        } catch (error) {
+          status = 422;
+          contents = homePage({
+            paste,
+            url: customUrl,
+            errors: { url: 'Encryption failed. Please try again.' },
+            mode: MODE,
+          });
+          return new Response(contents, { status, headers });
+        }
+      }
+
+      const pasteData: Paste = {
+        paste,
+        editCode,
+        isEncrypted,
+      };
 
       if (slug.length > 0) {
         const res = await storage.get(slug);
@@ -343,13 +460,13 @@ export default {
           status = 422;
 
           contents = homePage({
-            paste,
+            paste: form.get('paste') as string, // Show original paste, not encrypted
             url: customUrl,
             errors: { url: `url unavailable: ${customUrl}` },
             mode: MODE,
           });
         } else {
-          await storage.set(slug, { paste, editCode });
+          await storage.set(slug, pasteData);
           status = 302;
           headers.set('location', '/' + slug.trim());
         }
@@ -364,7 +481,7 @@ export default {
           );
         }
 
-        await storage.set(id, { paste, editCode });
+        await storage.set(id, pasteData);
         status = 302;
         headers.set('location', '/' + id.trim());
       }
@@ -381,7 +498,7 @@ export default {
 
       const id = params.id as string ?? '';
       const form = await req.formData();
-      const paste = form.get('paste') as string;
+      let paste = form.get('paste') as string;
       let editCode: string | undefined = form.get('editcode') as string;
       if (typeof editCode === 'string') {
         editCode = editCode.trim() || undefined;
@@ -413,7 +530,42 @@ export default {
           });
         } else {
           await storage.saveRevision(id, existing.paste); // Save current version as a revision
-          await storage.set(id, { ...existing, paste });
+          
+          // If the original paste was encrypted, we need to re-encrypt the updated content
+          if (existing.isEncrypted) {
+            const cookies = req.headers.get('cookie') || '';
+            const sessionCookie = cookies
+              .split(';')
+              .find(c => c.trim().startsWith(`decrypt-session-${id}=`));
+            
+            if (sessionCookie) {
+              const sessionPassword = sessionCookie.split('=')[1];
+              try {
+                const encryptedData = await ServerEncryption.encrypt(paste, sessionPassword);
+                paste = JSON.stringify(encryptedData);
+              } catch (error) {
+                status = 400;
+                contents = editPage({
+                  id,
+                  paste,
+                  hasEditCode,
+                  errors: { editCode: 'Encryption failed. Please try again.' },
+                  mode: MODE,
+                });
+                return new Response(contents, { status, headers });
+              }
+            } else {
+              // No session, redirect to view for password prompt
+              headers.set('location', `/${id}`);
+              return new Response(contents, { status, headers });
+            }
+          }
+          
+          await storage.set(id, { 
+            ...existing, 
+            paste,
+            editCode: editCode || existing.editCode 
+          });
           headers.set('location', '/' + id);
         }
       }
@@ -467,6 +619,56 @@ export default {
         status,
         headers,
       });
+    });
+
+    app.post('/:id/decrypt', async (req, params) => {
+      const id = params.id as string ?? '';
+      const form = await req.formData();
+      const password = form.get('password') as string;
+
+      if (!password) {
+        return new Response(passwordPromptPage({ id, mode: MODE, error: 'Password is required' }), {
+          status: 400,
+          headers: { 'content-type': 'text/html' },
+        });
+      }
+
+      const res = await storage.get(id);
+      if (res.value === null) {
+        return new Response(errorPage(MODE), {
+          status: 404,
+          headers: { 'content-type': 'text/html' },
+        });
+      }
+
+      const { paste, isEncrypted } = res.value;
+      
+      if (!isEncrypted) {
+        return new Response(passwordPromptPage({ id, mode: MODE, error: 'This paste is not encrypted' }), {
+          status: 400,
+          headers: { 'content-type': 'text/html' },
+        });
+      }
+
+      try {
+        const encryptedData = JSON.parse(paste) as EncryptedData;
+        const decryptedPaste = await ServerEncryption.decrypt(encryptedData, password);
+        
+        // Create a session cookie for this decrypt
+        return new Response('', {
+          status: 302,
+          headers: {
+            'location': `/${id}`,
+            'set-cookie': `decrypt-session-${id}=${password}; HttpOnly; Secure; SameSite=Strict; Max-Age=3600; Path=/`,
+          },
+        });
+      } catch (error) {
+        console.error('Decryption error:', error);
+        return new Response(passwordPromptPage({ id, mode: MODE, error: 'Invalid password. Please try again.' }), {
+          status: 400,
+          headers: { 'content-type': 'text/html' },
+        });
+      }
     });
 
     return await app.handler(request);
