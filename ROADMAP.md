@@ -3,20 +3,22 @@
 ## Core Features
 - [x] Cloudflare Worker and KV storage
 - [x] Edit history and revisions
-- [ ] fix spacing in between elements
+- [x] fix spacing in between elements
+- [ ] Add Navbar
+- [ ] Authentication and user management 
+- [ ] Customizable paste expiration
 - [ ] show the language used in codeblock 
-- [ ] Proper Keyboard Shortcuts
 - [ ] image render, embedded video preview
+- [ ] Proper Keyboard Shortcuts
 
 ## Future Roadmap (v2.0+)
 
 ### 🚀 Modern Markdown Engine
 - [ ] **Multi-Syntax Support**:
   - [x] GitHub Flavored Markdown (GFM)
-  - [ ] Add copy button to code block
+  - [x] Add copy button to code block
   - [ ] Math equations (KaTeX/MathJax)
   - [ ] Mermaid diagrams support
-  - [ ] MDX support for interactive components
   - [x] Definition lists, footnotes, and task lists
   - [ ] Custom syntax extensions (callouts, admonitions)
 - [x] **Advanced Parser**: Replace marked.js with unified/remark
@@ -31,6 +33,7 @@
   - [x] Secure key derivation using PBKDF2 (100,000 iterations)
   - [x] Zero-knowledge architecture - passwords never stored
 - [ ] **Access Control**
+  - [ ] View-only links with login
   - [ ] View-only passwords (separate from edit codes)
   - [ ] Expiration dates with automatic cleanup
   - [ ] Rate limiting and abuse protection

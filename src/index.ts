@@ -6,6 +6,7 @@ import { Paste, createStorage } from './storage';
 import { handleScheduled } from './cron';
 import { ModernMarkdownProcessor } from './markdown';
 import { ServerEncryption, EncryptedData } from './encryption';
+import { GUIDE_CONTENT } from './guide-content';
 import {
   deletePage,
   editPage,
@@ -128,6 +129,18 @@ function createSlug(text = '') {
 
 export default {
   async fetch(request: Request, env: CloudflareEnv, ctx: any): Promise<Response> {
+    const url = new URL(request.url);
+    
+    // First, try to serve static files from ASSETS
+    try {
+      const assetResponse = await env.ASSETS.fetch(request);
+      if (assetResponse.status !== 404) {
+        return assetResponse;
+      }
+    } catch (error) {
+      // If ASSETS.fetch fails, continue to application logic
+      console.log('Static file serving error:', error);
+    }
 
     const { MODE, DEMO_CLEAR_INTERVAL, KV } = getEnv(env);
     const storage = createStorage(KV);
@@ -142,14 +155,21 @@ export default {
     });
 
     app.get('/guide', async (req) => {
-      const guideMd = await fetch(new URL('/guide.md', req.url)).then(res => res.text());
-      const parse = createParser();
-      const { html, title } = await parse(guideMd);
+      try {
+        const parse = createParser();
+        const { html, title } = await parse(GUIDE_CONTENT);
 
-      return new Response(guidePage({ html, title, mode: MODE }), {
-        status: 200,
-        headers: { 'content-type': 'text/html' },
-      });
+        return new Response(guidePage({ html, title, mode: MODE }), {
+          status: 200,
+          headers: { 'content-type': 'text/html' },
+        });
+      } catch (error) {
+        console.error('Error loading guide:', error);
+        return new Response(errorPage(MODE), {
+          status: 404,
+          headers: { 'content-type': 'text/html' },
+        });
+      }
     });
 
     app.get('/:id', async (req, params) => {
