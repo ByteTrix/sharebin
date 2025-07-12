@@ -5,7 +5,8 @@
 - [x] Edit history and revisions
 - [x] fix spacing in between elements
 - [ ] Add Navbar
-- [ ] Authentication and user management 
+- [ ] Add Views count
+- [ ] Add Share button
 - [ ] Customizable paste expiration
 - [ ] show the language used in codeblock 
 - [ ] image render, embedded video preview
