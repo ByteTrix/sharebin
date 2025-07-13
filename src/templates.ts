@@ -4,6 +4,114 @@ const _if = (condition: unknown, template: string) => (
   condition ? template : ''
 );
 
+const ThemeToggle = () => `
+  <div class="theme-toggle-container">
+    <button id="themeToggle" class="theme-toggle" 
+            title="Toggle theme (Auto/Light/Dark)" 
+            aria-label="Toggle theme mode"
+            role="button">
+      <img class="theme-icon theme-auto" src="/icons/auto.png" alt="Auto theme" aria-hidden="true">
+      <img class="theme-icon theme-light" style="display: none;" src="/icons/light.png" alt="Light theme" aria-hidden="true">
+      <img class="theme-icon theme-dark" style="display: none;" src="/icons/dark.png" alt="Dark theme" aria-hidden="true">
+    </button>
+  </div>
+`;
+
+const Navbar = (currentPage = '') => `
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">
+        <div class="navbar-brand-icon">F</div>
+        <span>flrbin</span>
+      </a>
+      
+      <ul class="navbar-nav">
+        <li class="navbar-nav-item">
+          <a href="/" class="navbar-nav-link ${currentPage === 'home' ? 'active' : ''}">
+            <svg class="navbar-theme-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            New
+          </a>
+        </li>
+        <li class="navbar-nav-item">
+          <a href="/guide" class="navbar-nav-link ${currentPage === 'guide' ? 'active' : ''}">
+            <svg class="navbar-theme-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H19M18,17V16H6V17H18M15,15V14H6V15H15M18,13V12H6V13H18M18,11V10H6V11H18M18,9V8H6V9H18M18,7V6H6V7H18Z"/>
+            </svg>
+            Guide
+          </a>
+        </li>
+        <li class="navbar-nav-item">
+          <a href="/about" class="navbar-nav-link ${currentPage === 'about' ? 'active' : ''}">
+            <svg class="navbar-theme-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+            </svg>
+            About
+          </a>
+        </li>
+      </ul>
+      
+      <div class="navbar-actions">
+        <button id="navbarThemeToggle" class="navbar-theme-toggle" 
+                title="Toggle theme (Auto/Light/Dark)" 
+                aria-label="Toggle theme mode"
+                role="button">
+          <img class="navbar-theme-icon theme-auto" src="/icons/auto.png" alt="Auto theme" aria-hidden="true">
+          <img class="navbar-theme-icon theme-light" style="display: none;" src="/icons/light.png" alt="Light theme" aria-hidden="true">
+          <img class="navbar-theme-icon theme-dark" style="display: none;" src="/icons/dark.png" alt="Dark theme" aria-hidden="true">
+        </button>
+      </div>
+      
+      <button class="navbar-mobile-toggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="navbar-mobile-menu" id="navbarMobileMenu">
+      <ul class="navbar-mobile-nav">
+        <li class="navbar-nav-item">
+          <a href="/" class="navbar-nav-link ${currentPage === 'home' ? 'active' : ''}">
+            <svg class="navbar-theme-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12,2L2,7L12,12L22,7L12,2M2,17L12,22L22,17L12,12L2,17Z"/>
+            </svg>
+            New Paste
+          </a>
+        </li>
+        <li class="navbar-nav-item">
+          <a href="/guide" class="navbar-nav-link ${currentPage === 'guide' ? 'active' : ''}">
+            <svg class="navbar-theme-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H19M18,17V16H6V17H18M15,15V14H6V15H15M18,13V12H6V13H18M18,11V10H6V11H18M18,9V8H6V9H18M18,7V6H6V7H18Z"/>
+            </svg>
+            Guide
+          </a>
+        </li>
+        <li class="navbar-nav-item">
+          <a href="/about" class="navbar-nav-link ${currentPage === 'about' ? 'active' : ''}">
+            <svg class="navbar-theme-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+            </svg>
+            About
+          </a>
+        </li>
+      </ul>
+      <div class="navbar-mobile-actions">
+        <button id="navbarMobileThemeToggle" class="navbar-theme-toggle" 
+                title="Toggle theme (Auto/Light/Dark)" 
+                aria-label="Toggle theme mode"
+                role="button">
+          <svg class="navbar-theme-icon theme-auto" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C8.84,1 15.17,1 19.08,4.93C19.47,5.32 19.82,5.75 20.13,6.2C20.86,5.47 20.25,4.31 19.43,4.39C14.87,4.39 11.14,8.11 11.14,12.68C11.14,17.25 14.87,21 19.43,21C20.69,21 21.88,20.54 22.88,19.77C23.27,19.5 23.63,19.18 23.93,18.83C24.58,18.04 23.69,16.83 22.55,17.29C21.28,17.8 19.97,17.05 18.97,15.95Z"/>
+          </svg>
+          <span class="navbar-theme-label">Auto</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+`;
+
 const Tabs = () => `
   <input type="radio" name="tabs" id="tab1" class="tab-input" checked />
   <label class="tab" for="tab1">editor</label>
@@ -151,7 +259,7 @@ const Editor = (paste = '') => `
   </div>
 `;
 
-const layout = (title: string, content: string, mode?: string, showKeyboardHint?: boolean) => `
+const layout = (title: string, content: string, mode?: string, showKeyboardHint?: boolean, currentPage?: string, showNavbar = true) => `
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -171,25 +279,8 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
       ${title || 'flrbin'}
     </title>
   </head>
-  <body>
-    <!-- Professional Theme Switcher -->
-    <div class="theme-switcher">
-      <button id="themeToggle" class="theme-toggle-btn" 
-              title="Toggle theme (Auto/Light/Dark)" 
-              aria-label="Toggle theme mode"
-              role="button">
-        <svg class="theme-icon theme-auto" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20V4Z"/>
-        </svg>
-        <svg class="theme-icon theme-light" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z"/>
-        </svg>
-        <svg class="theme-icon theme-dark" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C7.79,7.9 8.75,10.87 10.95,13.06C13.14,15.26 16.1,16.22 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.4 6.35,17.41C9.37,20.43 14,20.54 17.33,17.97Z"/>
-        </svg>
-        <span class="theme-label" id="theme-label">Auto</span>
-      </button>
-    </div>
+  <body${showNavbar ? '' : ' class="no-navbar"'}>
+    ${showNavbar ? Navbar(currentPage) : ThemeToggle()}
 
     ${_if(mode === 'demo', `
       <div role="alert" class="demo-alert">
@@ -207,6 +298,7 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
         <div class="footer-links">
           <a href="/">new</a>
           <a href="/guide">guide</a>
+          <a href="/about">about</a>
           <a href="https://github.com/kvnlabs/flrbin">source</a>
         </div>
         ${_if(showKeyboardHint, `
@@ -217,64 +309,49 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
       </div>
     </footer>
     <script>
-      // Theme management with enhanced accessibility
-      const THEME_KEY = 'theme-mode';
+      // Advanced theme switcher for navbar
       const themes = ['auto', 'light', 'dark'];
-      const themeLabels = {
-        auto: 'Auto',
-        light: 'Light', 
-        dark: 'Dark'
-      };
+      const themeLabels = { auto: 'Auto', light: 'Light', dark: 'Dark' };
+      const themeStorageKey = 'navbar-theme';
+      let currentTheme = localStorage.getItem(themeStorageKey) || 'auto';
 
-      let currentTheme = localStorage.getItem(THEME_KEY) || 'auto';
-      
-      function updateTheme() {
-        const btn = document.getElementById('themeToggle');
-        const label = btn?.querySelector('.theme-label');
-        
-        // Update button state and accessibility
-        document.documentElement.setAttribute('data-theme-mode', currentTheme);
-        if (label) label.textContent = themeLabels[currentTheme];
-        if (btn) {
-          btn.setAttribute('aria-label', 'Current theme: ' + themeLabels[currentTheme] + '. Click to cycle to next theme.');
-          btn.title = 'Current: ' + themeLabels[currentTheme] + ' - Click to change theme';
-        }
-        
-        // Update syntax highlighting theme
-        const lightHighlight = document.querySelector('[data-theme-light]');
-        const darkHighlight = document.querySelector('[data-theme-dark]');
-        
-        // Apply actual theme
-        let isDark = false;
-        if (currentTheme === 'auto') {
-          // Use system preference
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          document.body.setAttribute('data-theme', prefersDark ? 'd' : 'l');
-          isDark = prefersDark;
+      function applyTheme(theme) {
+        if (theme === 'auto') {
+          document.body.removeAttribute('data-theme');
         } else {
-          document.body.setAttribute('data-theme', currentTheme === 'dark' ? 'd' : 'l');
-          isDark = currentTheme === 'dark';
+          document.body.setAttribute('data-theme', theme === 'light' ? 'l' : 'd');
         }
+      }
+
+      function updateThemeUI() {
+        const icons = {
+          auto: document.querySelectorAll('.theme-auto'),
+          light: document.querySelectorAll('.theme-light'),  
+          dark: document.querySelectorAll('.theme-dark')
+        };
         
-        // Update syntax highlighting media queries for manual theme switching
-        if (lightHighlight && darkHighlight) {
-          if (isDark) {
-            lightHighlight.media = 'not all';
-            darkHighlight.media = 'all';
-          } else {
-            lightHighlight.media = 'all';
-            darkHighlight.media = 'not all';
-          }
-        }
+        const labels = document.querySelectorAll('.navbar-theme-label');
+        
+        // Hide all icons
+        Object.values(icons).forEach(iconList => {
+          iconList.forEach(icon => icon.style.display = 'none');
+        });
+        
+        // Show current theme icon
+        icons[currentTheme].forEach(icon => icon.style.display = 'block');
+        
+        // Update labels
+        labels.forEach(label => label.textContent = themeLabels[currentTheme]);
       }
 
       function cycleTheme() {
         const currentIndex = themes.indexOf(currentTheme);
         currentTheme = themes[(currentIndex + 1) % themes.length];
-        localStorage.setItem(THEME_KEY, currentTheme);
-        updateTheme();
+        localStorage.setItem(themeStorageKey, currentTheme);
+        applyTheme(currentTheme);
+        updateThemeUI();
         
-        // Announce theme change for screen readers
+        // Announce to screen readers
         const announcement = document.createElement('div');
         announcement.setAttribute('aria-live', 'polite');
         announcement.setAttribute('aria-atomic', 'true');
@@ -284,33 +361,72 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
         setTimeout(() => document.body.removeChild(announcement), 1000);
       }
 
+      function toggleMobileMenu() {
+        const menu = document.getElementById('navbarMobileMenu');
+        menu.classList.toggle('open');
+      }
+
       // Initialize theme
-      updateTheme();
+      applyTheme(currentTheme);
+      updateThemeUI();
 
       // Listen for system theme changes when in auto mode
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
         if (currentTheme === 'auto') {
-          updateTheme();
+          applyTheme('auto');
         }
       });
 
-      // Add click and keyboard handlers
+      // Add click handlers when DOM is ready
       document.addEventListener('DOMContentLoaded', () => {
-        const btn = document.getElementById('themeToggle');
-        if (btn) {
-          btn.addEventListener('click', cycleTheme);
-          btn.addEventListener('keydown', (e) => {
+        // Desktop theme toggle
+        const desktopToggle = document.getElementById('navbarThemeToggle');
+        if (desktopToggle) {
+          desktopToggle.addEventListener('click', cycleTheme);
+          desktopToggle.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               cycleTheme();
             }
           });
         }
+
+        // Mobile theme toggle
+        const mobileToggle = document.getElementById('navbarMobileThemeToggle');
+        if (mobileToggle) {
+          mobileToggle.addEventListener('click', cycleTheme);
+          mobileToggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              cycleTheme();
+            }
+          });
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+          const menu = document.getElementById('navbarMobileMenu');
+          const toggle = document.querySelector('.navbar-mobile-toggle');
+          
+          if (menu && menu.classList.contains('open') && 
+              !menu.contains(e.target) && 
+              !toggle.contains(e.target)) {
+            menu.classList.remove('open');
+          }
+        });
+
+        // Close mobile menu when clicking on nav links
+        document.querySelectorAll('.navbar-mobile-nav .navbar-nav-link').forEach(link => {
+          link.addEventListener('click', () => {
+            document.getElementById('navbarMobileMenu').classList.remove('open');
+          });
+        });
       });
     </script>
     <script src="/nacl.min.js"></script>
     <script src="/nacl-util.min.js"></script>
     <script src="/crypto.js"></script>
+    <script src="/theme-switch.js"></script>
   </body>
   </html>
 `;
@@ -395,7 +511,7 @@ export const homePage = ({
   <script src="/cm-sublime.min.js"></script>
   <script src="/editor.js"></script>
   <script src="/encryption-ui.js"></script>
-`, mode, true);
+`, mode, true, 'home');
 
 import { PasteRevision } from './storage';
 
@@ -413,19 +529,19 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
           <div class="action-menu" id="actionMenu" style="display: none;">
             <a href="/${id}/edit" class="menu-item">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
               </svg>
               Edit
             </a>
             <a href="/${id}/raw" class="menu-item">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M5,3C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19H5V5H12V3H5Z"/>
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
               </svg>
               View Raw
             </a>
             <button class="menu-item" onclick="copyToClipboard('${id}')">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5Z"/>
+                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
               </svg>
               Copy ID
             </button>
@@ -641,7 +757,7 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
         copyBtn.title = 'Copy code';
         copyBtn.innerHTML = \`
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5Z"/>
+            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
           </svg>
         \`;
         
@@ -658,7 +774,7 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
           setTimeout(() => {
             copyBtn.innerHTML = \`
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5Z"/>
+                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
               </svg>
             \`;
           }, 2000);
@@ -903,7 +1019,7 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
       }
     });
   </script>
-`, mode);
+`, mode, false, 'paste', false);
 
 export const guidePage = ({ html = '', title = '', mode = '' } = {}) => layout(title, `
   <main>
@@ -911,7 +1027,7 @@ export const guidePage = ({ html = '', title = '', mode = '' } = {}) => layout(t
       ${html}
     </div>
   </main>
-`, mode);
+`, mode, false, 'guide');
 
 export const editPage = (
   { id = '', paste = '', hasEditCode = false, errors = { editCode: '' }, mode = '' } = {},
@@ -956,7 +1072,7 @@ export const editPage = (
   <script src="/cm-sublime.min.js"></script>
   <script src="/editor.js"></script>
   <script src="/encryption-ui.js"></script>
-`, mode, true);
+`, mode, true, 'edit');
 
 export const deletePage = (
   { id = '', hasEditCode = false, errors = { editCode: '' }, mode = '' } = {}
@@ -999,14 +1115,14 @@ export const deletePage = (
       </div>
     </form>
   </main>
-`, mode);
+`, mode, false, 'delete');
 
 export const errorPage = (mode = '') => layout('404', `
   <main>
     <h1>404</h1>
     <p>That paste doesn't exist! Maybe it was deleted?</p>
   </main>
-`, mode);
+`, mode, false, 'error');
 
 export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => layout(`🔒 Encrypted Paste - ${id}`, `
   <main>
@@ -1090,4 +1206,93 @@ export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => l
       line-height: 1.4;
     }
   </style>
-`, mode);
+`, mode, false, 'decrypt');
+
+export const aboutPage = ({ mode = '' } = {}) => layout('About - flrbin', `
+  <main>
+    <div class="content-wrapper">
+      <h1>About flrbin</h1>
+      
+      <div class="about-section">
+        <h2>What is flrbin?</h2>
+        <p>flrbin is a modern, minimalist pastebin service built for sharing text and code snippets quickly and securely. It features a clean, responsive design with dark and light themes to match your preference.</p>
+      </div>
+
+      <div class="about-section">
+        <h2>Features</h2>
+        <ul>
+          <li><strong>Fast & Simple:</strong> Create and share pastes in seconds with our intuitive editor</li>
+          <li><strong>Code Highlighting:</strong> Syntax highlighting for multiple programming languages</li>
+          <li><strong>Encryption:</strong> Optional client-side encryption for sensitive content</li>
+          <li><strong>Responsive Design:</strong> Works beautifully on desktop, tablet, and mobile</li>
+          <li><strong>Theme Support:</strong> Auto, light, and dark themes to suit your environment</li>
+          <li><strong>Version History:</strong> Track changes with built-in revision support</li>
+          <li><strong>Markdown Support:</strong> Rich text formatting with markdown rendering</li>
+        </ul>
+      </div>
+
+      <div class="about-section">
+        <h2>Privacy & Security</h2>
+        <p>Your privacy matters to us. flrbin offers client-side encryption for sensitive pastes, ensuring that only you and those you share the password with can access your content. Regular pastes are stored securely and can be deleted at any time.</p>
+      </div>
+
+      <div class="about-section">
+        <h2>Open Source</h2>
+        <p>flrbin is built with modern web technologies and runs on Cloudflare Workers for global performance and reliability. The project is designed to be fast, secure, and user-friendly.</p>
+      </div>
+
+      <div class="about-actions">
+        <a href="/" class="btn">Create New Paste</a>
+        <a href="/guide" class="btn btn-secondary">View Guide</a>
+      </div>
+    </div>
+  </main>
+
+  <style>
+    .about-section {
+      margin-bottom: 2rem;
+    }
+
+    .about-section h2 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+
+    .about-section p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .about-section ul {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      padding-left: 1.5rem;
+    }
+
+    .about-section li {
+      margin-bottom: 0.5rem;
+    }
+
+    .about-section li strong {
+      color: var(--text-primary);
+    }
+
+    .about-actions {
+      margin-top: 3rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-secondary {
+      background: var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-secondary);
+    }
+  </style>
+`, mode, false, 'about');

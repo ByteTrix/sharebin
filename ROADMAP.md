@@ -1,12 +1,15 @@
 # flrbin Roadmap
+## Fix
+- [ ] history page 
 
 ## Core Features
 - [x] Cloudflare Worker and KV storage
 - [x] Edit history and revisions
 - [x] fix spacing in between elements
-- [ ] Add Navbar
+- [x] Add Navbar
 - [ ] Add Views count
-- [ ] Add Share button
+- [ ] Add Share, raw copy, download buttons in menu
+- [ ] No Editing after publishing option
 - [ ] Customizable paste expiration
 - [ ] show the language used in codeblock 
 - [ ] image render, embedded video preview

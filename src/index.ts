@@ -8,6 +8,7 @@ import { ModernMarkdownProcessor } from './markdown';
 import { ServerEncryption, EncryptedData } from './encryption';
 import { GUIDE_CONTENT } from './guide-content';
 import {
+  aboutPage,
   deletePage,
   editPage,
   errorPage,
@@ -170,6 +171,13 @@ export default {
           headers: { 'content-type': 'text/html' },
         });
       }
+    });
+
+    app.get('/about', () => {
+      return new Response(aboutPage({ mode: MODE }), {
+        status: 200,
+        headers: { 'content-type': 'text/html' },
+      });
     });
 
     app.get('/:id', async (req, params) => {
