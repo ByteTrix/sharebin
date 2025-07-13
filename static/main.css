@@ -727,8 +727,8 @@ input:focus::placeholder {
 
 /* Fix theme toggle icon sizing for paste pages */
 .theme-toggle-container .theme-toggle {
-    width: 3rem;
-    height: 3rem;
+    width: 2.7rem;
+    height: 2.7rem;
     padding: 0.5rem;
 }
 
@@ -1023,8 +1023,8 @@ del, s {
     gap: var(--spacing-1);
     font-size: var(--font-2-size);
     font-weight: 500;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.6rem;
+    height: 2.6rem;
     justify-content: center;
 }
 
