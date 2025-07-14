@@ -7,10 +7,9 @@
 - [x] Edit history and revisions
 - [x] fix spacing in between elements
 - [x] Add Navbar
-- [ ] Add Views count
+- [x] Add Views count
+- [x] Customizable paste expiration
 - [ ] Add Share, raw copy, download buttons in menu
-- [ ] No Editing after publishing option
-- [ ] Customizable paste expiration
 - [ ] show the language used in codeblock 
 - [ ] image render, embedded video preview
 - [ ] Proper Keyboard Shortcuts
@@ -37,9 +36,9 @@
   - [x] Secure key derivation using PBKDF2 (100,000 iterations)
   - [x] Zero-knowledge architecture - passwords never stored
 - [ ] **Access Control**
-  - [ ] View-only links with login
-  - [ ] View-only passwords (separate from edit codes)
-  - [ ] Expiration dates with automatic cleanup
+  - [x] View-only links with login
+  - [x] View-only passwords (separate from edit codes)
+  - [x] Expiration dates with automatic cleanup
   - [ ] Rate limiting and abuse protection
   - [ ] IP-based access restrictions
 
@@ -48,23 +47,18 @@
   - [x] Enhanced CodeMirror with keyboard shortcuts
   - [x] Visual toolbar for common formatting
   - [x] Live preview with real-time updates
-  - [ ] Block-based editing with drag & drop
-  - [ ] Slash commands for quick formatting
 - [ ] **Enhanced Preview**
   - [x] Real-time markdown rendering
   - [x] Support for all new features
-  - [ ] Website-like rendering with custom themes
-  - [ ] Print-friendly layouts
   - [ ] PDF export capabilities
   - [ ] Social media preview cards
 
 ### 🎨 Modern UI/UX
-- [ ] **Design System**
+- [x] **Design System**
   - [x] Enhanced CSS with better typography and spacing
   - [x] Improved dark/light theme support
   - [x] Modern component styling
   - [x] Consistent design language
-  - [ ] Accessibility compliance (WCAG 2.1)
 - [x] **Typography & Fonts**
   - [x] Improved font stacks and typography scales
   - [x] Better reading experience
@@ -73,11 +67,7 @@
 ### 🏗️ Infrastructure
 - [ ] **Self-hosting Options**
   - [ ] Docker Compose setup
-  - [ ] Kubernetes manifests
-  - [ ] SQLite + file storage backend
-  - [ ] PostgreSQL option for larger deployments
 - [ ] **Performance**
   - [ ] CDN integration for global speed
-  - [ ] Image optimization and hosting
   - [ ] Lazy loading for large documents
   - [ ] Service workers for offline functionality

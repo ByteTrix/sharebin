@@ -2,7 +2,7 @@ export interface CloudflareEnv {
   MODE: string;
   DEMO_CLEAR_INTERVAL: string;
   KV: KVNamespace;
-  ASSETS: Fetcher;
+  ASSETS?: Fetcher;
 }
 
 export const getEnv = (env: CloudflareEnv) => ({

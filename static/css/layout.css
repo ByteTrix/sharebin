@@ -1,0 +1,482 @@
+/* ====================================
+   LAYOUT STYLES
+   Containers, Grid Systems, Spacing
+   ==================================== */
+
+/* Main Layout Containers */
+main, footer, .demo-alert {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    width: 100%;
+}
+
+main {
+    flex: 1; /* Allow main to grow and push footer to bottom */
+}
+
+/* Special styling for paste document pages */
+body:has(.paste-document) main {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+/* Notion-like container styling */
+.notion-container {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* New Layout - Tabs + Content + Sidebar */
+.new-layout {
+    display: flex;
+    gap: var(--spacing-6);
+    min-height: 80vh; /* More reasonable height */
+}
+
+.main-content {
+    flex: 1;
+    min-width: 0; /* Allow shrinking */
+}
+
+.sidebar-panel {
+    width: 280px;
+    flex-shrink: 0;
+    background: var(--faint-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.options-section {
+    background: var(--bg-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--spacing-3);
+}
+
+.options-content {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: var(--spacing-3);
+    background: var(--faint-bg-color);
+}
+
+.sidebar-actions {
+    padding: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-color);
+}
+
+/* GitHub-style Layout - Professional Width */
+.github-layout {
+    display: flex;
+    gap: 1.5rem;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 1rem;
+    min-height: 72vh; /* Reduced from calc(100vh - 140px) to 60vh */
+}
+
+/* Main Content Area - Larger */
+.main-content {
+    flex: 1;
+    min-width: 0;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    min-height: 800px; /* Increased minimum height */
+}
+
+/* Content Container - Fixed Large Heights */
+.main-content {
+    height: 600px;
+    min-height: 600px;
+}
+
+.editor-content {
+    position: relative;
+    height: 500px;
+    min-height: 500px;
+}
+
+/* When navbar is present, keep same fixed heights */
+body:has(.new-navbar) .main-content {
+    height: 600px;
+    min-height: 600px;
+}
+
+body:has(.new-navbar) .editor-content {
+    height: 500px;
+    min-height: 500px;
+}
+
+/* Adjust github layout for new navbar */
+body:has(.new-navbar) .github-layout {
+    padding-top: 0;
+}
+
+/* Tab Content Areas */
+.tab-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    overflow: auto;
+    background: var(--bg-color);
+    z-index: 1;
+}
+
+.tab-content.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 10;
+}
+
+/* Right Sidebar - Compact */
+.sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    height: fit-content;
+}
+
+.sidebar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+/* Container for Floating Elements */
+.floating-actions {
+    position: fixed;
+    top: 4.5rem;
+    right: 1rem;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* New Paste Button */
+.new-paste-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--link-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    min-width: 140px;
+    justify-content: center;
+}
+
+.new-paste-btn:hover {
+    background: var(--link-hover-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.new-paste-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(91, 78, 150, 0.3);
+}
+
+.new-paste-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Theme Toggle Containers */
+.dark-mode-container,
+.theme-switcher {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 0;
+    z-index: 1200; /* Higher than floating actions */
+}
+
+.theme-toggle-container {
+    position: fixed;
+    top: var(--spacing-4);
+    right: var(--spacing-4);
+    z-index: 1000;
+}
+
+/* Footer Layout */
+footer {
+    margin-top: 0.5rem; /* Add back some margin but keep it small */
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer-links {
+    display: flex;
+    flex-direction: row;
+    gap: var(--spacing-4);
+    justify-content: center;
+}
+
+.footer-info {
+    text-align: center;
+    color: var(--faint-color);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.footer-info span {
+    display: inline-block;
+}
+
+.footer-info a {
+    color: var(--link-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.footer-info a:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+}
+
+.footer-info strong {
+    color: var(--color);
+    font-weight: 600;
+}
+
+/* Remove body padding since navbar is now sticky */
+body:has(.new-navbar) {
+    padding-top: 0;
+}
+
+/* Add gap below navbar */
+.new-navbar + * {
+    margin-top: 1rem;
+}
+
+/* Revision Panel Layout */
+.revision-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 300px;
+    background: var(--dark-bg-color);
+    border-left: 1px solid var(--border-color);
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-out;
+}
+
+.revision-panel.show {
+    transform: translateX(0);
+}
+
+.revision-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-color);
+    flex-shrink: 0;
+}
+
+.revision-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem 1.5rem;
+}
+
+/* Adjust main content when revision panel is open */
+body.revision-panel-open .paste-main {
+    margin-right: 300px;
+    transition: margin-right 0.3s ease-out;
+}
+
+/* Notification Container Layout */
+#notification-container {
+    position: fixed;
+    top: 7.5rem;
+    right: 1rem;
+    z-index: 1050;
+}
+
+/* Focus Mode Layout Overrides */
+.focus-mode {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    background: var(--bg-color);
+}
+
+.focus-mode .new-navbar {
+    display: none;
+}
+
+.focus-mode .theme-toggle-container {
+    display: none;
+}
+
+.focus-mode main {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    background: var(--bg-color);
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    max-width: none;
+}
+
+.focus-mode #editor-form {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    max-width: none;
+}
+
+.focus-mode .github-layout {
+    height: 100vh;
+    width: 100vw;
+    padding: 0;
+    margin: 0;
+    max-width: none;
+    gap: 0;
+}
+
+.focus-mode .main-content {
+    height: 100vh;
+    width: 100%;
+    max-width: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.focus-mode .sidebar {
+    display: none;
+}
+
+.focus-mode .editor-header {
+    position: sticky;
+    top: 0;
+    z-index: 11;
+    background: var(--bg-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.focus-mode .editor-content {
+    height: calc(100vh - 70px) !important;
+    min-height: auto !important;
+    flex: 1;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+.focus-mode .tab-content {
+    height: 100%;
+    padding: 1rem;
+    margin: 0;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.focus-mode .CodeMirror {
+    height: calc(100vh - 70px) !important;
+    width: 100% !important;
+    font-size: 14px;
+}
+
+.focus-mode .CodeMirror-scroll {
+    height: calc(100vh - 70px) !important;
+    overflow-y: auto !important;
+}
+
+.focus-mode footer {
+    display: none;
+}
+
+/* Ensure all containers lose their width constraints in focus mode */
+.focus-mode * {
+    max-width: none !important;
+}
+
+/* Paste Page Layout */
+.paste-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+    position: relative;
+}
+
+.paste-document {
+    background: var(--bg-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    margin-top: 10rem;
+}
+
+/* Preserve newlines in document content */
+.document-content {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.6;
+}
+
+/* Utility Classes */
+.hidden-file-input {
+    display: none;
+}

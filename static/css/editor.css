@@ -1,0 +1,434 @@
+/* ====================================
+   EDITOR STYLES
+   CodeMirror, Preview, Editor Components
+   ==================================== */
+
+/* Tab Logic for Editor/Preview Toggle */
+#tab1:checked ~ .main-content #editor-container,
+#tab1:checked ~ #editor-container {
+    display: block;
+}
+
+#tab1:checked ~ .main-content #preview-container,
+#tab1:checked ~ #preview-container {
+    display: none;
+}
+
+#tab2:checked ~ .main-content #editor-container,
+#tab2:checked ~ #editor-container {
+    display: none;
+}
+
+#tab2:checked ~ .main-content #preview-container,
+#tab2:checked ~ #preview-container {
+    display: block;
+}
+
+/* Editor Container */
+#editor-container {
+    position: relative;
+    min-height: 500px;
+    width: 100%;
+}
+
+#editor {
+    min-height: 500px;
+    width: 100%;
+}
+
+/* CodeMirror Base Styles */
+.CodeMirror {
+    height: auto;
+    min-height: 500px;
+    font-family: var(--monospace);
+    font-size: var(--font-3-size);
+    line-height: 1.5;
+    border: none;
+    border-radius: 0.375rem;
+    background-color: var(--bg-color);
+    color: var(--color);
+    box-shadow: none;
+}
+
+.CodeMirror-focused {
+    border: none;
+    box-shadow: none;
+    outline: none;
+}
+
+.CodeMirror-scroll {
+    min-height: 300px;
+    padding: var(--spacing-3);
+    background-color: var(--bg-color);
+    max-height: 500px;
+    overflow-y: auto !important;
+}
+
+.CodeMirror-gutters {
+    background-color: transparent !important;
+    background: none !important;
+    border-right: none !important;
+    padding-right: var(--spacing-2);
+    border-radius: 0.375rem 0 0 0.375rem;
+    display: none !important;
+}
+
+.CodeMirror-linenumber {
+    color: var(--faint-color);
+    font-size: var(--font-1-size);
+    padding-right: var(--spacing-2);
+    padding-left: var(--spacing-2);
+    text-align: right;
+    min-width: 32px;
+    font-family: var(--monospace);
+    background: none !important;
+}
+
+.CodeMirror-cursor {
+    border-left: 2px solid var(--color);
+}
+
+.CodeMirror-selected {
+    background-color: var(--focus-color);
+    opacity: 0.3;
+}
+
+/* CodeMirror Syntax Highlighting */
+.cm-header { 
+    color: var(--link-color); 
+    font-weight: bold; 
+}
+
+.cm-strong { 
+    color: var(--color); 
+    font-weight: bold; 
+}
+
+.cm-em { 
+    color: var(--color); 
+    font-style: italic; 
+}
+
+.cm-link { 
+    color: var(--link-color); 
+}
+
+.cm-code { 
+    color: var(--faint-color);
+    background-color: var(--code-bg-color);
+    padding: 1px 3px;
+    border-radius: 2px;
+}
+
+.cm-quote { 
+    color: var(--faint-color); 
+    font-style: italic; 
+}
+
+.cm-keyword { 
+    color: var(--link-color); 
+}
+
+.cm-atom { 
+    color: var(--link-hover-color); 
+}
+
+.cm-number { 
+    color: var(--link-hover-color); 
+}
+
+.cm-def { 
+    color: var(--color); 
+}
+
+.cm-variable { 
+    color: var(--color); 
+}
+
+.cm-punctuation { 
+    color: var(--faint-color); 
+}
+
+.cm-property { 
+    color: var(--color); 
+}
+
+.cm-operator { 
+    color: var(--faint-color); 
+}
+
+.cm-variable-2 { 
+    color: var(--color); 
+}
+
+.cm-variable-3 { 
+    color: var(--color); 
+}
+
+.cm-comment { 
+    color: var(--faint-color); 
+    font-style: italic; 
+}
+
+.cm-string { 
+    color: var(--link-hover-color); 
+}
+
+.cm-string-2 { 
+    color: var(--link-hover-color); 
+}
+
+.cm-meta { 
+    color: var(--faint-color); 
+}
+
+.cm-qualifier { 
+    color: var(--faint-color); 
+}
+
+.cm-builtin { 
+    color: var(--link-color); 
+}
+
+.cm-bracket { 
+    color: var(--faint-color); 
+}
+
+.cm-tag { 
+    color: var(--link-color); 
+}
+
+.cm-attribute { 
+    color: var(--color); 
+}
+
+/* Enhanced CodeMirror Integration */
+#editor-container #editor {
+    height: 100%;
+    border: none;
+    font-family: var(--monospace);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+#editor-container #editor .CodeMirror {
+    height: 100%;
+    background: var(--bg-color);
+    color: var(--color);
+    border: none;
+    padding: 0;
+    font-family: var(--monospace);
+    font-size: 12px;
+}
+
+#editor-container #editor .CodeMirror-lines {
+    padding: 1.5rem;
+}
+
+#editor-container #editor .CodeMirror-gutters {
+    background: var(--faint-bg-color);
+    border-right: 1px solid var(--border-color);
+}
+
+#editor-container #editor .CodeMirror-linenumber {
+    color: var(--faint-color);
+    padding: 0 0.5rem;
+    font-size: 11px;
+}
+
+#editor-container #editor .CodeMirror-cursor {
+    border-left: 2px solid var(--link-color);
+}
+
+#editor-container #editor .CodeMirror-selected {
+    background: rgba(91, 78, 150, 0.2);
+}
+
+/* Preview Container Styles */
+#preview-container {
+    flex: 1;
+    padding: var(--spacing-4);
+    overflow-y: auto;
+    font-family: var(--sans-serif);
+    line-height: 1.6;
+    color: var(--color);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background-color: var(--bg-color);
+    min-height: 300px;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    max-height: 600px;
+}
+
+/* Preview container should match editor height */
+#preview-container {
+    height: 500px;
+    min-height: 500px;
+}
+
+.preview-placeholder {
+    color: var(--faint-color);
+    font-style: italic;
+    text-align: center;
+    padding: var(--spacing-6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 0.9rem;
+}
+
+/* Consistent content styling between preview and viewer */
+#preview-container p,
+.document-content p {
+    margin: 1rem 0;
+    line-height: 1.7;
+}
+
+#preview-container * {
+    max-width: 100%;
+}
+
+/* Enhanced Preview Content Styling */
+#preview-container.document-content {
+    padding: 1rem;
+    overflow-y: auto;
+    height: 100%;
+}
+
+#preview-container h1,
+#preview-container h2,
+#preview-container h3,
+#preview-container h4,
+#preview-container h5,
+#preview-container h6 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+    color: var(--color);
+}
+
+#preview-container h1 {
+    font-size: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+#preview-container h2 {
+    font-size: 1.5rem;
+}
+
+#preview-container h3 {
+    font-size: 1.25rem;
+}
+
+#preview-container p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+#preview-container pre {
+    background: var(--code-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+#preview-container code {
+    background: var(--code-bg-color);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+    font-family: var(--monospace);
+}
+
+#preview-container pre code {
+    background: none;
+    padding: 0;
+}
+
+#preview-container blockquote {
+    margin: 1rem 0;
+    padding: 0 1rem;
+    border-left: 4px solid var(--link-color);
+    color: var(--faint-color);
+    font-style: italic;
+}
+
+#preview-container ul,
+#preview-container ol {
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+#preview-container li {
+    margin: 0.5rem 0;
+}
+
+#preview-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+#preview-container th,
+#preview-container td {
+    border: 1px solid var(--border-color);
+    padding: 0.75rem;
+    text-align: left;
+}
+
+#preview-container th {
+    background: var(--faint-bg-color);
+    font-weight: 600;
+}
+
+/* Expiry Options for Editor */
+.expiry-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Password Field for Editor */
+.password-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.password-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.password-input-container {
+    margin-top: 0.3rem;
+}
+
+/* Focus Mode Editor Styles */
+.focus-mode .editor-header {
+    padding: 0.75rem 1rem;
+    background: var(--faint-bg-color);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+    width: 100%;
+}
+
+.focus-mode #editor {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.focus-mode .CodeMirror {
+    height: 100% !important;
+    border: none;
+    border-radius: 0;
+    width: 100%;
+}

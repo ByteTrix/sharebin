@@ -14,6 +14,8 @@ import {
   errorPage,
   guidePage,
   homePage,
+  noteCreatedPage,
+  oneTimeViewWarningPage,
   pastePage,
   passwordPromptPage,
 } from './templates';
@@ -132,15 +134,17 @@ export default {
   async fetch(request: Request, env: CloudflareEnv, ctx: any): Promise<Response> {
     const url = new URL(request.url);
     
-    // First, try to serve static files from ASSETS
-    try {
-      const assetResponse = await env.ASSETS.fetch(request);
-      if (assetResponse.status !== 404) {
-        return assetResponse;
+    // First, try to serve static files from ASSETS (if available)
+    if (env.ASSETS) {
+      try {
+        const assetResponse = await env.ASSETS.fetch(request);
+        if (assetResponse.status !== 404) {
+          return assetResponse;
+        }
+      } catch (error) {
+        // If ASSETS.fetch fails, continue to application logic
+        console.log('Static file serving error:', error);
       }
-    } catch (error) {
-      // If ASSETS.fetch fails, continue to application logic
-      console.log('Static file serving error:', error);
     }
 
     const { MODE, DEMO_CLEAR_INTERVAL, KV } = getEnv(env);
@@ -180,16 +184,49 @@ export default {
       });
     });
 
+    app.get('/created/:id', async (req, params) => {
+      const id = params.id as string ?? '';
+      const url = new URL(req.url);
+      const fullUrl = `${url.protocol}//${url.host}/${id}`;
+      
+      // Verify that the note exists
+      const res = await storage.get(id);
+      if (res.value === null) {
+        return new Response(errorPage(MODE), {
+          status: 404,
+          headers: { 'content-type': 'text/html' },
+        });
+      }
+
+      return new Response(noteCreatedPage({ id, url: fullUrl, mode: MODE }), {
+        status: 200,
+        headers: { 'content-type': 'text/html' },
+      });
+    });
+
     app.get('/:id', async (req, params) => {
       let contents = '';
       let status = 200;
       const id = params.id as string ?? '';
-      const res = await storage.get(id);
+      const url = new URL(req.url);
+      const confirmView = url.searchParams.get('confirm') === 'true';
+      
+      // First check if paste exists without consuming it
+      const res = await storage.get(id, false);
 
       if (res.value !== null) {
-        const { paste, isEncrypted } = res.value;
+        const { paste, isEncrypted, oneTimeView } = res.value;
         
-        // Check if this is an encrypted paste that needs password
+        // Show warning page for one-time view content unless confirmed
+        if (oneTimeView && !confirmView) {
+          contents = oneTimeViewWarningPage({ id, mode: MODE });
+          return new Response(contents, {
+            status: 200,
+            headers: { 'content-type': 'text/html' },
+          });
+        }
+        
+        // Check if this is an encrypted paste that needs password BEFORE consuming it
         if (isEncrypted) {
           // Check if user has provided password in cookie
           const cookies = req.headers.get('cookie') || '';
@@ -205,52 +242,84 @@ export default {
               headers: { 'content-type': 'text/html' },
             });
           }
-          
-          const sessionPassword = sessionCookie.split('=')[1];
-          
-          // Try to decrypt with session password
-          try {
-            if (ServerEncryption.isEncryptedData(JSON.parse(paste))) {
-              const encryptedData = JSON.parse(paste) as EncryptedData;
-              const decryptedPaste = await ServerEncryption.decrypt(encryptedData, sessionPassword);
-              
-              const parse = createParser();
-              let { html, title } = await parse(decryptedPaste);
-              html = xss(html, XSS_OPTIONS);
-              if (!title) title = id;
-
-              const revisions = await storage.getRevisions(id);
-              contents = pastePage({ id, html, title, mode: MODE, revisions, isEncrypted: true });
-            } else {
-              throw new Error('Invalid encrypted data format');
-            }
-          } catch (error) {
-            // Invalid password, show prompt again
-            contents = passwordPromptPage({ id, mode: MODE, error: 'Invalid password' });
-            return new Response(contents, {
-              status: 200,
-              headers: { 'content-type': 'text/html' },
-            });
-          }
-        } else {
-          // Regular unencrypted paste
-          const parse = createParser();
-          let { html, title } = await parse(paste);
-          html = xss(html, XSS_OPTIONS);
-          if (!title) title = id;
-
-          const revisions = await storage.getRevisions(id);
-          contents = pastePage({ 
-            id, 
-            html, 
-            title, 
-            mode: MODE, 
-            revisions, 
-            isEncrypted: false
-          });
         }
         
-        status = 200;
+        // Now consume the paste (for one-time view)
+        const finalRes = await storage.get(id, true);
+        if (finalRes.value === null) {
+          contents = errorPage(MODE);
+          status = 404;
+        } else {
+          const finalPaste = finalRes.value;
+          
+          // Check if this is an encrypted paste that needs password
+          if (finalPaste.isEncrypted) {
+            // Check if user has provided password in cookie
+            const cookies = req.headers.get('cookie') || '';
+            const sessionCookie = cookies
+              .split(';')
+              .find(c => c.trim().startsWith(`decrypt-session-${id}=`));
+            
+            if (!sessionCookie) {
+              // Show password prompt
+              contents = passwordPromptPage({ id, mode: MODE });
+              return new Response(contents, {
+                status: 200,
+                headers: { 'content-type': 'text/html' },
+              });
+            }
+            
+            const sessionPassword = decodeURIComponent(sessionCookie.split('=')[1]);
+            
+            // Try to decrypt with session password
+            try {
+              if (ServerEncryption.isEncryptedData(JSON.parse(finalPaste.paste))) {
+                const encryptedData = JSON.parse(finalPaste.paste) as EncryptedData;
+                const decryptedPaste = await ServerEncryption.decrypt(encryptedData, sessionPassword);
+                
+                const parse = createParser();
+                let { html, title } = await parse(decryptedPaste);
+                html = xss(html, XSS_OPTIONS);
+                if (!title) title = id;
+
+                const revisions = await storage.getRevisions(id);
+                const attachments = finalPaste.attachments || [];
+                console.log('Displaying encrypted paste with attachments:', attachments.length);
+                contents = pastePage({ id, html, title, mode: MODE, revisions, isEncrypted: true, attachments });
+              } else {
+                throw new Error('Invalid encrypted data format');
+              }
+            } catch (error) {
+              // Invalid password, show prompt again
+              contents = passwordPromptPage({ id, mode: MODE, error: 'Invalid password' });
+              return new Response(contents, {
+                status: 200,
+                headers: { 'content-type': 'text/html' },
+              });
+            }
+          } else {
+            // Regular unencrypted paste
+            const parse = createParser();
+            let { html, title } = await parse(finalPaste.paste);
+            html = xss(html, XSS_OPTIONS);
+            if (!title) title = id;
+
+            const revisions = await storage.getRevisions(id);
+            const attachments = finalPaste.attachments || [];
+            console.log('Displaying unencrypted paste with attachments:', attachments.length);
+            contents = pastePage({
+              id,
+              html,
+              title,
+              mode: MODE,
+              revisions,
+              isEncrypted: false,
+              attachments
+            });
+          }
+          
+          status = 200;
+        }
       } else {
         contents = errorPage(MODE);
         status = 404;
@@ -304,7 +373,7 @@ export default {
               .find(c => c.trim().startsWith(`decrypt-session-${id}=`));
             
             if (sessionCookie) {
-              const sessionPassword = sessionCookie.split('=')[1];
+              const sessionPassword = decodeURIComponent(sessionCookie.split('=')[1]);
               try {
                 const encryptedData = JSON.parse(pasteContent) as EncryptedData;
                 pasteContent = await ServerEncryption.decrypt(encryptedData, sessionPassword);
@@ -330,7 +399,9 @@ export default {
       }
 
       if (status !== 404) {
-        contents = editPage({ id, paste: pasteContent, hasEditCode, mode: MODE });
+        const res = await storage.get(id);
+        const existingAttachments = res.value?.attachments || [];
+        contents = editPage({ id, paste: pasteContent, hasEditCode, mode: MODE, existingAttachments });
       }
 
       return new Response(contents, {
@@ -446,24 +517,88 @@ export default {
       const customUrl = form.get('url') as string;
       let paste = form.get('paste') as string;
       const slug = createSlug(customUrl);
-      const enableEncryption = form.get('enableEncryption') === 'on';
       const encryptionPassword = form.get('encryptionPassword') as string;
+      const enableEncryption = encryptionPassword && encryptionPassword.trim().length > 0;
+      const enableOneTimeView = form.get('enableOneTimeView') === 'on';
+      const expiryTimestamp = form.get('expiryTimestamp') as string;
+      const customExpiryDate = form.get('customExpiryDate') as string;
 
       let editCode: string | undefined = form.get('editcode') as string;
       if (typeof editCode === 'string') {
         editCode = editCode.trim() || undefined;
       }
 
+      // Handle file attachments
+      const attachments: any[] = [];
+      const fileAttachments = form.getAll('fileAttachment') as File[];
+      
+      console.log('File attachments check:', {
+        count: fileAttachments.length,
+        files: fileAttachments.map(f => ({ name: f.name, size: f.size, type: f.type }))
+      });
+      
+      for (const fileAttachment of fileAttachments) {
+        if (fileAttachment && fileAttachment.size > 0 && fileAttachment.name) {
+          const attachmentId = generateId();
+          const fileBuffer = await fileAttachment.arrayBuffer();
+          
+          console.log('Processing attachment:', { attachmentId, name: fileAttachment.name, bufferSize: fileBuffer.byteLength });
+          
+          // Store the file in KV
+          await storage.storeAttachment(attachmentId, fileBuffer);
+          
+          // Add attachment info
+          attachments.push({
+            id: attachmentId,
+            originalName: fileAttachment.name,
+            size: fileAttachment.size,
+            type: fileAttachment.type,
+            uploadTimestamp: Date.now(),
+          });
+          
+          console.log('Attachment stored:', attachments[attachments.length - 1]);
+        }
+      }
+      
+      console.log('Final attachments array:', attachments);
+
+      // Calculate expiry time
+      let expiryTime: number | undefined;
+      
+      if (expiryTimestamp) {
+        expiryTime = parseInt(expiryTimestamp, 10);
+        if (isNaN(expiryTime) || expiryTime <= Date.now()) {
+          expiryTime = undefined;
+        }
+      } else if (customExpiryDate) {
+        // Handle custom date format from datetime-local input
+        const customDate = new Date(customExpiryDate);
+        if (customDate.getTime() > Date.now()) {
+          expiryTime = customDate.getTime();
+        }
+      }
+      
+      console.log('Expiry processing:', {
+        expiryTimestamp,
+        customExpiryDate,
+        calculatedExpiryTime: expiryTime,
+        now: Date.now()
+      });
+
       // Handle encryption
       let isEncrypted = false;
       
-      if (enableEncryption && encryptionPassword) {
+      console.log('Encryption check:', { enableEncryption, encryptionPassword: !!encryptionPassword });
+      
+      if (enableEncryption && encryptionPassword && encryptionPassword.trim()) {
         // Always use server-side encryption
         try {
           const encryptedData = await ServerEncryption.encrypt(paste, encryptionPassword);
           paste = JSON.stringify(encryptedData);
           isEncrypted = true;
+          console.log('Encryption successful');
         } catch (error) {
+          console.error('Encryption failed:', error);
           status = 422;
           contents = homePage({
             paste,
@@ -479,6 +614,10 @@ export default {
         paste,
         editCode,
         isEncrypted,
+        oneTimeView: enableOneTimeView,
+        expiryTime,
+        viewCount: 0,
+        attachments,
       };
 
       if (slug.length > 0) {
@@ -496,7 +635,7 @@ export default {
         } else {
           await storage.set(slug, pasteData);
           status = 302;
-          headers.set('location', '/' + slug.trim());
+          headers.set('location', '/created/' + slug.trim());
         }
       } else {
         let id = '';
@@ -511,7 +650,7 @@ export default {
 
         await storage.set(id, pasteData);
         status = 302;
-        headers.set('location', '/' + id.trim());
+        headers.set('location', '/created/' + id.trim());
       }
 
       return new Response(contents, {
@@ -543,21 +682,58 @@ export default {
         const existing = res.value as Paste;
         const hasEditCode = Boolean(existing.editCode);
 
-        if (
-          hasEditCode &&
-          existing.editCode !== editCode
-        ) {
-          // editCode mismatch
+        // Use robust edit code validation
+        const validation = await storage.validateEditCode(id, editCode || '');
+        
+        if (!validation.valid) {
           status = 400;
           contents = editPage({
             id,
             paste,
             hasEditCode,
-            errors: { editCode: 'invalid edit code' },
+            errors: { editCode: validation.error || 'Invalid edit code' },
             mode: MODE,
           });
         } else {
           await storage.saveRevision(id, existing.paste); // Save current version as a revision
+          
+          // Handle attachment removal
+          const attachmentsToRemove = form.getAll('removeAttachment') as string[];
+          let existingAttachments = existing.attachments || [];
+          
+          // Remove attachments marked for deletion
+          for (const attachmentId of attachmentsToRemove) {
+            existingAttachments = existingAttachments.filter((att: any) => att.id !== attachmentId);
+            // Also remove from KV storage
+            try {
+              await storage.deleteAttachment(attachmentId);
+            } catch (error) {
+              console.error('Failed to delete attachment:', attachmentId, error);
+            }
+          }
+          
+          // Handle file attachments for edit
+          const newAttachments: any[] = [];
+          const fileAttachments = form.getAll('fileAttachment') as File[];
+          
+          for (const fileAttachment of fileAttachments) {
+            if (fileAttachment && fileAttachment.size > 0 && fileAttachment.name) {
+              const attachmentId = generateId();
+              const fileBuffer = await fileAttachment.arrayBuffer();
+              
+              // Store the file in KV
+              await storage.storeAttachment(attachmentId, fileBuffer);
+              
+              // Add attachment info
+              newAttachments.push({
+                id: attachmentId,
+                originalName: fileAttachment.name,
+                size: fileAttachment.size,
+                type: fileAttachment.type,
+                uploadTimestamp: Date.now(),
+              });
+            }
+          }
           
           // If the original paste was encrypted, we need to re-encrypt the updated content
           if (existing.isEncrypted) {
@@ -567,7 +743,7 @@ export default {
               .find(c => c.trim().startsWith(`decrypt-session-${id}=`));
             
             if (sessionCookie) {
-              const sessionPassword = sessionCookie.split('=')[1];
+              const sessionPassword = decodeURIComponent(sessionCookie.split('=')[1]);
               try {
                 const encryptedData = await ServerEncryption.encrypt(paste, sessionPassword);
                 paste = JSON.stringify(encryptedData);
@@ -589,10 +765,14 @@ export default {
             }
           }
           
-          await storage.set(id, { 
-            ...existing, 
+          // Combine existing and new attachments
+          const allAttachments = [...existingAttachments, ...newAttachments];
+          
+          await storage.set(id, {
+            ...existing,
             paste,
-            editCode: editCode || existing.editCode 
+            editCode: editCode || existing.editCode,
+            attachments: allAttachments
           });
           headers.set('location', '/' + id);
         }
@@ -625,16 +805,15 @@ export default {
         const existing = res.value as Paste;
         const hasEditCode = Boolean(existing.editCode);
 
-        if (
-          hasEditCode &&
-          existing.editCode !== editCode
-        ) {
-          // editCode mismatch
+        // Use robust edit code validation
+        const validation = await storage.validateEditCode(id, editCode || '');
+        
+        if (!validation.valid) {
           status = 400;
           contents = deletePage({
             id,
             hasEditCode,
-            errors: { editCode: 'invalid edit code' },
+            errors: { editCode: validation.error || 'Invalid edit code' },
             mode: MODE,
           });
         } else {
@@ -687,7 +866,7 @@ export default {
           status: 302,
           headers: {
             'location': `/${id}`,
-            'set-cookie': `decrypt-session-${id}=${password}; HttpOnly; Secure; SameSite=Strict; Max-Age=3600; Path=/`,
+            'set-cookie': `decrypt-session-${id}=${encodeURIComponent(password)}; HttpOnly; Secure; SameSite=Strict; Max-Age=3600; Path=/`,
           },
         });
       } catch (error) {
@@ -695,6 +874,106 @@ export default {
         return new Response(passwordPromptPage({ id, mode: MODE, error: 'Invalid password. Please try again.' }), {
           status: 400,
           headers: { 'content-type': 'text/html' },
+        });
+      }
+    });
+
+    // Handle file uploads
+    app.post('/upload', async (req) => {
+      try {
+        const form = await req.formData();
+        const file = form.get('file') as File;
+        
+        if (!file) {
+          return new Response(JSON.stringify({ error: 'No file provided' }), {
+            status: 400,
+            headers: { 'content-type': 'application/json' },
+          });
+        }
+
+        // Generate unique attachment ID
+        const attachmentId = generateId();
+        
+        // Store file data in KV
+        const fileBuffer = await file.arrayBuffer();
+        await storage.storeAttachment(attachmentId, fileBuffer);
+        
+        // Return attachment info
+        const attachmentInfo = {
+          id: attachmentId,
+          originalName: file.name,
+          size: file.size,
+          type: file.type,
+          uploadTimestamp: Date.now(),
+        };
+
+        return new Response(JSON.stringify(attachmentInfo), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+      } catch (error) {
+        console.error('File upload error:', error);
+        return new Response(JSON.stringify({ error: 'File upload failed' }), {
+          status: 500,
+          headers: { 'content-type': 'application/json' },
+        });
+      }
+    });
+
+    // Handle attachment downloads
+    app.get('/attachment/:id', async (req, params) => {
+      const attachmentId = params.id as string ?? '';
+      const url = new URL(req.url);
+      const pasteId = url.searchParams.get('paste');
+      const action = url.searchParams.get('action') || 'download'; // 'download' or 'view'
+      
+      try {
+        // Get attachment metadata from paste
+        let attachmentInfo = null;
+        if (pasteId) {
+          const pasteRes = await storage.get(pasteId);
+          if (pasteRes.value && pasteRes.value.attachments) {
+            attachmentInfo = pasteRes.value.attachments.find((att: any) => att.id === attachmentId);
+          }
+        }
+        
+        const fileData = await storage.getAttachment(attachmentId);
+        
+        if (!fileData) {
+          return new Response('Attachment not found', {
+            status: 404,
+            headers: { 'content-type': 'text/plain' },
+          });
+        }
+
+        // Determine filename and content type
+        const filename = attachmentInfo ? attachmentInfo.originalName : attachmentId;
+        const contentType = attachmentInfo ? attachmentInfo.type : 'application/octet-stream';
+        
+        // Handle view vs download
+        if (action === 'view' && contentType.startsWith('text/')) {
+          return new Response(fileData, {
+            status: 200,
+            headers: {
+              'content-type': contentType,
+              'content-disposition': `inline; filename="${filename}"`,
+            },
+          });
+        } else {
+          // Always download for non-text files or when explicitly requested
+          return new Response(fileData, {
+            status: 200,
+            headers: {
+              'content-type': 'application/octet-stream',
+              'content-disposition': `attachment; filename="${filename}"`,
+            },
+          });
+        }
+      } catch (error) {
+        console.error('Attachment download error:', error);
+        return new Response('Attachment download failed', {
+          status: 500,
+          headers: { 'content-type': 'text/plain' },
         });
       }
     });

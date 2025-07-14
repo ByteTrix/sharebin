@@ -1,0 +1,156 @@
+/* ====================================
+   THEME STYLES
+   Light/Dark Theme Variables
+   ==================================== */
+
+/* Light Theme - Auto Detection */
+@media (prefers-color-scheme: light) {
+    body:not([data-theme="d"]), [data-theme="l"] {
+        --error-color: #d71c1c;
+        --bg-color: #ffffff;
+        --dark-bg-color: #f8f8f8;
+        --light-bg-color: #f0f0f0;
+        --faint-bg-color: #f5f5f5;
+        --color: #1a1a1a;
+        --faint-color: #666666;
+        --link-color: #5b4e96;
+        --link-hover-color: #443775;
+        --code-bg-color: #f8f8f8;
+        --border-color: #d0d0d0;
+        --focus-color: #5b4e96;
+        --editor-bg-color: #f5f5f5;
+    }
+}
+
+/* Light Theme - Explicit */
+[data-theme="l"] {
+    --error-color: #d71c1c;
+    --bg-color: #ffffff;
+    --dark-bg-color: #f8f8f8;
+    --light-bg-color: #f0f0f0;
+    --faint-bg-color: #f5f5f5;
+    --color: #1a1a1a;
+    --faint-color: #666666;
+    --link-color: #5b4e96;
+    --link-hover-color: #443775;
+    --code-bg-color: #f8f8f8;
+    --border-color: #d0d0d0;
+    --focus-color: #5b4e96;
+    --editor-bg-color: #f5f5f5;
+}
+
+/* Theme Toggle Icon Filters */
+.theme-toggle-icon .theme-icon {
+    filter: brightness(0) saturate(100%) invert(40%) sepia(8%) saturate(928%) hue-rotate(201deg) brightness(95%) contrast(86%);
+}
+
+[data-theme="d"] .theme-toggle-icon .theme-icon {
+    filter: brightness(0) saturate(100%) invert(90%) sepia(3%) saturate(25%) hue-rotate(315deg) brightness(107%) contrast(107%);
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme]) .theme-toggle-icon .theme-icon {
+        filter: brightness(0) saturate(100%) invert(90%) sepia(3%) saturate(25%) hue-rotate(315deg) brightness(107%) contrast(107%);
+    }
+}
+
+/* Theme dropdown styling */
+.theme-dropdown .dropdown-item img {
+    filter: brightness(0) saturate(100%) invert(40%) sepia(8%) saturate(928%) hue-rotate(201deg) brightness(95%) contrast(86%);
+}
+
+[data-theme="d"] .theme-dropdown .dropdown-item img {
+    filter: brightness(0) saturate(100%) invert(90%) sepia(3%) saturate(25%) hue-rotate(315deg) brightness(107%) contrast(107%);
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme]) .theme-dropdown .dropdown-item img {
+        filter: brightness(0) saturate(100%) invert(90%) sepia(3%) saturate(25%) hue-rotate(315deg) brightness(107%) contrast(107%);
+    }
+}
+
+/* Theme Icon Display Logic */
+.theme-icon {
+    display: none;
+    flex-shrink: 0;
+}
+
+/* Show appropriate theme icon based on current theme */
+[data-theme="l"] .theme-light,
+[data-theme="d"] .theme-dark,
+body:not([data-theme]) .theme-auto {
+    display: block;
+}
+
+[data-theme="l"] .theme-auto,
+[data-theme="l"] .theme-dark,
+[data-theme="d"] .theme-auto,
+[data-theme="d"] .theme-light,
+body:not([data-theme]) .theme-light,
+body:not([data-theme]) .theme-dark {
+    display: none;
+}
+
+/* Theme states for navbar */
+[data-theme-mode="auto"] .theme-auto,
+[data-theme-mode="light"] .theme-light,
+[data-theme-mode="dark"] .theme-dark {
+    display: block;
+}
+
+/* Dark theme button styling adjustments */
+[data-theme="d"] .theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="d"] .theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--focus-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Dark theme copy button styling */
+[data-theme="d"] .copy-code-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="d"] .copy-code-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--focus-color);
+}
+
+/* Dark theme notification styles */
+[data-theme="d"] .notification.success {
+    background: #0c4a6e;
+    color: #7dd3fc;
+    border-color: #0369a1;
+}
+
+[data-theme="d"] .notification.error {
+    background: #7f1d1d;
+    color: #fca5a5;
+    border-color: #dc2626;
+}
+
+/* Dark theme menu item styles */
+[data-theme="d"] .menu-item.danger:hover {
+    background: #450a0a;
+}
+
+/* Theme-specific navbar backgrounds */
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme]) .new-navbar {
+        background: var(--bg-color);
+    }
+}
+
+[data-theme="l"] .new-navbar {
+    background: var(--bg-color);
+}
+
+[data-theme="d"] .new-navbar {
+    background: var(--bg-color);
+}

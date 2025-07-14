@@ -61,15 +61,25 @@
   let currentMode = localStorage.getItem(themeStorageKey) || 'auto';
   setMode(currentMode);
 
-  // Add click listeners to all theme toggles
-  themeToggles.forEach(toggle => {
-    if (toggle) {
-      toggle.addEventListener('click', () => {
-        currentMode = getNextMode(currentMode);
-        setMode(currentMode);
-      });
-    }
-  });
+  // Add click listeners to theme toggles
+  // Handle standalone theme toggle (cycles through modes)
+  const standaloneToggle = document.getElementById('themeToggle');
+  if (standaloneToggle) {
+    standaloneToggle.addEventListener('click', () => {
+      currentMode = getNextMode(currentMode);
+      setMode(currentMode);
+    });
+  }
+
+  // Handle navbar theme toggle (shows dropdown)
+  const navbarToggle = document.getElementById('navbarThemeToggle');
+  if (navbarToggle) {
+    navbarToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // This should only toggle the dropdown, not change theme
+      // The dropdown functionality is handled in templates.ts
+    });
+  }
 
   // Listen for system theme changes when in auto mode
   if (window.matchMedia) {
@@ -82,4 +92,8 @@
       }
     });
   }
+
+  // Make setMode available globally for dropdown selections
+  window.setThemeMode = setMode;
+  window.getCurrentTheme = () => currentMode;
 })(window);

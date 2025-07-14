@@ -1,61 +1,113 @@
 // Encryption UI for ShareBin
 (function() {
-  const encryptionCheckbox = document.getElementById('enableEncryption');
-  const encryptionOptions = document.getElementById('encryptionOptions');
   const encryptionPassword = document.getElementById('encryptionPassword');
   const generatePasswordBtn = document.getElementById('generatePassword');
+  const togglePasswordBtn = document.getElementById('togglePasswordVisibility');
   const editorForm = document.getElementById('editor-form');
 
-  if (!encryptionCheckbox || !encryptionOptions || !encryptionPassword || !generatePasswordBtn) {
+  if (!encryptionPassword || !generatePasswordBtn) {
     return; // Not on the right page
   }
 
-  // Toggle encryption options
-  encryptionCheckbox.addEventListener('change', function() {
-    if (this.checked) {
-      encryptionOptions.style.display = 'block';
-      encryptionPassword.required = true;
-    } else {
-      encryptionOptions.style.display = 'none';
-      encryptionPassword.required = false;
-      encryptionPassword.value = '';
-    }
-  });
+  // Toggle password visibility
+  if (togglePasswordBtn) {
+    togglePasswordBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const isPassword = encryptionPassword.type === 'password';
+      encryptionPassword.type = isPassword ? 'text' : 'password';
+      
+      // Update button icon
+      const svg = this.querySelector('svg path');
+      if (svg) {
+        if (isPassword) {
+          // Show open eye (password visible)
+          svg.setAttribute('d', 'M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.09L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.76,7.13 11.37,7 12,7Z');
+          this.title = 'Hide password';
+        } else {
+          // Show closed eye (password hidden)
+          svg.setAttribute('d', 'M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z');
+          this.title = 'Show password';
+        }
+      }
+    });
+  }
 
   // Generate secure password
-  generatePasswordBtn.addEventListener('click', function() {
-    if (window.ShareBinCrypto) {
-      const password = window.ShareBinCrypto.generatePassword(16);
-      encryptionPassword.value = password;
-      
-      // Show the password temporarily
-      const originalType = encryptionPassword.type;
-      encryptionPassword.type = 'text';
-      encryptionPassword.select();
-      
-      // Copy to clipboard
-      navigator.clipboard.writeText(password).then(() => {
-        showNotification('Password generated and copied to clipboard!');
-      }).catch(() => {
-        showNotification('Password generated! Please copy it manually.');
-      });
-      
-      // Hide password after 3 seconds
-      setTimeout(() => {
-        encryptionPassword.type = originalType;
-      }, 3000);
-    } else {
-      showNotification('Encryption not available. Please refresh the page.', 'error');
+  generatePasswordBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Generate a secure password
+    const password = generateSecurePassword(16);
+    encryptionPassword.value = password;
+    
+    // Show the password temporarily
+    const originalType = encryptionPassword.type;
+    encryptionPassword.type = 'text';
+    encryptionPassword.select();
+    
+    // Update toggle button icon to show "hide" state
+    if (togglePasswordBtn) {
+      const svg = togglePasswordBtn.querySelector('svg path');
+      if (svg) {
+        svg.setAttribute('d', 'M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.09L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.76,7.13 11.37,7 12,7Z');
+        togglePasswordBtn.title = 'Hide password';
+      }
     }
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(password).then(() => {
+      showNotification('✅ Secure password generated and copied to clipboard!', 'success');
+    }).catch(() => {
+      showNotification('✅ Secure password generated! Please copy it manually.', 'success');
+    });
+    
+    // Hide password after 3 seconds
+    setTimeout(() => {
+      encryptionPassword.type = originalType;
+      
+      // Update toggle button icon back to "show" state
+      if (togglePasswordBtn) {
+        const svg = togglePasswordBtn.querySelector('svg path');
+        if (svg) {
+          svg.setAttribute('d', 'M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z');
+          togglePasswordBtn.title = 'Show password';
+        }
+      }
+    }, 3000);
   });
+
+  // Generate secure password function
+  function generateSecurePassword(length = 16) {
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+    let password = '';
+    
+    // Use crypto.getRandomValues for better randomness
+    if (window.crypto && window.crypto.getRandomValues) {
+      const randomArray = new Uint32Array(length);
+      crypto.getRandomValues(randomArray);
+      
+      for (let i = 0; i < length; i++) {
+        password += charset.charAt(randomArray[i] % charset.length);
+      }
+    } else {
+      // Fallback to Math.random if crypto is not available
+      for (let i = 0; i < length; i++) {
+        password += charset.charAt(Math.floor(Math.random() * charset.length));
+      }
+    }
+    
+    return password;
+  }
 
   // Enhanced form submission with encryption
   if (editorForm) {
     editorForm.addEventListener('submit', async function(e) {
-      const enableEncryption = encryptionCheckbox.checked;
       const password = encryptionPassword.value;
       
-      if (enableEncryption && password) {
+      if (password) {
         // For server-side encryption, let the form submit normally with the password
         // The server will handle the encryption
         console.log('Form will be submitted with encryption enabled');

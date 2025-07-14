@@ -1,48 +1,68 @@
-/* ====================================
-   MAIN.CSS - DEPRECATED
-   This file has been modularized for better maintainability
-   ==================================== */
+a*, *::before, *::after {
+    box-sizing: border-box;
+}
 
-/*
-  🎉 CSS Architecture Modernized! 🎉
-  
-  The styles in this file have been reorganized into a modular architecture 
-  for better performance, maintainability, and developer experience.
-  
-  New Structure:
-  ├── css/
-  │   ├── base.css       - CSS Reset, Variables, Typography
-  │   ├── themes.css     - Light/Dark Theme Variables  
-  │   ├── layout.css     - Containers, Grid Systems, Spacing
-  │   ├── components.css - Buttons, Forms, Navigation, Cards
-  │   ├── editor.css     - CodeMirror, Preview, Editor Components
-  │   └── responsive.css - Mobile and Tablet Breakpoints
-  
-  Benefits:
-  ✅ Better organization and maintainability
-  ✅ Improved caching (browsers can cache individual modules)
-  ✅ Easier debugging and development
-  ✅ Reduced redundancy and better performance
-  ✅ Cleaner separation of concerns
-  
-  The original file has been backed up as main.css.backup
-  
-  This modular approach follows modern CSS architecture best practices
-  and makes the codebase more scalable and easier to work with.
-*/
+* {
+    margin: 0;
+}
 
-/* 
-  If you need to temporarily revert to the old system:
-  1. Copy main.css.backup to main.css
-  2. Update templates.ts to use the single file again
-  
-  However, we recommend keeping the modular structure! 🚀
-*/
+body {
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
 
-/* Placeholder to prevent 404 errors - see comments above for new structure */
-body { 
-    /* This file is deprecated - styles moved to modular CSS files */
-    background: transparent;
+img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+}
+
+input, button, textarea, select {
+    font: inherit;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+    overflow-wrap: break-word;
+}
+
+#root, #__next {
+    isolation: isolate;
+}
+
+/* body{margin:40px
+    auto;max-width:650px;line-height:1.6;font-size:18px;color:#444;padding:0
+    10px}h1,h2,h3{line-height:1.2} */
+
+:root {
+    --monospace: monospace;
+    --sans-serif: 'PT Sans', sans-serif;
+    --serif: 'PT Serif', serif;
+    --font-1-size: 12px;
+    --font-2-size: 14px;
+    --font-3-size: 16px;
+    --font-4-size: 18px;
+    --font-5-size: 20px;
+    --font-6-size: 28px;
+
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 0.75rem;
+    --spacing-4: 1rem;
+    --spacing-5: 1.25rem;
+    --spacing-6: 2rem;
+
+    --error-color: #d71c1c;
+    --bg-color: #0a0a0a;
+    --dark-bg-color: #141414;
+    --light-bg-color: #2a2a2a;
+    --faint-bg-color: #252525;
+    --color: #e5e5e5;
+    --faint-color: #a0a0a0;
+    --link-color: #8b7ec8;
+    --link-hover-color: #b8a9ff;
+    --code-bg-color: #2d2d2d;
+    --border-color: #404040;
+    --focus-color: #8b7ec8;
+    --editor-bg-color: #1f1f1f;
 }
 
 /* light theme */

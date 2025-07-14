@@ -10,7 +10,7 @@
     "setup": "pwsh -File deploy.ps1",
     "kv:create": "wrangler kv:namespace create KV && wrangler kv:namespace create KV --preview"
   },
-  "packageManager": "pnpm@10.12.4",
+  "packageManager": "pnpm@10.13.1",
   "dependencies": {
     "lz-string": "^1.5.0",
     "rehype-highlight": "^7.0.2",

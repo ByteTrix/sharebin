@@ -1,26 +1,23 @@
 (function() {
-  const MAX_LENGTH = 40000;
   const cmEl = document.getElementById('editor');
   const textArea = document.getElementById('pasteTextArea');
-  const editorTab = document.getElementById('tab1');
   const editorForm = document.getElementById('editor-form');
-  const previewTab = document.getElementById('tab2');
   const previewContainer = document.getElementById('preview-container');
-  const characterCount = document.getElementById('characterCount');
+  const editorTabs = document.querySelectorAll('.editor-tab');
+  const tabContents = document.querySelectorAll('.tab-content');
 
   // Check if required elements exist
-  if (!cmEl || !textArea || !editorTab || !previewTab || !previewContainer) {
+  if (!cmEl || !textArea || !previewContainer || !editorTabs.length) {
     console.error('Required editor elements not found:', {
       cmEl: !!cmEl,
       textArea: !!textArea,
-      editorTab: !!editorTab,
-      previewTab: !!previewTab,
-      previewContainer: !!previewContainer
+      previewContainer: !!previewContainer,
+      editorTabs: editorTabs.length
     });
     return;
   }
 
-  console.log('All required elements found, initializing editor...');
+  console.log('All required elements found, initializing modern editor...');
 
   // Check if CodeMirror is available
   if (typeof CodeMirror === 'undefined') {
@@ -29,9 +26,6 @@
   }
 
   console.log('CodeMirror available, proceeding with initialization...');
-
-  // onload, reset to editorTab since we can't be sure preview tab will be populated
-  editorTab.click();
 
   // hide paste textarea
   textArea.style.display = 'none';
@@ -42,7 +36,7 @@
     keymap: 'sublime',
     theme: 'default',
     viewportMargin: Infinity,
-    lineNumbers: true,
+    lineNumbers: false,
     lineWrapping: true,
     autoCloseBrackets: true,
     matchBrackets: true,
@@ -171,8 +165,9 @@
   // Enhanced preview with server-side markdown processing
   async function updatePreview() {
     const content = editor.getValue();
+    
     if (!content.trim()) {
-      previewContainer.innerHTML = '<p style="color: var(--faint-color); font-style: italic; padding: var(--spacing-4);">Preview will appear here...</p>';
+      previewContainer.innerHTML = '<p style="color: #888; font-style: italic; padding: 1rem;">Preview will appear here...</p>';
       return;
     }
 
@@ -194,37 +189,27 @@
         if (!previewContainer.classList.contains('document-content')) {
           previewContainer.classList.add('document-content');
         }
+        
+        // Ensure the preview container is visible
+        previewContainer.style.display = 'block';
+        previewContainer.style.visibility = 'visible';
+        previewContainer.style.opacity = '1';
       } else {
         // Show error message if server preview fails
-        previewContainer.innerHTML = `<div style="color: var(--error-color); padding: var(--spacing-4); border: 1px solid var(--error-color); border-radius: 0.375rem; margin: var(--spacing-4);">
-          <strong>Preview Error:</strong> Unable to generate preview. Please try again.
+        previewContainer.innerHTML = `<div style="color: #e74c3c; padding: 0.75rem; border: 1px solid #e74c3c; border-radius: 0.25rem; margin: 0.5rem;">
+          <strong>Preview Error:</strong> Unable to generate preview (Status: ${response.status}).
         </div>`;
       }
       
     } catch (error) {
       console.error('Server preview error:', error);
       // Show error message if server preview fails
-      previewContainer.innerHTML = `<div style="color: var(--error-color); padding: var(--spacing-4); border: 1px solid var(--error-color); border-radius: 0.375rem; margin: var(--spacing-4);">
-        <strong>Preview Error:</strong> Unable to generate preview. Please try again.
+      previewContainer.innerHTML = `<div style="color: #e74c3c; padding: 0.75rem; border: 1px solid #e74c3c; border-radius: 0.25rem; margin: 0.5rem;">
+        <strong>Preview Error:</strong> Unable to generate preview.
       </div>`;
     }
   }
 
-  // initialize characterCount
-  const updateCharacterCount = (count) => {
-    characterCount.innerHTML = `${count}/${MAX_LENGTH}`;
-    
-    // Add visual warning when approaching limit
-    if (count > MAX_LENGTH * 0.9) {
-      characterCount.style.color = 'var(--error-color)';
-    } else if (count > MAX_LENGTH * 0.8) {
-      characterCount.style.color = 'orange';
-    } else {
-      characterCount.style.color = 'var(--faint-color)';
-    }
-  };
-
-  updateCharacterCount(textArea.value.length);
 
   const updateTextArea = debounce((value) => {
     textArea.value = value;
@@ -235,11 +220,11 @@
   const onChange = (instance, change) => {
     const value = instance.getValue();
     textArea.value = value;
-    updateCharacterCount(value.length);
     updateTextArea(value);
     
-    // Update preview if preview tab is active
-    if (previewTab.checked) {
+    // Update preview only if preview mode is active
+    const activeTab = document.querySelector('.editor-tab.active');
+    if (activeTab && activeTab.dataset.tab === 'preview') {
       debouncedPreviewUpdate();
     }
   };
@@ -247,48 +232,138 @@
   // Debounced preview update for performance
   const debouncedPreviewUpdate = debounce(updatePreview, 500);
 
-  // this is a long-winded way of implementing a max-length on CodeMirror
-  const onBeforeChange = (instance, change) => {
-    if (change.update) {
-      const newLine = instance.getDoc().lineSeparator();
-      let text = change.text.join(newLine);
-      let delta = text.length - (instance.indexFromPos(change.to) - instance.indexFromPos(change.from));
-      if (delta <= 0) return true;
-
-      delta = instance.getValue().length + delta - MAX_LENGTH;
-      if (delta > 0) {
-        text = text.substr(0, text.length - delta);
-        change.update(change.from, change.to, text.split(newLine));
-      }
-    }
-
-    return true;
-  };
-
   editor.on('change', onChange);
-  editor.on('beforeChange', onBeforeChange);
 
-  // set event listener to refresh editor on tab select
-  editorTab.addEventListener('click', () => {
-    editor.refresh();
+  // Tab switching functionality
+  editorTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const targetTab = tab.dataset.tab;
+      
+      // Update active tab
+      editorTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      
+      // Update active content
+      tabContents.forEach(content => {
+        content.classList.remove('active');
+        if (content.dataset.content === targetTab) {
+          content.classList.add('active');
+        }
+      });
+      
+      // Update preview if switching to preview tab
+      if (targetTab === 'preview') {
+        updatePreview();
+      } else if (targetTab === 'edit') {
+        // Refresh editor when switching back
+        setTimeout(() => {
+          editor.refresh();
+        }, 100);
+      }
+    });
   });
 
-  // override form submit
-  editorForm.addEventListener('submit', (ev) => {
-    ev.preventDefault();
-
-    // set textarea to ensure it is up to date
-    textArea.value = editor.getValue();
-
-    editorForm.submit();
-  });
-
-  // populate preview tab when activating it
-  previewTab.addEventListener('change', () => {
-    if (previewTab.checked) {
+  // Force initial preview update if preview tab is active
+  setTimeout(() => {
+    const activeTab = document.querySelector('.editor-tab.active');
+    if (activeTab && activeTab.dataset.tab === 'preview') {
       updatePreview();
     }
-  });
+  }, 500);
+
+  // override form submit
+  if (editorForm) {
+    editorForm.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+
+      // set textarea to ensure it is up to date
+      textArea.value = editor.getValue();
+
+      // Ensure expiry timestamp is properly set if expiry is selected
+      if (window.getSelectedExpiryDate && window.getSelectedExpiryDate()) {
+        const expiryDate = window.getSelectedExpiryDate();
+        let hiddenInput = document.getElementById('selectedExpiryTimestamp');
+        if (!hiddenInput) {
+          hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.id = 'selectedExpiryTimestamp';
+          hiddenInput.name = 'expiryTimestamp';
+          editorForm.appendChild(hiddenInput);
+        }
+        hiddenInput.value = expiryDate.getTime().toString();
+      } else {
+        // Check if custom date is set directly (fallback)
+        const customExpiryInput = document.getElementById('customExpiryDate');
+        if (customExpiryInput && customExpiryInput.value) {
+          const customDate = new Date(customExpiryInput.value);
+          if (customDate.getTime() > Date.now()) {
+            let hiddenInput = document.getElementById('selectedExpiryTimestamp');
+            if (!hiddenInput) {
+              hiddenInput = document.createElement('input');
+              hiddenInput.type = 'hidden';
+              hiddenInput.id = 'selectedExpiryTimestamp';
+              hiddenInput.name = 'expiryTimestamp';
+              editorForm.appendChild(hiddenInput);
+            }
+            hiddenInput.value = customDate.getTime().toString();
+          }
+        }
+      }
+
+      // Handle file attachments properly
+      const fileInput = document.getElementById('fileAttachment');
+      if (fileInput && window.getSelectedFiles) {
+        const selectedFiles = window.getSelectedFiles();
+        if (selectedFiles.length > 0) {
+          // Create a new FormData object
+          const formData = new FormData();
+          
+          // Add all form fields
+          const formElements = editorForm.elements;
+          for (let i = 0; i < formElements.length; i++) {
+            const element = formElements[i];
+            if (element.name && element.type !== 'file') {
+              if (element.type === 'checkbox') {
+                if (element.checked) {
+                  formData.append(element.name, element.value);
+                }
+              } else {
+                formData.append(element.name, element.value);
+              }
+            }
+          }
+          
+          // Add selected files
+          selectedFiles.forEach(file => {
+            formData.append('fileAttachment', file);
+          });
+          
+          // Submit using fetch
+          fetch(editorForm.action, {
+            method: 'POST',
+            body: formData
+          }).then(response => {
+            if (response.redirected) {
+              window.location.href = response.url;
+            } else {
+              // Handle non-redirect responses
+              response.text().then(text => {
+                document.open();
+                document.write(text);
+                document.close();
+              });
+            }
+          }).catch(error => {
+            console.error('Form submission error:', error);
+          });
+          
+          return;
+        }
+      }
+
+      editorForm.submit();
+    });
+  }
 
   // Add toolbar for common formatting options
   function createToolbar() {
@@ -415,8 +490,6 @@
     });
   }
 
-  // Make toggleShortcutsModal available globally for debugging
-  window.toggleShortcutsModal = toggleShortcutsModal;
 
   // Add click handler for footer shortcuts hint
   const shortcutsHint = document.querySelector('.shortcuts-hint');
@@ -439,18 +512,26 @@
   // File Attachment Functionality
   function initializeFileAttachment() {
     const fileInput = document.getElementById('fileAttachment');
-    const fileAttachmentList = document.getElementById('fileAttachmentList');
-    const fileItems = document.querySelector('.file-items');
-    const fileCount = document.querySelector('.file-count');
-    const clearFilesBtn = document.getElementById('clearFiles');
-    const fileAttachmentLabel = document.querySelector('.file-attachment-label');
+    const fileList = document.getElementById('fileList');
+    const fileItems = document.getElementById('fileItems');
+    const clearFilesBtn = document.getElementById('clearAllFiles');
+    const fileCount = document.getElementById('fileCount');
+    const attachFilesBtn = document.getElementById('attachFiles');
 
-    if (!fileInput || !fileAttachmentList || !fileItems || !fileCount || !clearFilesBtn) {
+    if (!fileInput) {
       console.log('File attachment elements not found, skipping initialization');
       return;
     }
 
     let selectedFiles = [];
+
+    // Connect attach button to file input
+    if (attachFilesBtn) {
+      attachFilesBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        fileInput.click();
+      });
+    }
 
     // Handle file selection
     fileInput.addEventListener('change', function(e) {
@@ -469,45 +550,25 @@
     });
 
     // Handle clear all files
-    clearFilesBtn.addEventListener('click', function() {
-      selectedFiles = [];
-      updateFileList();
-    });
-
-    // Handle drag and drop
-    fileAttachmentLabel.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      fileAttachmentLabel.classList.add('drag-over');
-    });
-
-    fileAttachmentLabel.addEventListener('dragleave', function(e) {
-      e.preventDefault();
-      fileAttachmentLabel.classList.remove('drag-over');
-    });
-
-    fileAttachmentLabel.addEventListener('drop', function(e) {
-      e.preventDefault();
-      fileAttachmentLabel.classList.remove('drag-over');
-      
-      const files = Array.from(e.dataTransfer.files);
-      files.forEach(file => {
-        // Check if file is already selected
-        if (!selectedFiles.find(f => f.name === file.name && f.size === file.size)) {
-          selectedFiles.push(file);
-        }
+    if (clearFilesBtn) {
+      clearFilesBtn.addEventListener('click', function() {
+        selectedFiles = [];
+        updateFileList();
       });
-
-      updateFileList();
-    });
+    }
 
     function updateFileList() {
+      if (!fileList || !fileItems) return;
+
       if (selectedFiles.length === 0) {
-        fileAttachmentList.style.display = 'none';
+        fileList.style.display = 'none';
         return;
       }
 
-      fileAttachmentList.style.display = 'block';
-      fileCount.textContent = `Selected files (${selectedFiles.length}):`;
+      fileList.style.display = 'block';
+      if (fileCount) {
+        fileCount.textContent = `Selected files (${selectedFiles.length}):`;
+      }
 
       // Clear existing items
       fileItems.innerHTML = '';
@@ -587,25 +648,10 @@
           return "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z";
         case 'py':
           return "M19.14,7.5A2.86,2.86 0 0,1 22,10.36V14.14A2.86,2.86 0 0,1 19.14,17H12C12,17.39 12.32,17.96 12.71,17.96H17V19.64A2.86,2.86 0 0,1 14.14,22.5H9.86A2.86,2.86 0 0,1 7,19.64V15.89C7,14.31 8.28,13.04 9.86,13.04H15.11C16.69,13.04 17.96,11.76 17.96,10.18V7.5H19.14M14.86,19.29C14.46,19.29 14.14,19.59 14.14,20.18C14.14,20.77 14.46,20.89 14.86,20.89A0.71,0.71 0 0,0 15.57,20.18C15.57,19.59 15.25,19.29 14.86,19.29M9.14,5.71C9.54,5.71 9.86,5.41 9.86,4.82C9.86,4.23 9.54,4.11 9.14,4.11A0.71,0.71 0 0,0 8.43,4.82C8.43,5.41 8.75,5.71 9.14,5.71M15.11,1.5A2.86,2.86 0 0,1 17.96,4.36V8.11C17.96,9.69 16.69,10.96 15.11,10.96H9.86C8.28,10.96 7,12.24 7,13.82V15.89C7,16.28 6.68,16.85 6.29,16.85H2V15.18A2.86,2.86 0 0,1 4.86,12.32H12C12,11.93 11.68,11.36 11.29,11.36H7V9.68A2.86,2.86 0 0,1 9.86,6.82H15.11A2.86,2.86 0 0,1 17.96,4V1.5H15.11Z";
-        case 'java':
-          return "M8.851,18.56S9.53,19.15 11.36,19.15C16.66,19.15 16.87,16.41 16.87,16.41V15.74C16.87,15.74 15.36,16.91 12.27,16.91C8.84,16.91 8.851,18.56 8.851,18.56M8.544,15.688S9.257,16.25 11.021,16.25C15.191,16.25 15.191,14.289 15.191,14.289V13.591C15.191,13.591 13.72,14.74 10.63,14.74C7.2,14.74 8.544,15.688 8.544,15.688M14.581,17.56C14.581,17.56 16.87,16.41 16.87,16.41V15.74C16.87,15.74 15.36,16.91 12.27,16.91S8.851,18.56 8.851,18.56S9.53,19.15 11.36,19.15C16.66,19.15 16.87,16.41 16.87,16.41V15.74M14.581,16.25C14.581,16.25 16.87,15.1 16.87,15.1V14.43C16.87,14.43 15.36,15.6 12.27,15.6S8.851,17.25 8.851,17.25S9.53,17.84 11.36,17.84C16.66,17.84 16.87,15.1 16.87,15.1V14.43";
         default:
           return "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z";
       }
     }
-
-    // Attach files to form data when submitting
-    const originalSubmit = editorForm.addEventListener;
-    editorForm.addEventListener('submit', function(e) {
-      if (selectedFiles.length > 0) {
-        // Store files in a hidden input or handle them differently
-        // For now, we'll just log them as the backend would need to handle file uploads
-        console.log('Files to attach:', selectedFiles);
-        
-        // You could convert files to base64 and store in hidden inputs
-        // or handle them via FormData when implementing backend support
-      }
-    });
 
     // Make selected files available globally for form submission
     window.getSelectedFiles = function() {
@@ -620,44 +666,89 @@
   function initializeExpiryDate() {
     const enableExpiryCheckbox = document.getElementById('enableExpiryDate');
     const expiryDateOptions = document.getElementById('expiryDateOptions');
-    const quickExpiryButtons = document.querySelectorAll('.quick-expiry-btn');
+    const quickExpiryButtons = document.querySelectorAll('.compact-expiry-btn'); // Changed from quick-expiry-btn
     const customExpiryInput = document.getElementById('customExpiryDate');
     const selectedExpiryDisplay = document.getElementById('selectedExpiryDisplay');
     const expiryDisplayValue = document.getElementById('expiryDisplayValue');
     const clearExpiryBtn = document.getElementById('clearExpiry');
 
-    if (!enableExpiryCheckbox || !expiryDateOptions || !customExpiryInput) {
+    if (!quickExpiryButtons.length) {
       console.log('Expiry date elements not found, skipping initialization');
       return;
     }
 
     let selectedExpiryDate = null;
 
-    // Toggle expiry options visibility
-    enableExpiryCheckbox.addEventListener('change', function() {
-      if (this.checked) {
-        expiryDateOptions.style.display = 'block';
-      } else {
-        expiryDateOptions.style.display = 'none';
-        clearSelectedExpiry();
+    // Initialize default selection (1 day)
+    function initializeDefaultSelection() {
+      const defaultButton = document.querySelector('.compact-expiry-btn[data-hours="24"]');
+      if (defaultButton && defaultButton.classList.contains('selected')) {
+        const hours = parseInt(defaultButton.dataset.hours);
+        const expiryDate = new Date();
+        expiryDate.setHours(expiryDate.getHours() + hours);
+        setSelectedExpiry(expiryDate, defaultButton.textContent);
       }
-    });
+    }
+
+    // Toggle expiry options visibility - only if elements exist
+    if (enableExpiryCheckbox && expiryDateOptions) {
+      enableExpiryCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+          expiryDateOptions.style.display = 'block';
+        } else {
+          expiryDateOptions.style.display = 'none';
+          clearSelectedExpiry();
+        }
+      });
+    } else {
+      console.log('Expiry checkbox or options not found, skipping expiry toggle initialization');
+    }
 
     // Handle quick expiry button clicks
     quickExpiryButtons.forEach(button => {
       button.addEventListener('click', function() {
-        const hours = parseInt(this.dataset.hours);
-        const expiryDate = new Date();
-        expiryDate.setHours(expiryDate.getHours() + hours);
+        const hours = this.dataset.hours;
+        let expiryDate = null;
+        
+        if (hours === 'custom') {
+          // Custom date button clicked
+          // Clear previous selections
+          quickExpiryButtons.forEach(btn => btn.classList.remove('selected'));
+          
+          // Mark this button as selected
+          this.classList.add('selected');
+          
+          // Show custom date input
+          customExpiryInput.style.display = 'block';
+          customExpiryInput.focus();
+          
+          // Clear any existing expiry
+          clearSelectedExpiry();
+          
+          return;
+        }
+        
+        const hoursNum = parseInt(hours);
+        
+        if (hoursNum > 0) {
+          expiryDate = new Date();
+          expiryDate.setHours(expiryDate.getHours() + hoursNum);
+        }
         
         // Clear previous selections
         quickExpiryButtons.forEach(btn => btn.classList.remove('selected'));
         customExpiryInput.value = '';
+        customExpiryInput.style.display = 'none';
         
         // Mark this button as selected
         this.classList.add('selected');
         
-        setSelectedExpiry(expiryDate, this.textContent);
+        if (hoursNum === 0) {
+          // Infinite expiry
+          clearSelectedExpiry();
+        } else {
+          setSelectedExpiry(expiryDate, this.textContent);
+        }
       });
     });
 
@@ -673,10 +764,17 @@
           return;
         }
         
-        // Clear quick button selections
+        // Keep custom button selected
         quickExpiryButtons.forEach(btn => btn.classList.remove('selected'));
+        const customBtn = document.getElementById('customDateBtn');
+        if (customBtn) {
+          customBtn.classList.add('selected');
+        }
         
         setSelectedExpiry(expiryDate, 'Custom date');
+      } else {
+        // If input is cleared, clear the expiry
+        clearSelectedExpiry();
       }
     });
 
@@ -700,26 +798,35 @@
       };
       
       const formattedDate = date.toLocaleDateString(navigator.language || 'en-US', options);
-      expiryDisplayValue.textContent = formattedDate;
-      selectedExpiryDisplay.style.display = 'flex';
+      
+      if (expiryDisplayValue) {
+        expiryDisplayValue.textContent = formattedDate;
+      }
+      
+      if (selectedExpiryDisplay) {
+        selectedExpiryDisplay.style.display = 'flex';
+      }
       
       // Set a hidden input value for form submission
       let hiddenInput = document.getElementById('selectedExpiryTimestamp');
-      if (!hiddenInput) {
+      if (!hiddenInput && expiryDateOptions) {
         hiddenInput = document.createElement('input');
         hiddenInput.type = 'hidden';
         hiddenInput.id = 'selectedExpiryTimestamp';
         hiddenInput.name = 'expiryTimestamp';
         expiryDateOptions.appendChild(hiddenInput);
       }
-      hiddenInput.value = date.getTime();
+      if (hiddenInput) {
+        hiddenInput.value = date.getTime();
+      }
     }
 
     function clearSelectedExpiry() {
       selectedExpiryDate = null;
-      selectedExpiryDisplay.style.display = 'none';
-      quickExpiryButtons.forEach(btn => btn.classList.remove('selected'));
-      customExpiryInput.value = '';
+      
+      if (selectedExpiryDisplay) {
+        selectedExpiryDisplay.style.display = 'none';
+      }
       
       // Remove hidden input
       const hiddenInput = document.getElementById('selectedExpiryTimestamp');
@@ -730,6 +837,8 @@
 
     // Set minimum datetime for custom input to current time
     function setMinDateTime() {
+      if (!customExpiryInput) return;
+      
       const now = new Date();
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -747,6 +856,9 @@
     // Update minimum datetime every minute
     setInterval(setMinDateTime, 60000);
 
+    // Initialize default selection
+    initializeDefaultSelection();
+
     // Make expiry functions available globally for debugging
     window.getSelectedExpiryDate = function() {
       return selectedExpiryDate;
@@ -756,6 +868,92 @@
   // Initialize expiry date
   initializeExpiryDate();
 
+  // Modern Interface Functionality
+  function initializeModernInterface() {
+    // Password toggle functionality
+    const enableEncryption = document.getElementById('enableEncryption');
+    const passwordField = document.getElementById('passwordField');
+    const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
+    const encryptionPassword = document.getElementById('encryptionPassword');
+
+    if (enableEncryption && passwordField) {
+      enableEncryption.addEventListener('change', function() {
+        if (this.checked) {
+          passwordField.style.display = 'block';
+          setTimeout(() => {
+            if (encryptionPassword) {
+              encryptionPassword.focus();
+            }
+          }, 100);
+        } else {
+          passwordField.style.display = 'none';
+          if (encryptionPassword) {
+            encryptionPassword.value = '';
+          }
+        }
+      });
+    }
+
+    if (togglePasswordVisibility && encryptionPassword) {
+      togglePasswordVisibility.addEventListener('click', function() {
+        const type = encryptionPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        encryptionPassword.setAttribute('type', type);
+        
+        // Update icon
+        const icon = type === 'password' 
+          ? 'M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z'
+          : 'M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.09L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.76,7.13 11.37,7 12,7Z';
+        
+        this.querySelector('path').setAttribute('d', icon);
+      });
+    }
+
+    // Expiry buttons functionality is handled by the main expiry initialization
+    // This section is removed to avoid conflicts
+
+    // File attachment button
+    const attachFilesBtn = document.getElementById('attachFiles');
+    const fileAttachment = document.getElementById('fileAttachment');
+    
+    if (attachFilesBtn && fileAttachment) {
+      attachFilesBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        fileAttachment.click();
+      });
+      
+      // Add visual feedback when hovering
+      attachFilesBtn.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-1px)';
+      });
+      
+      attachFilesBtn.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    }
+
+    // Ensure Create Note button functionality
+    const createNoteBtn = document.querySelector('.sidebar-btn.primary[type="submit"]');
+    if (createNoteBtn) {
+      createNoteBtn.addEventListener('click', function(e) {
+        // Let the form submission handle the note creation
+        console.log('Create note button clicked');
+      });
+      
+      // Add visual feedback
+      createNoteBtn.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-1px)';
+      });
+      
+      createNoteBtn.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    }
+
+  }
+
+  // Initialize modern interface
+  initializeModernInterface();
+
   // Initialize everything
-  console.log('Editor initialization complete');
+  console.log('Modern editor initialization complete');
 })();

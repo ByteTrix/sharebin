@@ -1,4 +1,4 @@
-import { CloudflareEnv } from './env';
+ import { CloudflareEnv } from './env';
 
 const _if = (condition: unknown, template: string) => (
   condition ? template : ''
@@ -17,99 +17,105 @@ const ThemeToggle = () => `
   </div>
 `;
 
-const Navbar = (currentPage = '') => `
-  <nav class="navbar">
-    <div class="navbar-container">
-      <a href="/" class="navbar-brand">
-        <div class="navbar-brand-icon">F</div>
-        <span>ShareBin</span>
-      </a>
-      
-      <ul class="navbar-nav">
-        <li class="navbar-nav-item">
-          <a href="/" class="navbar-nav-link ${currentPage === 'home' ? 'active' : ''}">
-            <svg class="navbar-theme-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-            New
-          </a>
-        </li>
-        <li class="navbar-nav-item">
-          <a href="/guide" class="navbar-nav-link ${currentPage === 'guide' ? 'active' : ''}">
-            <svg class="navbar-theme-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H19M18,17V16H6V17H18M15,15V14H6V15H15M18,13V12H6V13H18M18,11V10H6V11H18M18,9V8H6V9H18M18,7V6H6V7H18Z"/>
-            </svg>
-            Guide
-          </a>
-        </li>
-        <li class="navbar-nav-item">
-          <a href="/about" class="navbar-nav-link ${currentPage === 'about' ? 'active' : ''}">
-            <svg class="navbar-theme-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
-            </svg>
-            About
-          </a>
-        </li>
-      </ul>
-      
-      <div class="navbar-actions">
-        <button id="navbarThemeToggle" class="navbar-theme-toggle" 
-                title="Toggle theme (Auto/Light/Dark)" 
-                aria-label="Toggle theme mode"
-                role="button">
-          <img class="navbar-theme-icon theme-auto" src="/icons/auto.png" alt="Auto theme" aria-hidden="true">
-          <img class="navbar-theme-icon theme-light" style="display: none;" src="/icons/light.png" alt="Light theme" aria-hidden="true">
-          <img class="navbar-theme-icon theme-dark" style="display: none;" src="/icons/dark.png" alt="Dark theme" aria-hidden="true">
-        </button>
+const NewNavbar = () => `
+  <nav class="new-navbar">
+    <div class="navbar-content">
+      <!-- Project Name -->
+      <div class="navbar-brand">
+        <a href="/" class="brand-link">ShareBin</a>
       </div>
       
-      <button class="navbar-mobile-toggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+      
+      <!-- Icon Actions -->
+      <div class="navbar-actions">
+      <!-- New Note Button (Professional) -->
+      <button class="new-note-btn" onclick="window.location.href='/'" title="New Note">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
         </svg>
+        <span>New</span>
       </button>
-    </div>
-    
-    <div class="navbar-mobile-menu" id="navbarMobileMenu">
-      <ul class="navbar-mobile-nav">
-        <li class="navbar-nav-item">
-          <a href="/" class="navbar-nav-link ${currentPage === 'home' ? 'active' : ''}">
-            <svg class="navbar-theme-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12,2L2,7L12,12L22,7L12,2M2,17L12,22L22,17L12,12L2,17Z"/>
+        <!-- GitHub Cat Icon -->
+        <a href="https://github.com/kvnlabs/ShareBin" class="navbar-icon github-icon" title="GitHub" target="_blank" rel="noopener">
+          <img src="/github-cat-static.png" alt="GitHub Cat" width="35" height="35">
+        </a>
+        
+        
+        <!-- Theme Dropdown -->
+        <div class="navbar-menu-container">
+          <button class="navbar-icon theme-toggle-icon" id="navbarThemeToggle" title="Theme">
+            <img class="theme-icon theme-auto" src="/icons/auto.png" alt="Auto theme" aria-hidden="true">
+            <img class="theme-icon theme-light" style="display: none;" src="/icons/light.png" alt="Light theme" aria-hidden="true">
+            <img class="theme-icon theme-dark" style="display: none;" src="/icons/dark.png" alt="Dark theme" aria-hidden="true">
+          </button>
+          
+          <div class="navbar-dropdown theme-dropdown" id="themeDropdown">
+            <button class="dropdown-item" data-theme="auto">
+              <img src="/icons/auto.png" alt="Auto" width="14" height="14">
+              Auto
+            </button>
+            <button class="dropdown-item" data-theme="light">
+              <img src="/icons/light.png" alt="Light" width="14" height="14">
+              Light
+            </button>
+            <button class="dropdown-item" data-theme="dark">
+              <img src="/icons/dark.png" alt="Dark" width="14" height="14">
+              Dark
+            </button>
+          </div>
+        </div>
+        
+        <!-- Three Dot Menu Icon -->
+        <div class="navbar-menu-container">
+          <button class="navbar-icon menu-toggle menu-dots" id="navbarMenuToggle" title="More options">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="1"></circle>
+              <circle cx="19" cy="12" r="1"></circle>
+              <circle cx="5" cy="12" r="1"></circle>
             </svg>
-            New Paste
-          </a>
-        </li>
-        <li class="navbar-nav-item">
-          <a href="/guide" class="navbar-nav-link ${currentPage === 'guide' ? 'active' : ''}">
-            <svg class="navbar-theme-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H19M18,17V16H6V17H18M15,15V14H6V15H15M18,13V12H6V13H18M18,11V10H6V11H18M18,9V8H6V9H18M18,7V6H6V7H18Z"/>
-            </svg>
-            Guide
-          </a>
-        </li>
-        <li class="navbar-nav-item">
-          <a href="/about" class="navbar-nav-link ${currentPage === 'about' ? 'active' : ''}">
-            <svg class="navbar-theme-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
-            </svg>
-            About
-          </a>
-        </li>
-      </ul>
-      <div class="navbar-mobile-actions">
-        <button id="navbarMobileThemeToggle" class="navbar-theme-toggle" 
-                title="Toggle theme (Auto/Light/Dark)" 
-                aria-label="Toggle theme mode"
-                role="button">
-          <svg class="navbar-theme-icon theme-auto" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C8.84,1 15.17,1 19.08,4.93C19.47,5.32 19.82,5.75 20.13,6.2C20.86,5.47 20.25,4.31 19.43,4.39C14.87,4.39 11.14,8.11 11.14,12.68C11.14,17.25 14.87,21 19.43,21C20.69,21 21.88,20.54 22.88,19.77C23.27,19.5 23.63,19.18 23.93,18.83C24.58,18.04 23.69,16.83 22.55,17.29C21.28,17.8 19.97,17.05 18.97,15.95Z"/>
-          </svg>
-          <span class="navbar-theme-label">Auto</span>
-        </button>
+          </button>
+          
+          <div class="navbar-dropdown" id="navbarDropdown">
+            <a href="/guide" class="dropdown-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
+              </svg>
+              Documentation
+            </a>
+            <a href="#" class="dropdown-item" onclick="alert('CLI commands feature coming soon!')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20,19V7H4V19H20M20,3A2,2 0 0,1 22,5V19A2,2 0 0,1 20,21H4A2,2 0 0,1 2,19V5C2,3.89 2.9,3 4,3H20M13,17V15H18V17H13M9.58,13L5.57,9H8.4L11.7,12.3L15,9H17.8L13.79,13L18.22,18H15.39L11.7,14.3L8,18H5.17L9.58,13Z"/>
+              </svg>
+              CLI Commands
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="https://github.com/kvnlabs/ShareBin/issues" class="dropdown-item" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14,12H10V10H14M14,16H10V14H14M20,8H17.19C16.74,7.22 16.12,6.55 15.37,6.04L17,4.41L15.59,3L13.42,5.17C12.96,5.06 12.49,5 12,5C11.51,5 11.04,5.06 10.59,5.17L8.41,3L7,4.41L8.62,6.04C7.88,6.55 7.26,7.22 6.81,8H4V10H6.09C6.04,10.33 6,10.66 6,11V12H4V14H6V15C6,15.34 6.04,15.67 6.09,16H4V18H6.81C7.85,19.79 9.78,21 12,21C14.22,21 16.15,19.79 17.19,18H20V16H17.91C17.96,15.67 18,15.34 18,15V14H20V12H18V11C18,10.66 17.96,10.33 17.91,10H20V8Z"/>
+              </svg>
+              Bug Report
+            </a>
+            <a href="mailto:support@sharebin.in" class="dropdown-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"/>
+              </svg>
+              Support Me
+            </a>
+            <a href="#" class="dropdown-item" id="keyboard-shortcuts-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20,5H4C2.9,5 2,5.9 2,7V17C2,18.1 2.9,19 4,19H20C21.1,19 22,18.1 22,17V7C22,5.9 21.1,5 20,5M20,17H4V7H20V17M5,8H7V10H5V8M8,8H10V10H8V8M11,8H13V10H11V8M14,8H16V10H14V8M17,8H19V10H17V8M5,11H7V13H5V11M8,11H10V13H8V11M11,11H13V13H11V11M14,11H16V13H14V11M17,11H19V13H17V11M8,14H16V16H8V14Z"/>
+              </svg>
+              Keyboard Shortcuts
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
+`;
+
+const CharacterCount = () => `
+  <small id="characterCount"></small>
 `;
 
 const Tabs = () => `
@@ -120,13 +126,191 @@ const Tabs = () => `
   <small id="characterCount"></small>
 `;
 
-const Editor = (paste = '') => `
-  <div id="editor-container">
-    <textarea id="pasteTextArea" name="paste" required>${paste}</textarea>
-    <div id="editor"></div>
-  </div>
-
-  <div id="preview-container">
+const Editor = (paste = '', url = '', errors: any = { url: '' }) => `
+  <!-- Modern Split Layout -->
+  <div class="github-layout">
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Editor Header with Tab-like Interface -->
+      <div class="editor-header">
+        <div class="editor-tabs">
+          <button type="button" class="editor-tab active" data-tab="edit">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+            </svg>
+            Edit
+          </button>
+          <button type="button" class="editor-tab" data-tab="preview">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+            </svg>
+            Preview
+          </button>
+        </div>
+        <div class="editor-actions">
+          <!-- Focus Mode Toggle -->
+          <button type="button" class="focus-mode-btn" id="focusModeToggle" title="Focus Mode">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Content Container -->
+      <div class="editor-content">
+        <!-- Editor View -->
+        <div id="editor-container" class="tab-content active" data-content="edit">
+          <textarea id="pasteTextArea" name="paste" required>${paste}</textarea>
+          <div id="editor"></div>
+        </div>
+        
+        <!-- Preview View -->
+        <div id="preview-container" class="tab-content" data-content="preview">
+          <div class="preview-placeholder">Preview will appear here...</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right Sidebar -->
+    <div class="sidebar">
+      <!-- Note Password -->
+      <div class="sidebar-section">
+        <label class="sidebar-label">Note password (optional)</label>
+        <div class="password-field">
+          <div class="input-with-action">
+            <input
+              type="password"
+              id="encryptionPassword"
+              name="encryptionPassword"
+              placeholder="Optional password..."
+              minlength="8"
+              class="sidebar-input"
+            />
+            <button type="button" id="togglePasswordVisibility" class="input-action-btn" title="Show/Hide password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+              </svg>
+            </button>
+            <button type="button" id="generatePassword" class="input-action-btn" title="Generate secure password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,2A2,2 0 0,1 14,4C14,5.11 13.1,6 12,6C10.89,6 10,5.1 10,4A2,2 0 0,1 12,2M21,9V7L19,8L21,9M23,13V11L21,12L23,13M20,2V4L22,3L20,2M17,3L15,5L16.5,6.5L18.5,4.5L17,3M7,14A3,3 0 0,1 10,17A3,3 0 0,1 7,20A3,3 0 0,1 4,17A3,3 0 0,1 7,14M7,16A1,1 0 0,0 6,17A1,1 0 0,0 7,18A1,1 0 0,0 8,17A1,1 0 0,0 7,16Z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Expiration Delay -->
+      <div class="sidebar-section">
+        <label class="sidebar-label">Expiration delay</label>
+        <div class="expiry-options">
+          <div class="compact-expiry-buttons">
+            <button type="button" class="compact-expiry-btn" data-hours="1">1 hour</button>
+            <button type="button" class="compact-expiry-btn selected" data-hours="24">1 day</button>
+            <button type="button" class="compact-expiry-btn" data-hours="168">1 week</button>
+            <button type="button" class="compact-expiry-btn" data-hours="720">1 month</button>
+            <button type="button" class="compact-expiry-btn" data-hours="0">infinite</button>
+            <button type="button" class="compact-expiry-btn" id="customDateBtn" data-hours="custom">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19,3H18V1H16V3H8V1H6V3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19M5,6V5H19V6H5Z"/>
+              </svg>
+              Custom date
+            </button>
+          </div>
+          <input
+            type="datetime-local"
+            id="customExpiryDate"
+            name="customExpiryDate"
+            class="sidebar-input"
+            style="display: none;"
+            placeholder="Custom date"
+          />
+        </div>
+      </div>
+      
+      <!-- Delete after reading -->
+      <div class="sidebar-section">
+        <div class="toggle-option">
+          <label class="toggle-option-label">
+            <input type="checkbox" id="enableOneTimeView" name="enableOneTimeView" class="toggle-checkbox" />
+            <span class="toggle-switch-small">
+              <span class="toggle-slider-small"></span>
+            </span>
+            <span class="toggle-text">Delete the note after reading</span>
+          </label>
+        </div>
+      </div>
+      
+      <!-- Custom URL -->
+      <div class="sidebar-section">
+        <label class="sidebar-label">Custom URL (optional)</label>
+        <input
+          name="url"
+          type="text"
+          placeholder="Custom URL slug"
+          minlength="3"
+          maxlength="40"
+          value="${url}"
+          pattern=".*\\S+.*"
+          aria-invalid="${Boolean(errors.url)}"
+          ${_if(errors.url, 'aria-describedby="url-error"')}
+          class="sidebar-input"
+        />
+        ${_if(errors.url, `
+          <small class="field-error" id="url-error">${errors.url}</small>
+        `)}
+      </div>
+      
+      <!-- Edit Code -->
+      <div class="sidebar-section">
+        <label class="sidebar-label">Edit Code (optional)</label>
+        <input
+          name="editcode"
+          type="text"
+          placeholder="Optional edit code"
+          minlength="3"
+          maxlength="40"
+          class="sidebar-input"
+        />
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="sidebar-actions">
+        <button type="button" class="sidebar-btn secondary" id="attachFiles">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z"/>
+          </svg>
+          Attach files
+        </button>
+        
+        <button type="submit" class="sidebar-btn primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+          </svg>
+          Create note
+        </button>
+      </div>
+      
+      <!-- Hidden file input -->
+      <input
+        type="file"
+        id="fileAttachment"
+        name="fileAttachment"
+        multiple
+        accept=".txt,.md,.js,.ts,.html,.css,.json,.xml,.csv,.log,.py,.java,.cpp,.c,.php,.rb,.go,.rs,.swift,.kt,.scala,.sh,.bat,.sql,.yml,.yaml"
+        class="hidden-file-input"
+      />
+      
+      <!-- File list -->
+      <div id="fileList" class="file-list" style="display: none;">
+        <div class="file-list-header">
+          <span id="fileCount">Attached Files</span>
+          <button type="button" id="clearAllFiles" class="clear-all">Clear All</button>
+        </div>
+        <div id="fileItems" class="file-items"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Shortcuts Modal -->
@@ -269,18 +453,31 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
     <meta name="description" content="pastebin" >
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <!-- External Libraries -->
     <link rel="stylesheet" href="/codemirror.min.css">
     <link rel="stylesheet" href="/highlight-light.min.css" media="(prefers-color-scheme: light)">
     <link rel="stylesheet" href="/highlight-dark.min.css" media="(prefers-color-scheme: dark)">
     <link rel="stylesheet" href="/highlight-light.min.css" media="not all and (prefers-color-scheme: dark)" data-theme-light>
     <link rel="stylesheet" href="/highlight-dark.min.css" media="not all and (prefers-color-scheme: light)" data-theme-dark>
-    <link rel="stylesheet" href="/main.css">
+    
+    <!-- Modular CSS Architecture -->
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/editor.css">
+    <link rel="stylesheet" href="/css/responsive.css">
     <title>
       ${title || 'ShareBin'}
     </title>
   </head>
   <body>
-    ${ThemeToggle()}
+    ${_if(!showNavbar, ThemeToggle())}
+    ${_if(showNavbar, NewNavbar())}
 
     ${_if(mode === 'demo', `
       <div role="alert" class="demo-alert">
@@ -292,20 +489,16 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
     `)}
 
     ${content}
+    ${_if(showKeyboardHint, `
+      <div class="shortcuts-hint">
+        <span class="hint-text">✨ Press <kbd>Ctrl</kbd> + <kbd>/</kbd> for keyboard shortcuts</span>
+      </div>
+    `)}
     <footer>
-      <hr />
       <div class="footer-content">
-        <div class="footer-links">
-          <a href="/">new</a>
-          <a href="/guide">guide</a>
-          <a href="/about">about</a>
-          <a href="https://github.com/kvnlabs/ShareBin">source</a>
+        <div class="footer-info">
+          <span>Crafted by <strong>kavin</strong> • Source code available on <a href="https://github.com/kvnlabs/ShareBin" target="_blank" rel="noopener">GitHub</a> • Version <strong id="version-number">v 1.0.0</strong></span>
         </div>
-        ${_if(showKeyboardHint, `
-          <div class="shortcuts-hint">
-            <span class="hint-text">✨ Press <kbd>Ctrl</kbd> + <kbd>/</kbd> for keyboard shortcuts</span>
-          </div>
-        `)}
       </div>
     </footer>
     <script>
@@ -326,7 +519,7 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
       function updateThemeUI() {
         const icons = {
           auto: document.querySelectorAll('.theme-auto'),
-          light: document.querySelectorAll('.theme-light'),  
+          light: document.querySelectorAll('.theme-light'),
           dark: document.querySelectorAll('.theme-dark')
         };
         
@@ -344,12 +537,17 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
         labels.forEach(label => label.textContent = themeLabels[currentTheme]);
       }
 
-      function cycleTheme() {
-        const currentIndex = themes.indexOf(currentTheme);
-        currentTheme = themes[(currentIndex + 1) % themes.length];
+      function setTheme(theme) {
+        currentTheme = theme;
         localStorage.setItem(themeStorageKey, currentTheme);
         applyTheme(currentTheme);
         updateThemeUI();
+        
+        // Close theme dropdown
+        const themeDropdown = document.getElementById('themeDropdown');
+        if (themeDropdown) {
+          themeDropdown.classList.remove('show');
+        }
         
         // Announce to screen readers
         const announcement = document.createElement('div');
@@ -363,7 +561,50 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
 
       function toggleMobileMenu() {
         const menu = document.getElementById('navbarMobileMenu');
-        menu.classList.toggle('open');
+        if (menu) menu.classList.toggle('open');
+      }
+
+      function toggleNavbarDropdown() {
+        const dropdown = document.getElementById('navbarDropdown');
+        if (dropdown) {
+          dropdown.classList.toggle('show');
+        }
+      }
+
+      function toggleThemeDropdown() {
+        const dropdown = document.getElementById('themeDropdown');
+        if (dropdown) {
+          dropdown.classList.toggle('show');
+        }
+      }
+
+      function toggleFocusMode() {
+        const body = document.body;
+        const focusBtn = document.getElementById('focusModeToggle');
+        
+        if (body.classList.contains('focus-mode')) {
+          // Exit focus mode
+          body.classList.remove('focus-mode');
+          if (focusBtn) {
+            focusBtn.title = 'Focus Mode';
+            focusBtn.innerHTML = \`
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z"/>
+              </svg>
+            \`;
+          }
+        } else {
+          // Enter focus mode
+          body.classList.add('focus-mode');
+          if (focusBtn) {
+            focusBtn.title = 'Exit Focus Mode';
+            focusBtn.innerHTML = \`
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14,14H19V16H16V19H14V14M5,14H10V19H8V16H5V14M8,5H10V10H5V8H8V5M19,8V10H14V5H16V8H19Z"/>
+              </svg>
+            \`;
+          }
+        }
       }
 
       // Initialize theme
@@ -377,28 +618,88 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
         }
       });
 
+      // Shortcuts modal functionality
+      function toggleShortcutsModal() {
+        const shortcutsModal = document.getElementById('shortcuts-modal');
+        if (shortcutsModal) {
+          const isVisible = shortcutsModal.style.display === 'flex';
+          
+          if (isVisible) {
+            shortcutsModal.style.display = 'none';
+          } else {
+            shortcutsModal.style.display = 'flex';
+          }
+        }
+      }
+      
+      function closeShortcutsModal() {
+        const shortcutsModal = document.getElementById('shortcuts-modal');
+        if (shortcutsModal) {
+          shortcutsModal.style.display = 'none';
+        }
+      }
+      
+
       // Add click handlers when DOM is ready
       document.addEventListener('DOMContentLoaded', () => {
-        // Desktop theme toggle
-        const desktopToggle = document.getElementById('navbarThemeToggle');
-        if (desktopToggle) {
-          desktopToggle.addEventListener('click', cycleTheme);
-          desktopToggle.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              cycleTheme();
+        // Fetch and display GitHub version
+
+        // Theme dropdown toggle
+        const themeToggle = document.getElementById('navbarThemeToggle');
+        const themeDropdown = document.getElementById('themeDropdown');
+        
+        if (themeToggle && themeDropdown) {
+          themeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleThemeDropdown();
+          });
+
+          // Handle theme selection
+          themeDropdown.addEventListener('click', (e) => {
+            if (e.target.classList.contains('dropdown-item') || e.target.closest('.dropdown-item')) {
+              const item = e.target.classList.contains('dropdown-item') ? e.target : e.target.closest('.dropdown-item');
+              const selectedTheme = item.dataset.theme;
+              if (selectedTheme) {
+                setTheme(selectedTheme);
+              }
+            }
+          });
+
+          // Close theme dropdown when clicking outside
+          document.addEventListener('click', (e) => {
+            if (!themeToggle.contains(e.target) && !themeDropdown.contains(e.target)) {
+              themeDropdown.classList.remove('show');
             }
           });
         }
 
-        // Mobile theme toggle
-        const mobileToggle = document.getElementById('navbarMobileThemeToggle');
-        if (mobileToggle) {
-          mobileToggle.addEventListener('click', cycleTheme);
-          mobileToggle.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              cycleTheme();
+        // Focus mode toggle
+        const focusToggle = document.getElementById('focusModeToggle');
+        if (focusToggle) {
+          focusToggle.addEventListener('click', toggleFocusMode);
+        }
+
+        // Navbar dropdown menu
+        const menuToggle = document.getElementById('navbarMenuToggle');
+        const dropdown = document.getElementById('navbarDropdown');
+        
+        if (menuToggle && dropdown) {
+          menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleNavbarDropdown();
+          });
+
+          // Close dropdown when clicking outside
+          document.addEventListener('click', (e) => {
+            if (!menuToggle.contains(e.target) && !dropdown.contains(e.target)) {
+              dropdown.classList.remove('show');
+            }
+          });
+
+          // Close dropdown when clicking on dropdown items
+          dropdown.addEventListener('click', (e) => {
+            if (e.target.classList.contains('dropdown-item')) {
+              dropdown.classList.remove('show');
             }
           });
         }
@@ -408,9 +709,9 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
           const menu = document.getElementById('navbarMobileMenu');
           const toggle = document.querySelector('.navbar-mobile-toggle');
           
-          if (menu && menu.classList.contains('open') && 
-              !menu.contains(e.target) && 
-              !toggle.contains(e.target)) {
+          if (menu && menu.classList.contains('open') &&
+              !menu.contains(e.target) &&
+              toggle && !toggle.contains(e.target)) {
             menu.classList.remove('open');
           }
         });
@@ -418,9 +719,57 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
         // Close mobile menu when clicking on nav links
         document.querySelectorAll('.navbar-mobile-nav .navbar-nav-link').forEach(link => {
           link.addEventListener('click', () => {
-            document.getElementById('navbarMobileMenu').classList.remove('open');
+            const menu = document.getElementById('navbarMobileMenu');
+            if (menu) menu.classList.remove('open');
           });
         });
+
+        // GitHub icon hover effect - animate only on hover
+        const githubIcon = document.querySelector('.github-icon img');
+        const githubLink = document.querySelector('.github-icon');
+        
+        if (githubIcon && githubLink) {
+          githubLink.addEventListener('mouseenter', () => {
+            // Force GIF to restart from beginning by adding timestamp
+            githubIcon.src = '/github-cat.gif?' + Date.now();
+          });
+          
+          githubLink.addEventListener('mouseleave', () => {
+            githubIcon.src = '/github-cat-static.png';
+          });
+        }
+        
+        // Keyboard shortcuts button
+        const keyboardShortcutsBtn = document.getElementById('keyboard-shortcuts-btn');
+        if (keyboardShortcutsBtn && typeof window.toggleShortcutsModal === 'function') {
+          keyboardShortcutsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.toggleShortcutsModal();
+          });
+        }
+        
+        // Shortcuts modal close button
+        const closeShortcutsBtn = document.getElementById('close-shortcuts');
+        if (closeShortcutsBtn) {
+          closeShortcutsBtn.addEventListener('click', closeShortcutsModal);
+        }
+        
+        // Close shortcuts modal when clicking outside
+        const shortcutsModal = document.getElementById('shortcuts-modal');
+        if (shortcutsModal) {
+          shortcutsModal.addEventListener('click', function(e) {
+            if (e.target === shortcutsModal) {
+              closeShortcutsModal();
+            }
+          });
+          
+          // Close shortcuts modal with Escape key
+          document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && shortcutsModal.style.display === 'flex') {
+              closeShortcutsModal();
+            }
+          });
+        }
       });
     </script>
     <script src="/nacl.min.js"></script>
@@ -438,155 +787,8 @@ export const homePage = ({
   mode = '',
 } = {}) => layout('ShareBin', `
   <main>
-    ${Tabs()}
-
-    <form id="editor-form" method="post" action="/save">
-      ${Editor(paste)}
-
-      <div class="input-group">
-        <div>
-          <input
-            name="editcode"
-            type="text"
-            placeholder="edit code (optional)"
-            minlength="3"
-            maxlength="40"
-          />
-        </div>
-        <div>
-          <input
-            name="url"
-            type="text"
-            placeholder="custom url"
-            minlength="3"
-            maxlength="40"
-            value="${url}"
-            pattern=".*\\S+.*"
-            aria-invalid="${Boolean(errors.url)}"
-            ${_if(errors.url, 'aria-describedby="url-error"')}
-          />
-          ${_if(errors.url, `
-            <small class="error" id="url-error">${errors.url}</small>
-          `)}
-        </div>
-      </div>
-
-      <div class="file-attachment-section">
-        <label class="file-attachment-label">
-          <svg class="file-attachment-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-          </svg>
-          <span class="file-attachment-text">📎 Attach files (optional)</span>
-          <input
-            type="file"
-            id="fileAttachment"
-            name="fileAttachment"
-            multiple
-            accept=".txt,.md,.js,.ts,.html,.css,.json,.xml,.csv,.log,.py,.java,.cpp,.c,.php,.rb,.go,.rs,.swift,.kt,.scala,.sh,.bat,.sql,.yml,.yaml"
-            class="file-input-hidden"
-          />
-        </label>
-        <div id="fileAttachmentList" class="file-attachment-list" style="display: none;">
-          <div class="file-attachment-header">
-            <span class="file-count">Selected files:</span>
-            <button type="button" id="clearFiles" class="clear-files-btn" title="Clear all files">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
-              </svg>
-            </button>
-          </div>
-          <div class="file-items"></div>
-        </div>
-        <small class="file-attachment-note">
-          💡 Attach text files, code, or documents. Files will be included as appendices to your paste.
-        </small>
-      </div>
-
-      <div class="expiry-date-section">
-        <label>
-          <input type="checkbox" id="enableExpiryDate" name="enableExpiryDate" />
-          <span class="expiry-date-label">⏰ Set expiry date for this paste</span>
-        </label>
-        <div id="expiryDateOptions" class="expiry-date-options" style="display: none;">
-          <div class="expiry-options-grid">
-            <div class="quick-expiry-options">
-              <label class="quick-option-label">Quick options:</label>
-              <div class="quick-expiry-buttons">
-                <button type="button" class="quick-expiry-btn" data-hours="1">1 Hour</button>
-                <button type="button" class="quick-expiry-btn" data-hours="24">1 Day</button>
-                <button type="button" class="quick-expiry-btn" data-hours="168">1 Week</button>
-                <button type="button" class="quick-expiry-btn" data-hours="720">1 Month</button>
-              </div>
-            </div>
-            <div class="custom-expiry-option">
-              <label for="customExpiryDate" class="custom-expiry-label">Or set custom date:</label>
-              <input
-                type="datetime-local"
-                id="customExpiryDate"
-                name="customExpiryDate"
-                class="custom-expiry-input"
-              />
-            </div>
-          </div>
-          <div class="selected-expiry-display" id="selectedExpiryDisplay" style="display: none;">
-            <span class="expiry-display-text">Expires: <strong id="expiryDisplayValue"></strong></span>
-            <button type="button" id="clearExpiry" class="clear-expiry-btn" title="Clear expiry date">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <small class="expiry-date-note">
-          🕒 Your paste will be automatically deleted at the specified time. This cannot be undone.
-          <br>💡 Perfect for temporary content that should not persist indefinitely.
-        </small>
-      </div>
-
-      <div class="one-time-view-section">
-        <label>
-          <input type="checkbox" id="enableOneTimeView" name="enableOneTimeView" />
-          <span class="one-time-view-label">🔥 One-time view (paste will be deleted after first view)</span>
-        </label>
-        <small class="one-time-view-note">
-          ⚠️ <strong>Warning:</strong> Once someone views this paste, it will be permanently deleted and cannot be recovered.
-          <br>💡 Perfect for sharing sensitive information that should only be seen once.
-        </small>
-      </div>
-
-      <div class="encryption-section">
-        <label>
-          <input type="checkbox" id="enableEncryption" name="enableEncryption" />
-          <span class="encryption-label">🔒 Encrypt this paste with a password</span>
-        </label>
-        <div id="encryptionOptions" class="encryption-options" style="display: none;">
-          <div class="input-group">
-            <div>
-              <input
-                type="password"
-                id="encryptionPassword"
-                name="encryptionPassword"
-                placeholder="Encryption password"
-                minlength="8"
-              />
-            </div>
-            <div>
-              <button type="button" id="generatePassword" title="Generate secure password">🎲</button>
-            </div>
-          </div>
-          <small class="encryption-note">
-            🔒 Your paste will be encrypted with <strong>AES-256-GCM</strong> using <strong>PBKDF2</strong> key derivation (100,000 iterations).<br>
-            Anyone who wants to view this paste will need to enter the password.<br>
-            ⚠️ If you lose the password, the paste cannot be recovered.
-          </small>
-        </div>
-      </div>
-
-      <div class="button-group">
-        <button type="submit">
-          save
-        </button>
-      </div>
+    <form id="editor-form" method="post" action="/save" enctype="multipart/form-data">
+      ${Editor(paste, url, errors)}
     </form>
   </main>
   <script src="/codemirror.min.js"></script>
@@ -594,16 +796,24 @@ export const homePage = ({
   <script src="/cm-sublime.min.js"></script>
   <script src="/editor.js"></script>
   <script src="/encryption-ui.js"></script>
-`, mode, true);
+`, mode, true, '', true);
 
-import { PasteRevision } from './storage';
+import { PasteRevision, AttachmentInfo } from './storage';
 
-export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions = [], isEncrypted = false }: { id?: string; html?: string; title?: string; mode?: string; revisions?: PasteRevision[]; isEncrypted?: boolean } = {}) => layout(title, `
+export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions = [], isEncrypted = false, attachments = [] }: { id?: string; html?: string; title?: string; mode?: string; revisions?: PasteRevision[]; isEncrypted?: boolean; attachments?: AttachmentInfo[] } = {}) => layout(title, `
   <main class="paste-main">
     <div class="paste-document">
         
         <!-- Floating Action Menu -->
         <div class="floating-actions">
+          <!-- New Note Button -->
+          <a href="/" class="new-paste-btn" title="Create New Paste">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+            </svg>
+            <span>New Note</span>
+          </a>
+          
           <button class="action-menu-btn" onclick="toggleActionMenu()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z"/>
@@ -660,39 +870,92 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
         <div class="document-content">
           ${html}
         </div>
+        
+        <!-- Attachments Section -->
+        <div class="attachments-section" id="attachmentsSection" style="display: none;">
+          <div class="attachments-header">
+            <h3>📎 Attachments</h3>
+            <div class="attachments-actions">
+              <button class="download-all-btn" onclick="downloadAllAttachments()" title="Download all attachments">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"/>
+                </svg>
+                Download All
+              </button>
+              <span class="attachments-count" id="attachmentsCount">0 files</span>
+            </div>
+          </div>
+          <div class="attachments-grid" id="attachmentsList">
+            <!-- Attachments will be populated here -->
+          </div>
+        </div>
       </div>
 
-      <!-- Floating Revision Panel -->
+      <!-- Enhanced Revision Panel -->
       ${_if(revisions.length > 0, `
         <div class="revision-panel" id="revisionPanel">
           <div class="revision-panel-header">
-            <h3>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z"/>
-              </svg>
-              Page History
-            </h3>
+            <div class="revision-title-section">
+              <h3>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z"/>
+                </svg>
+                Page History
+              </h3>
+              <span class="revision-count">${revisions.length} revisions</span>
+            </div>
             <button class="close-btn" onclick="toggleRevisionHistory()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
               </svg>
             </button>
           </div>
+          <div class="revision-controls">
+            <button class="revision-filter active" data-filter="all">All Changes</button>
+            <button class="revision-filter" data-filter="recent">Recent</button>
+            <button class="revision-filter" data-filter="major">Major</button>
+          </div>
           <div class="revision-list">
             ${revisions.map((rev, index) => `
-              <div class="revision-entry">
-                <div class="revision-info">
-                  <span class="revision-title" data-user-version="${revisions.length - index}">Loading...</span>
-                  <span class="revision-date" data-timestamp="${rev.timestamp}">
-                    <span class="date-relative">Loading...</span>
-                    <span class="date-absolute">Loading...</span>
-                  </span>
+              <div class="revision-entry" data-revision-index="${index}">
+                <div class="revision-timeline">
+                  <div class="revision-dot"></div>
+                  ${index < revisions.length - 1 ? '<div class="revision-line"></div>' : ''}
                 </div>
-                <a href="/${id}/edit?revision=${rev.timestamp}" class="revision-action" title="Edit this revision">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
-                  </svg>
-                </a>
+                <div class="revision-content">
+                  <div class="revision-header">
+                    <div class="revision-info">
+                      <span class="revision-title" data-user-version="${revisions.length - index}">Loading...</span>
+                      <span class="revision-date" data-timestamp="${rev.timestamp}">
+                        <span class="date-relative">Loading...</span>
+                        <span class="date-absolute">Loading...</span>
+                      </span>
+                    </div>
+                    <div class="revision-actions">
+                      <button class="revision-action-btn" onclick="viewRevision('${rev.timestamp}')" title="View this revision">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+                        </svg>
+                      </button>
+                      <button class="revision-action-btn" onclick="restoreRevision('${rev.timestamp}')" title="Restore this revision">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z"/>
+                        </svg>
+                      </button>
+                      <a href="/${id}/edit?revision=${rev.timestamp}" class="revision-action-btn" title="Edit this revision">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                  <div class="revision-preview">
+                    <div class="revision-changes">
+                      <span class="change-indicator">Modified content</span>
+                      <span class="change-size" data-size="${rev.timestamp}">Loading...</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             `).join('')}
           </div>
@@ -901,11 +1164,140 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
       }
     }
 
+    // Initialize attachments
+    function initializeAttachments() {
+      // Use real attachments passed from server
+      const attachmentData = ${JSON.stringify(attachments)};
+      
+      if (attachmentData.length > 0) {
+        displayAttachments(attachmentData);
+      }
+    }
+    
+    function displayAttachments(attachments) {
+      const attachmentsSection = document.getElementById('attachmentsSection');
+      const attachmentsList = document.getElementById('attachmentsList');
+      const attachmentsCount = document.getElementById('attachmentsCount');
+      
+      if (!attachmentsSection || !attachmentsList || !attachmentsCount) return;
+      
+      attachmentsSection.style.display = 'block';
+      attachmentsCount.textContent = attachments.length === 1 ? '1 file' : \`\${attachments.length} files\`;
+      
+      attachmentsList.innerHTML = attachments.map(attachment => \`
+        <div class="attachment-item">
+          <div class="attachment-info">
+            <svg class="attachment-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="\${getFileIcon(attachment.originalName)}"/>
+            </svg>
+            <div class="attachment-details">
+              <div class="attachment-name" title="\${attachment.originalName}">\${attachment.originalName}</div>
+              <div class="attachment-size">\${formatFileSize(attachment.size)}</div>
+            </div>
+          </div>
+          <div class="attachment-actions">
+            <button class="attachment-btn primary" onclick="downloadAttachment('\${attachment.id}', '\${attachment.originalName}')">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"/>
+              </svg>
+              Download
+            </button>
+            <button class="attachment-btn" onclick="viewAttachment('\${attachment.id}', '\${attachment.type}', '\${attachment.originalName}')">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+              </svg>
+              View
+            </button>
+          </div>
+        </div>
+      \`).join('');
+    }
+    
+    function downloadAttachment(attachmentId, filename) {
+      const url = \`/attachment/\${attachmentId}?paste=\${encodeURIComponent('${id}')}&action=download\`;
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+      showNotification('Downloading ' + filename, 'success');
+    }
+    
+    function viewAttachment(attachmentId, type, filename) {
+      if (type.startsWith('text/') || type === 'application/json') {
+        // Open in new tab for text files with inline display
+        const url = \`/attachment/\${attachmentId}?paste=\${encodeURIComponent('${id}')}&action=view\`;
+        window.open(url, '_blank');
+      } else {
+        // Download non-text files
+        downloadAttachment(attachmentId, filename);
+      }
+    }
+    
+    function getFileIcon(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      
+      switch (ext) {
+        case 'js':
+        case 'ts':
+        case 'jsx':
+        case 'tsx':
+          return "M3,3H21V21H3V3M7.73,18.04C8.13,18.89 8.92,19.59 10.27,19.59C11.77,19.59 12.8,18.79 12.8,17.04V11.26H11.1V17C11.1,17.86 10.75,18.08 10.2,18.08C9.62,18.08 9.38,17.68 9.09,17.18L7.73,18.04M13.71,17.86C14.21,18.84 15.22,19.59 16.8,19.59C18.4,19.59 19.6,18.76 19.6,17.23C19.6,15.82 18.79,15.19 17.35,14.57L16.93,14.39C16.2,14.08 15.89,13.87 15.89,13.37C15.89,12.96 16.2,12.64 16.7,12.64C17.18,12.64 17.5,12.85 17.79,13.37L19.1,12.5C18.55,11.54 17.77,11.17 16.7,11.17C15.19,11.17 14.22,12.13 14.22,13.4C14.22,14.78 15.03,15.43 16.25,15.95L16.67,16.13C17.45,16.47 17.91,16.68 17.91,17.26C17.91,17.74 17.46,18.09 16.76,18.09C15.93,18.09 15.45,17.66 15.09,17.06L13.71,17.86Z";
+        case 'html':
+        case 'htm':
+          return "M12,17.56L16.07,16.43L16.62,10.33H9.38L9.2,8.3H16.8L17,6.31H7L7.56,12.32H14.45L14.22,14.9L12,15.5L9.78,14.9L9.64,13.24H7.64L7.93,16.43L12,17.56M4.07,3H19.93L18.5,19.2L12,21L5.5,19.2L4.07,3Z";
+        case 'css':
+          return "M5,3L4.35,6.34H17.94L17.5,8.5H3.92L3.26,11.83H16.85L16.09,15.64L10.61,17.45L5.86,15.64L6.19,14H2.85L2.06,18L9.91,21L18.96,18L20.16,11.97L20.4,10.76L21.94,3H5Z";
+        case 'json':
+          return "M5,3H7V5H5V10A2,2 0 0,1 3,12A2,2 0 0,1 5,14V19H7V21H5C3.93,20.73 3,20.1 3,19V15A2,2 0 0,0 1,13H0V11H1A2,2 0 0,0 3,9V5C3,3.9 3.9,3 5,3M19,3A2,2 0 0,1 21,5V9A2,2 0 0,0 23,11H24V13H23A2,2 0 0,0 21,15V19A2,2 0 0,1 19,21H17V19H19V14A2,2 0 0,1 21,12A2,2 0 0,1 19,10V5H17V3H19M12,15A1,1 0 0,1 13,16A1,1 0 0,1 12,17A1,1 0 0,1 11,16A1,1 0 0,1 12,15M8,15A1,1 0 0,1 9,16A1,1 0 0,1 8,17A1,1 0 0,1 7,16A1,1 0 0,1 8,15M16,15A1,1 0 0,1 17,16A1,1 0 0,1 16,17A1,1 0 0,1 15,16A1,1 0 0,1 16,15Z";
+        case 'md':
+        case 'markdown':
+          return "M22.269,19.385H1.731a1.73,1.73 0,0 1,-1.73 -1.73V6.345a1.73,1.73 0,0 1,1.73 -1.73H22.269a1.73,1.73 0,0 1,1.73 1.73V17.654A1.73,1.73 0,0 1,22.269 19.385ZM5.547,16.855L8.3,14.1H6.977V9.646H4.117V14.1H2.794ZM16.982,9.646H14.122V14.1H12.8L15.552,16.855L18.3,14.1H16.982Z";
+        case 'txt':
+          return "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z";
+        case 'pdf':
+          return "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z";
+        case 'py':
+          return "M19.14,7.5A2.86,2.86 0 0,1 22,10.36V14.14A2.86,2.86 0 0,1 19.14,17H12C12,17.39 12.32,17.96 12.71,17.96H17V19.64A2.86,2.86 0 0,1 14.14,22.5H9.86A2.86,2.86 0 0,1 7,19.64V15.89C7,14.31 8.28,13.04 9.86,13.04H15.11C16.69,13.04 17.96,11.76 17.96,10.18V7.5H19.14M14.86,19.29C14.46,19.29 14.14,19.59 14.14,20.18C14.14,20.77 14.46,20.89 14.86,20.89A0.71,0.71 0 0,0 15.57,20.18C15.57,19.59 15.25,19.29 14.86,19.29M9.14,5.71C9.54,5.71 9.86,5.41 9.86,4.82C9.86,4.23 9.54,4.11 9.14,4.11A0.71,0.71 0 0,0 8.43,4.82C8.43,5.41 8.75,5.71 9.14,5.71M15.11,1.5A2.86,2.86 0 0,1 17.96,4.36V8.11C17.96,9.69 16.69,10.96 15.11,10.96H9.86C8.28,10.96 7,12.24 7,13.82V15.89C7,16.28 6.68,16.85 6.29,16.85H2V15.18A2.86,2.86 0 0,1 4.86,12.32H12C12,11.93 11.68,11.36 11.29,11.36H7V9.68A2.86,2.86 0 0,1 9.86,6.82H15.11A2.86,2.86 0 0,1 17.96,4V1.5H15.11Z";
+        default:
+          return "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z";
+      }
+    }
+    
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    function downloadAllAttachments() {
+      const attachmentData = ${JSON.stringify(attachments)};
+      
+      if (attachmentData.length === 0) {
+        showNotification('No attachments to download', 'error');
+        return;
+      }
+      
+      // Show notification
+      showNotification(\`Downloading \${attachmentData.length} attachments...\`, 'info');
+      
+      // Download each attachment with a small delay to avoid overwhelming the browser
+      attachmentData.forEach((attachment, index) => {
+        setTimeout(() => {
+          downloadAttachment(attachment.id, attachment.originalName);
+        }, index * 200); // 200ms delay between downloads
+      });
+    }
+
     // Initialize when page loads
     document.addEventListener('DOMContentLoaded', () => {
       addCopyButtonsToCodeBlocks();
       initializeRevisionTimestamps();
       initializeUserVersions();
+      initializeAttachments();
+      initializeRevisionFilters();
+      initializeRevisionSizes();
       
       // Update relative timestamps every minute
       setInterval(updateRelativeTimestamps, 60000);
@@ -1068,6 +1460,117 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
       return date.toLocaleDateString(navigator.language || 'en-US', options);
     }
 
+    // Enhanced revision history functions
+    function viewRevision(timestamp) {
+      // Create a modal or overlay to show the revision content
+      const modal = document.createElement('div');
+      modal.className = 'revision-modal';
+      modal.innerHTML = \`
+        <div class="revision-modal-content">
+          <div class="revision-modal-header">
+            <h3>Revision from \${formatAbsoluteTime(new Date(parseInt(timestamp)))}</h3>
+            <button class="close-btn" onclick="this.closest('.revision-modal').remove()">×</button>
+          </div>
+          <div class="revision-modal-body">
+            <div class="loading">Loading revision...</div>
+          </div>
+        </div>
+      \`;
+      
+      document.body.appendChild(modal);
+      
+      // Fetch and display the revision content
+      fetch('/${id}/revision/' + timestamp)
+        .then(response => response.text())
+        .then(content => {
+          modal.querySelector('.revision-modal-body').innerHTML = \`
+            <div class="revision-content">\${content}</div>
+          \`;
+        })
+        .catch(error => {
+          modal.querySelector('.revision-modal-body').innerHTML = \`
+            <div class="error">Failed to load revision: \${error.message}</div>
+          \`;
+        });
+    }
+    
+    function restoreRevision(timestamp) {
+      if (confirm('Are you sure you want to restore this revision? This will replace the current content.')) {
+        showNotification('Restoring revision...', 'info');
+        
+        fetch('/${id}/restore/' + timestamp, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            showNotification('Revision restored successfully!', 'success');
+            setTimeout(() => window.location.reload(), 1000);
+          } else {
+            showNotification('Failed to restore revision', 'error');
+          }
+        })
+        .catch(error => {
+          showNotification('Error restoring revision: ' + error.message, 'error');
+        });
+      }
+    }
+    
+    // Initialize revision filters
+    function initializeRevisionFilters() {
+      const filterButtons = document.querySelectorAll('.revision-filter');
+      const revisionEntries = document.querySelectorAll('.revision-entry');
+      
+      filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          // Update active filter
+          filterButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+          
+          const filter = button.dataset.filter;
+          
+          revisionEntries.forEach((entry, index) => {
+            const shouldShow = filter === 'all' ||
+                             (filter === 'recent' && index < 5) ||
+                             (filter === 'major' && index % 3 === 0);
+            
+            entry.style.display = shouldShow ? 'flex' : 'none';
+          });
+        });
+      });
+    }
+    
+    // Calculate and display revision sizes
+    function initializeRevisionSizes() {
+      const sizeElements = document.querySelectorAll('.change-size');
+      const revisions = ${JSON.stringify(revisions)};
+      
+      sizeElements.forEach((element, index) => {
+        const currentSize = revisions[index]?.content?.length || 0;
+        const previousSize = revisions[index + 1]?.content?.length || 0;
+        const diff = currentSize - previousSize;
+        
+        let sizeText = '';
+        let className = '';
+        
+        if (diff > 0) {
+          sizeText = '+' + diff + ' chars';
+          className = 'addition';
+        } else if (diff < 0) {
+          sizeText = diff + ' chars';
+          className = 'deletion';
+        } else {
+          sizeText = 'No change';
+          className = 'neutral';
+        }
+        
+        element.textContent = sizeText;
+        element.className = 'change-size ' + className;
+      });
+    }
+
     document.getElementById('decrypt-form')?.addEventListener('submit', async function(e) {
       e.preventDefault();
       const password = document.getElementById('decrypt-password').value;
@@ -1112,42 +1615,178 @@ export const guidePage = ({ html = '', title = '', mode = '' } = {}) => layout(t
   </main>
 `, mode, false);
 
-export const editPage = (
-  { id = '', paste = '', hasEditCode = false, errors = { editCode: '' }, mode = '' } = {},
-) => layout(`edit ${id}`, `
-  <main>
-    ${Tabs()}
-
-    <form id="editor-form" method="post" action="/${id}/save">
-      ${Editor(paste)}
-
-      <input class="display-none" name="url" type="text" value="${id}" disabled />
-      <div class="input-group">
+const EditEditor = (paste = '', id = '', hasEditCode = false, errors: any = { editCode: '' }, existingAttachments: any[] = []) => `
+  <!-- Modern Edit Layout -->
+  <div class="github-layout">
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Editor Header -->
+      <div class="editor-header">
+        <div class="editor-tabs">
+          <button type="button" class="editor-tab active" data-tab="edit">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+            </svg>
+            Edit
+          </button>
+          <button type="button" class="editor-tab" data-tab="preview">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+            </svg>
+            Preview
+          </button>
+        </div>
+        <div class="editor-actions">
+          <button type="button" class="focus-mode-btn" id="focusModeToggle" title="Focus Mode">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Content Container -->
+      <div class="editor-content">
+        <!-- Editor View -->
+        <div id="editor-container" class="tab-content active" data-content="edit">
+          <textarea id="pasteTextArea" name="paste" required>${paste}</textarea>
+          <div id="editor"></div>
+        </div>
+        
+        <!-- Preview View -->
+        <div id="preview-container" class="tab-content" data-content="preview">
+          <div class="preview-placeholder">Preview will appear here...</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Edit Sidebar -->
+    <div class="sidebar">
+      <!-- Note Information -->
+      <div class="sidebar-section">
+        <label class="sidebar-label">Note ID</label>
+        <input
+          type="text"
+          value="${id}"
+          class="sidebar-input"
+          readonly
+          style="background: var(--faint-bg-color); cursor: text;"
+        />
+      </div>
+      
+      <!-- Edit Code Section -->
+      <div class="sidebar-section">
+        <label class="sidebar-label">Edit Code ${hasEditCode ? '(required)' : '(optional)'}</label>
+        <input
+          name="editcode"
+          type="text"
+          placeholder="${hasEditCode ? 'Enter edit code to save changes' : 'Optional edit code'}"
+          minlength="3"
+          maxlength="40"
+          ${hasEditCode ? 'required' : ''}
+          aria-invalid="${Boolean(errors.editCode)}"
+          ${_if(errors.editCode, 'aria-describedby="editcode-error"')}
+          class="sidebar-input"
+        />
+        ${_if(errors.editCode, `
+          <small class="field-error" id="editcode-error">${errors.editCode}</small>
+        `)}
         ${_if(hasEditCode, `
-          <div>
-            <input
-              name="editcode"
-              type="text"
-              placeholder="edit code"
-              minlength="3"
-              maxlength="40"
-              required
-              aria-invalid="${Boolean(errors.editCode)}"
-              ${_if(errors.editCode, 'aria-describedby="editcode-error"')}
-            />
-
-            ${_if(errors.editCode, `
-              <small class="error" id="editcode-error">${errors.editCode}</small>
-            `)}
-          </div>
+          <small class="field-help">This note requires an edit code to save changes.</small>
         `)}
       </div>
-
-      <div class="button-group">
-        <button type="submit">
-          save
+      
+      <!-- Action Buttons -->
+      <div class="sidebar-actions">
+        <button type="button" class="sidebar-btn secondary" id="attachFiles">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z"/>
+          </svg>
+          Attach files
         </button>
+        
+        <button type="submit" class="sidebar-btn primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z"/>
+          </svg>
+          Save note
+        </button>
+        
+        <a href="/${id}" class="sidebar-btn secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+          </svg>
+          Cancel
+        </a>
       </div>
+      
+      <!-- Hidden file input -->
+      <input
+        type="file"
+        id="fileAttachment"
+        name="fileAttachment"
+        multiple
+        accept=".txt,.md,.js,.ts,.html,.css,.json,.xml,.csv,.log,.py,.java,.cpp,.c,.php,.rb,.go,.rs,.swift,.kt,.scala,.sh,.bat,.sql,.yml,.yaml"
+        class="hidden-file-input"
+      />
+      
+      <!-- File list -->
+      <div id="fileList" class="file-list" style="display: none;">
+        <div class="file-list-header">
+          <span id="fileCount">Attached Files</span>
+          <button type="button" id="clearAllFiles" class="clear-all">Clear All</button>
+        </div>
+        <div id="fileItems" class="file-items"></div>
+      </div>
+      
+      <!-- Existing Attachments -->
+      ${existingAttachments.length > 0 ? `
+        <div class="existing-attachments">
+          <div class="sidebar-section">
+            <label class="sidebar-label">Existing Attachments (${existingAttachments.length})</label>
+            <div class="existing-attachments-list">
+              ${existingAttachments.map(attachment => `
+                <div class="existing-attachment-item">
+                  <div class="attachment-info">
+                    <svg class="attachment-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    </svg>
+                    <div class="attachment-details">
+                      <div class="attachment-name" title="${attachment.originalName}">${attachment.originalName}</div>
+                      <div class="attachment-size">${attachment.size < 1024 ? attachment.size + ' B' : attachment.size < 1048576 ? Math.round(attachment.size/1024) + ' KB' : Math.round(attachment.size/1048576) + ' MB'}</div>
+                    </div>
+                  </div>
+                  <div class="attachment-actions">
+                    <button type="button" class="attachment-btn small" onclick="downloadEditAttachment('${attachment.id}', '${attachment.originalName}')">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"/>
+                      </svg>
+                      Download
+                    </button>
+                    <button type="button" class="attachment-btn small danger" onclick="removeExistingAttachment('${attachment.id}')">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                      </svg>
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  </div>
+`;
+
+export const editPage = (
+  { id = '', paste = '', hasEditCode = false, errors = { editCode: '' }, mode = '', existingAttachments = [] as any[] } = {},
+) => layout(`edit ${id}`, `
+  <main>
+    <form id="editor-form" method="post" action="/${id}/save" enctype="multipart/form-data">
+      ${EditEditor(paste, id, hasEditCode, errors, existingAttachments)}
+      <input type="hidden" name="url" value="${id}" />
     </form>
   </main>
   <script src="/codemirror.min.js"></script>
@@ -1155,7 +1794,33 @@ export const editPage = (
   <script src="/cm-sublime.min.js"></script>
   <script src="/editor.js"></script>
   <script src="/encryption-ui.js"></script>
-`, mode, true);
+  <script>
+    // Edit page attachment functions
+    function downloadEditAttachment(attachmentId, filename) {
+      const url = \`/attachment/\${attachmentId}?paste=\${encodeURIComponent('${id}')}&action=download\`;
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+    }
+    
+    function removeExistingAttachment(attachmentId) {
+      if (confirm('Are you sure you want to remove this attachment?')) {
+        const attachmentItem = document.querySelector(\`[onclick*="\${attachmentId}"]\`).closest('.existing-attachment-item');
+        if (attachmentItem) {
+          attachmentItem.remove();
+          
+          // Add hidden input to mark for deletion
+          const hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.name = 'removeAttachment';
+          hiddenInput.value = attachmentId;
+          document.getElementById('editor-form').appendChild(hiddenInput);
+        }
+      }
+    }
+  </script>
+`, mode, true, '', true);
 
 export const deletePage = (
   { id = '', hasEditCode = false, errors = { editCode: '' }, mode = '' } = {}
@@ -1205,6 +1870,173 @@ export const errorPage = (mode = '') => layout('404', `
     <h1>404</h1>
     <p>That paste doesn't exist! Maybe it was deleted?</p>
   </main>
+`, mode, false);
+
+export const oneTimeViewWarningPage = ({ id = '', mode = '' } = {}) => layout(`⚠️ One-Time View Warning - ${id}`, `
+  <main>
+    <div class="warning-prompt">
+      <div class="warning-prompt-content">
+        <div class="warning-icon">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,2L13.09,8.26L22,9L13.09,9.74L12,16L10.91,9.74L2,9L10.91,8.26L12,2M12,21L10.91,15.74L2,15L10.91,14.26L12,8L13.09,14.26L22,15L13.09,15.74L12,21Z"/>
+          </svg>
+        </div>
+        
+        <h2>⚠️ One-Time View Warning</h2>
+        
+        <div class="warning-message">
+          <p><strong>This paste will be deleted after you view it once.</strong></p>
+          <p>After clicking "View Content", you will not be able to access this paste again. Make sure you're ready to view and process the content.</p>
+        </div>
+        
+        <div class="warning-actions">
+          <button onclick="proceedToView()" class="warning-btn primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+            </svg>
+            View Content (One Time Only)
+          </button>
+          
+          <a href="/" class="warning-btn secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+            </svg>
+            Go Back to Home
+          </a>
+        </div>
+        
+        <div class="warning-info">
+          <small>
+            <strong>💡 Tip:</strong> If you need to share content that can be viewed multiple times, create a new paste without the "Delete after reading" option.
+          </small>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <style>
+    .warning-prompt {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 70vh;
+      padding: 1rem;
+    }
+    
+    .warning-prompt-content {
+      max-width: 500px;
+      padding: 2rem;
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      background: var(--bg-color);
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.2);
+    }
+    
+    .warning-icon {
+      color: #f59e0b;
+      margin-bottom: 1rem;
+    }
+    
+    .warning-prompt h2 {
+      margin-bottom: 1.5rem;
+      color: #f59e0b;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    
+    .warning-message {
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+    
+    .warning-message p {
+      margin-bottom: 1rem;
+      color: var(--color);
+      line-height: 1.6;
+    }
+    
+    .warning-message strong {
+      color: #dc2626;
+    }
+    
+    .warning-actions {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .warning-btn {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .warning-btn.primary {
+      background: #dc2626;
+      color: white;
+    }
+    
+    .warning-btn.primary:hover {
+      background: #b91c1c;
+      transform: translateY(-1px);
+    }
+    
+    .warning-btn.secondary {
+      background: var(--faint-bg-color);
+      color: var(--color);
+      border: 1px solid var(--border-color);
+    }
+    
+    .warning-btn.secondary:hover {
+      background: var(--light-bg-color);
+      border-color: var(--link-color);
+    }
+    
+    .warning-info {
+      padding: 1rem;
+      background: var(--faint-bg-color);
+      border-radius: 6px;
+      border-left: 4px solid #f59e0b;
+    }
+    
+    .warning-info small {
+      color: var(--faint-color);
+      line-height: 1.4;
+    }
+    
+    @media (max-width: 640px) {
+      .warning-actions {
+        flex-direction: column;
+      }
+      
+      .warning-btn {
+        min-width: auto;
+      }
+    }
+  </style>
+  
+  <script>
+    function proceedToView() {
+      // Add a confirmation dialog for extra safety
+      if (confirm('Are you sure you want to view this one-time content? It will be permanently deleted after viewing.')) {
+        // Proceed to the actual paste view
+        window.location.href = '/${id}?confirm=true';
+      }
+    }
+  </script>
 `, mode, false);
 
 export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => layout(`🔒 Encrypted Paste - ${id}`, `
@@ -1289,6 +2121,439 @@ export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => l
       line-height: 1.4;
     }
   </style>
+`, mode, false);
+
+export const noteCreatedPage = ({ id = '', url = '', mode = '' } = {}) => layout(`Note Created - ${id}`, `
+  <main class="confirmation-main">
+    <div class="confirmation-panel">
+      <!-- Success Icon -->
+      <div class="success-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M11,16.5L18,9.5L16.59,8.09L11,13.67L7.91,10.59L6.5,12L11,16.5Z"/>
+        </svg>
+      </div>
+      
+      <!-- Heading -->
+      <h1 class="confirmation-heading">Note created successfully</h1>
+      
+      <!-- Sub-text -->
+      <p class="confirmation-subtext">Your note has been created and is ready to share</p>
+      
+      <!-- URL Input Field -->
+      <div class="url-section">
+        <input
+          type="text"
+          id="noteUrl"
+          class="url-input"
+          value="${url}"
+          readonly
+          onclick="this.select()"
+        />
+        
+        <!-- Copy Link Button -->
+        <button type="button" id="copyUrlBtn" class="copy-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+          </svg>
+          Copy link
+        </button>
+      </div>
+      
+      <!-- QR Code Section -->
+      <div class="qr-section">
+        <div class="qr-content">
+          <!-- QR Code -->
+          <div class="qr-code-container">
+            <canvas id="qrCanvas" width="200" height="200"></canvas>
+          </div>
+          
+          <!-- QR Info -->
+          <div class="qr-info">
+            <p class="qr-description">Share this note on mobile devices by scanning the QR code</p>
+            <div class="qr-actions">
+              <button type="button" id="exportQrBtn" class="export-qr-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+                Export QR code
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Create Another Note Link -->
+      <div class="bottom-actions">
+        <a href="/" class="create-another-link">Create another note</a>
+      </div>
+    </div>
+  </main>
+
+  <style>
+    .confirmation-main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 60vh; /* Reduced from calc(100vh - 200px) to make footer more visible */
+      padding: 1rem; /* Reduced padding */
+    }
+
+    .confirmation-panel {
+      background: var(--bg-color);
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .success-icon {
+      color: #10b981;
+      margin: 0 auto 1.5rem auto; /* Center the icon */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .confirmation-heading {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--color);
+      margin-bottom: 0.75rem;
+    }
+
+    .confirmation-subtext {
+      color: var(--faint-color);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .url-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .url-input {
+      width: 85%;
+      padding: 0.75rem;
+      font-family: var(--monospace);
+      font-size: 0.9rem;
+      background: var(--faint-bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--color);
+      text-align: center;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+
+    .url-input:focus {
+      outline: none;
+      border-color: var(--link-color);
+      box-shadow: 0 0 0 2px rgba(91, 78, 150, 0.1);
+    }
+
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      height: 32px;
+      background: var(--link-color);
+      color: var(--bg-color);
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: var(--link-hover-color);
+      transform: translateY(-1px);
+    }
+
+    .qr-section {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: var(--faint-bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+    }
+
+    .qr-content {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      text-align: left;
+    }
+
+    .qr-code-container {
+      flex-shrink: 0;
+    }
+
+    #qrCanvas {
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: white;
+    }
+
+    .qr-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .qr-description {
+      color: var(--color);
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin-bottom: 1rem;
+    }
+
+    .export-qr-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--color);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .export-qr-btn:hover {
+      background: var(--light-bg-color);
+      border-color: var(--link-color);
+    }
+
+    .bottom-actions {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .create-another-link {
+      color: var(--link-color);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
+
+    .create-another-link:hover {
+      color: var(--link-hover-color);
+      text-decoration: underline;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .confirmation-panel {
+        padding: 1.5rem;
+        max-width: 100%;
+        margin: 0 1rem;
+      }
+
+      .qr-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .qr-info {
+        text-align: center;
+      }
+
+      .url-input {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .confirmation-main {
+        padding: 1rem 0.5rem;
+      }
+
+      .confirmation-panel {
+        padding: 1rem;
+      }
+
+      .confirmation-heading {
+        font-size: 1.5rem;
+      }
+
+      #qrCanvas {
+        width: 150px;
+        height: 150px;
+      }
+    }
+  </style>
+
+  <!-- QR Code Generation Script -->
+  <script>
+    // Simple QR Code generation using a public API
+    function generateQRCode(text, canvas) {
+      const ctx = canvas.getContext('2d');
+      const size = 200;
+      
+      // Create QR code using qr-server.com API
+      const qrUrl = \`https://api.qrserver.com/v1/create-qr-code/?size=\${size}x\${size}&data=\${encodeURIComponent(text)}&format=png&margin=10\`;
+      
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function() {
+        ctx.clearRect(0, 0, size, size);
+        ctx.drawImage(img, 0, 0, size, size);
+      };
+      img.onerror = function() {
+        // Fallback: draw a simple placeholder
+        ctx.fillStyle = '#f0f0f0';
+        ctx.fillRect(0, 0, size, size);
+        ctx.fillStyle = '#666';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('QR Code', size/2, size/2 - 10);
+        ctx.fillText('Unavailable', size/2, size/2 + 10);
+      };
+      img.src = qrUrl;
+    }
+
+    // Copy URL functionality
+    function copyToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text).then(() => {
+          showNotification('Link copied to clipboard!', 'success');
+        }).catch(() => {
+          fallbackCopyTextToClipboard(text);
+        });
+      } else {
+        fallbackCopyTextToClipboard(text);
+      }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          showNotification('Link copied to clipboard!', 'success');
+        } else {
+          showNotification('Failed to copy link', 'error');
+        }
+      } catch (err) {
+        showNotification('Failed to copy link', 'error');
+      }
+      
+      document.body.removeChild(textArea);
+    }
+
+    // Export QR code functionality
+    function exportQRCode() {
+      const canvas = document.getElementById('qrCanvas');
+      const link = document.createElement('a');
+      link.download = 'sharebin-qr-code.png';
+      link.href = canvas.toDataURL();
+      link.click();
+      showNotification('QR code downloaded!', 'success');
+    }
+
+    // Simple notification system
+    function showNotification(message, type = 'info') {
+      // Create notification container if it doesn't exist
+      let container = document.getElementById('notification-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'notification-container';
+        container.style.cssText = 'position: fixed; top: 1rem; right: 1rem; z-index: 1050; pointer-events: none;';
+        document.body.appendChild(container);
+      }
+      
+      const notification = document.createElement('div');
+      notification.className = \`notification notification-\${type}\`;
+      notification.textContent = message;
+      notification.style.cssText = \`
+        background: var(--bg-color);
+        color: var(--color);
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+        pointer-events: auto;
+        max-width: 300px;
+      \`;
+      
+      if (type === 'success') {
+        notification.style.background = '#f0f9ff';
+        notification.style.color = '#0369a1';
+        notification.style.borderColor = '#7dd3fc';
+      } else if (type === 'error') {
+        notification.style.background = '#fef2f2';
+        notification.style.color = '#dc2626';
+        notification.style.borderColor = '#fca5a5';
+      }
+      
+      container.appendChild(notification);
+      
+      // Show notification
+      setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(0)';
+      }, 10);
+      
+      // Hide and remove notification
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          if (container.contains(notification)) {
+            container.removeChild(notification);
+          }
+          if (container.children.length === 0) {
+            document.body.removeChild(container);
+          }
+        }, 300);
+      }, 3000);
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      const noteUrl = document.getElementById('noteUrl').value;
+      const qrCanvas = document.getElementById('qrCanvas');
+      const copyBtn = document.getElementById('copyUrlBtn');
+      const exportBtn = document.getElementById('exportQrBtn');
+      
+      // Generate QR code
+      generateQRCode(noteUrl, qrCanvas);
+      
+      // Copy URL button
+      copyBtn.addEventListener('click', () => {
+        copyToClipboard(noteUrl);
+      });
+      
+      // Export QR code button
+      exportBtn.addEventListener('click', exportQRCode);
+      
+      // Auto-select URL input on focus
+      document.getElementById('noteUrl').addEventListener('focus', function() {
+        this.select();
+      });
+    });
+  </script>
 `, mode, false);
 
 export const aboutPage = ({ mode = '' } = {}) => layout('About - ShareBin', `

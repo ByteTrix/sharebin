@@ -4,6 +4,18 @@ export interface Paste {
   paste: string;
   editCode?: string;
   isEncrypted?: boolean;
+  oneTimeView?: boolean;
+  expiryTime?: number; // Unix timestamp
+  viewCount?: number;
+  attachments?: AttachmentInfo[];
+}
+
+export interface AttachmentInfo {
+  id: string;
+  originalName: string;
+  size: number;
+  type: string;
+  uploadTimestamp: number;
 }
 
 export interface PasteRevision {
@@ -12,14 +24,37 @@ export interface PasteRevision {
 }
 
 export const createStorage = (kv: KVNamespace) => ({
-  async get(id: string) {
+  async get(id: string, isView: boolean = false) {
     const result = await kv.get<Paste>(id, { type: 'json' });
     
     if (result !== null) {
+      // Check if paste has expired
+      if (result.expiryTime && Date.now() > result.expiryTime) {
+        await kv.delete(id);
+        return {
+          value: null,
+          versionstamp: null
+        };
+      }
+      
       result.paste = decompress(result.paste) || '';
+      
+      // Handle one-time view
+      if (isView && result.oneTimeView) {
+        const viewCount = (result.viewCount || 0) + 1;
+        if (viewCount >= 1) {
+          // Delete after first view
+          await kv.delete(id);
+        } else {
+          // Update view count
+          const compressed = compress(result.paste);
+          const payload = { ...result, paste: compressed, viewCount };
+          await kv.put(id, JSON.stringify(payload));
+        }
+      }
     }
 
-    return { 
+    return {
       value: result,
       versionstamp: null // Cloudflare KV doesn't have versionstamp like Deno KV
     };
@@ -63,5 +98,42 @@ export const createStorage = (kv: KVNamespace) => ({
     }
     // Sort by timestamp in descending order (newest first)
     return revisions.sort((a, b) => b.timestamp - a.timestamp);
+  },
+
+  async storeAttachment(attachmentId: string, fileData: ArrayBuffer): Promise<void> {
+    await kv.put(`attachment:${attachmentId}`, fileData);
+  },
+
+  async getAttachment(attachmentId: string): Promise<ArrayBuffer | null> {
+    return await kv.get(`attachment:${attachmentId}`, { type: 'arrayBuffer' });
+  },
+
+  async deleteAttachment(attachmentId: string): Promise<void> {
+    await kv.delete(`attachment:${attachmentId}`);
+  },
+
+  async validateEditCode(id: string, providedCode: string): Promise<{ valid: boolean; error?: string }> {
+    const result = await kv.get<Paste>(id, { type: 'json' });
+    
+    if (!result) {
+      return { valid: false, error: 'Paste not found' };
+    }
+
+    // If no edit code is set on the paste, allow access
+    if (!result.editCode) {
+      return { valid: true }; // No edit code required
+    }
+
+    // If edit code is required but not provided
+    if (!providedCode || providedCode.trim() === '') {
+      return { valid: false, error: 'Edit code is required to modify this paste' };
+    }
+
+    // Compare the provided code with the stored edit code
+    if (providedCode.trim() !== result.editCode.trim()) {
+      return { valid: false, error: 'Invalid edit code. Please check your edit code and try again.' };
+    }
+
+    return { valid: true };
   }
 });
