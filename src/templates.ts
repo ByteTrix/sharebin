@@ -259,7 +259,7 @@ const Editor = (paste = '') => `
   </div>
 `;
 
-const layout = (title: string, content: string, mode?: string, showKeyboardHint?: boolean, currentPage?: string, showNavbar = true) => `
+const layout = (title: string, content: string, mode?: string, showKeyboardHint?: boolean, currentPage?: string, showNavbar = false) => `
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -279,8 +279,8 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
       ${title || 'ShareBin'}
     </title>
   </head>
-  <body${showNavbar ? '' : ' class="no-navbar"'}>
-    ${showNavbar ? Navbar(currentPage) : ThemeToggle()}
+  <body>
+    ${ThemeToggle()}
 
     ${_if(mode === 'demo', `
       <div role="alert" class="demo-alert">
@@ -471,6 +471,89 @@ export const homePage = ({
         </div>
       </div>
 
+      <div class="file-attachment-section">
+        <label class="file-attachment-label">
+          <svg class="file-attachment-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+          </svg>
+          <span class="file-attachment-text">📎 Attach files (optional)</span>
+          <input
+            type="file"
+            id="fileAttachment"
+            name="fileAttachment"
+            multiple
+            accept=".txt,.md,.js,.ts,.html,.css,.json,.xml,.csv,.log,.py,.java,.cpp,.c,.php,.rb,.go,.rs,.swift,.kt,.scala,.sh,.bat,.sql,.yml,.yaml"
+            class="file-input-hidden"
+          />
+        </label>
+        <div id="fileAttachmentList" class="file-attachment-list" style="display: none;">
+          <div class="file-attachment-header">
+            <span class="file-count">Selected files:</span>
+            <button type="button" id="clearFiles" class="clear-files-btn" title="Clear all files">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="file-items"></div>
+        </div>
+        <small class="file-attachment-note">
+          💡 Attach text files, code, or documents. Files will be included as appendices to your paste.
+        </small>
+      </div>
+
+      <div class="expiry-date-section">
+        <label>
+          <input type="checkbox" id="enableExpiryDate" name="enableExpiryDate" />
+          <span class="expiry-date-label">⏰ Set expiry date for this paste</span>
+        </label>
+        <div id="expiryDateOptions" class="expiry-date-options" style="display: none;">
+          <div class="expiry-options-grid">
+            <div class="quick-expiry-options">
+              <label class="quick-option-label">Quick options:</label>
+              <div class="quick-expiry-buttons">
+                <button type="button" class="quick-expiry-btn" data-hours="1">1 Hour</button>
+                <button type="button" class="quick-expiry-btn" data-hours="24">1 Day</button>
+                <button type="button" class="quick-expiry-btn" data-hours="168">1 Week</button>
+                <button type="button" class="quick-expiry-btn" data-hours="720">1 Month</button>
+              </div>
+            </div>
+            <div class="custom-expiry-option">
+              <label for="customExpiryDate" class="custom-expiry-label">Or set custom date:</label>
+              <input
+                type="datetime-local"
+                id="customExpiryDate"
+                name="customExpiryDate"
+                class="custom-expiry-input"
+              />
+            </div>
+          </div>
+          <div class="selected-expiry-display" id="selectedExpiryDisplay" style="display: none;">
+            <span class="expiry-display-text">Expires: <strong id="expiryDisplayValue"></strong></span>
+            <button type="button" id="clearExpiry" class="clear-expiry-btn" title="Clear expiry date">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <small class="expiry-date-note">
+          🕒 Your paste will be automatically deleted at the specified time. This cannot be undone.
+          <br>💡 Perfect for temporary content that should not persist indefinitely.
+        </small>
+      </div>
+
+      <div class="one-time-view-section">
+        <label>
+          <input type="checkbox" id="enableOneTimeView" name="enableOneTimeView" />
+          <span class="one-time-view-label">🔥 One-time view (paste will be deleted after first view)</span>
+        </label>
+        <small class="one-time-view-note">
+          ⚠️ <strong>Warning:</strong> Once someone views this paste, it will be permanently deleted and cannot be recovered.
+          <br>💡 Perfect for sharing sensitive information that should only be seen once.
+        </small>
+      </div>
+
       <div class="encryption-section">
         <label>
           <input type="checkbox" id="enableEncryption" name="enableEncryption" />
@@ -511,7 +594,7 @@ export const homePage = ({
   <script src="/cm-sublime.min.js"></script>
   <script src="/editor.js"></script>
   <script src="/encryption-ui.js"></script>
-`, mode, true, 'home');
+`, mode, true);
 
 import { PasteRevision } from './storage';
 
@@ -1019,7 +1102,7 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
       }
     });
   </script>
-`, mode, false, 'paste', false);
+`, mode, false);
 
 export const guidePage = ({ html = '', title = '', mode = '' } = {}) => layout(title, `
   <main>
@@ -1027,7 +1110,7 @@ export const guidePage = ({ html = '', title = '', mode = '' } = {}) => layout(t
       ${html}
     </div>
   </main>
-`, mode, false, 'guide');
+`, mode, false);
 
 export const editPage = (
   { id = '', paste = '', hasEditCode = false, errors = { editCode: '' }, mode = '' } = {},
@@ -1072,7 +1155,7 @@ export const editPage = (
   <script src="/cm-sublime.min.js"></script>
   <script src="/editor.js"></script>
   <script src="/encryption-ui.js"></script>
-`, mode, true, 'edit');
+`, mode, true);
 
 export const deletePage = (
   { id = '', hasEditCode = false, errors = { editCode: '' }, mode = '' } = {}
@@ -1115,14 +1198,14 @@ export const deletePage = (
       </div>
     </form>
   </main>
-`, mode, false, 'delete');
+`, mode, false);
 
 export const errorPage = (mode = '') => layout('404', `
   <main>
     <h1>404</h1>
     <p>That paste doesn't exist! Maybe it was deleted?</p>
   </main>
-`, mode, false, 'error');
+`, mode, false);
 
 export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => layout(`🔒 Encrypted Paste - ${id}`, `
   <main>
@@ -1206,7 +1289,7 @@ export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => l
       line-height: 1.4;
     }
   </style>
-`, mode, false, 'decrypt');
+`, mode, false);
 
 export const aboutPage = ({ mode = '' } = {}) => layout('About - ShareBin', `
   <main>
@@ -1295,4 +1378,4 @@ export const aboutPage = ({ mode = '' } = {}) => layout('About - ShareBin', `
       background: var(--bg-secondary);
     }
   </style>
-`, mode, false, 'about');
+`, mode, false);
