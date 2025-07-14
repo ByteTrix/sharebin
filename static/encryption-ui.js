@@ -1,4 +1,4 @@
-// Encryption UI for flrbin
+// Encryption UI for ShareBin
 (function() {
   const encryptionCheckbox = document.getElementById('enableEncryption');
   const encryptionOptions = document.getElementById('encryptionOptions');
@@ -24,8 +24,8 @@
 
   // Generate secure password
   generatePasswordBtn.addEventListener('click', function() {
-    if (window.flrbinCrypto) {
-      const password = window.flrbinCrypto.generatePassword(16);
+    if (window.ShareBinCrypto) {
+      const password = window.ShareBinCrypto.generatePassword(16);
       encryptionPassword.value = password;
       
       // Show the password temporarily
@@ -127,7 +127,7 @@
         const encryptedData = encryptedContent.replace(/^🔒 ENCRYPTED PASTE 🔒\s*\n+/, '');
 
         // Decrypt
-        const decryptedContent = await window.flrbinCrypto.decrypt(encryptedData, password);
+        const decryptedContent = await window.ShareBinCrypto.decrypt(encryptedData, password);
 
         // Update editor/textarea
         if (window.cmEditor) {

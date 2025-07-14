@@ -1,12 +1,12 @@
-# flrbin Guide: Mastering Your Markdown Pastes
+# ShareBin Guide: Mastering Your Markdown Pastes
 
-Welcome to the `flrbin` guide! `flrbin` is a powerful and flexible [Markdown](https://en.wikipedia.org/wiki/Markdown) pastebin, designed for simplicity and efficiency. Heavily inspired by [rentry.co](https://rentry.co), 
+Welcome to the `ShareBin` guide! `ShareBin` is a powerful and flexible [Markdown](https://en.wikipedia.org/wiki/Markdown) pastebin, designed for simplicity and efficiency. Heavily inspired by [rentry.co](https://rentry.co), 
 
-`flrbin` distinguishes itself as a [free and open-source](https://github.com/kvnlabs/flrbin) solution that is easily self-hostable.
+`ShareBin` distinguishes itself as a [free and open-source](https://github.com/kvnlabs/ShareBin) solution that is easily self-hostable.
 
-Leveraging modern Markdown processing with **GitHub Flavored Markdown (GFM)** support, `flrbin` supports a comprehensive set of Markdown features including tables, task lists, math equations, and syntax highlighting, allowing you to format your text with ease and precision.
+Leveraging modern Markdown processing with **GitHub Flavored Markdown (GFM)** support, `ShareBin` supports a comprehensive set of Markdown features including tables, task lists, math equations, and syntax highlighting, allowing you to format your text with ease and precision.
 
-This guide provides an in-depth overview of Markdown syntax supported by `flrbin`, adapted with modifications from [learnxinyminutes](https://learnxinyminutes.com/docs/markdown/). 
+This guide provides an in-depth overview of Markdown syntax supported by `ShareBin`, adapted with modifications from [learnxinyminutes](https://learnxinyminutes.com/docs/markdown/). 
 Whether you're a seasoned Markdown user or just starting, this guide will help you create well-structured and visually appealing pastes.
 
 [[[TOC]]]
@@ -28,7 +28,7 @@ To control access and modifications to your paste, you can set a custom edit cod
 
 ## 🔒 Client-Side Encryption
 
-`flrbin` now supports **client-side encryption** for sensitive content. Your data is encrypted in your browser before being sent to the server, ensuring maximum privacy.
+`ShareBin` now supports **client-side encryption** for sensitive content. Your data is encrypted in your browser before being sent to the server, ensuring maximum privacy.
 
 ### How It Works
 
@@ -101,7 +101,7 @@ Markdown is designed to be easily readable and writable, but it also allows for 
 ```
 
 **Important Considerations:**
-*   **Sanitization:** `flrbin` automatically sanitizes untrusted HTML to prevent security vulnerabilities. This ensures that embedded HTML is safe for viewing.
+*   **Sanitization:** `ShareBin` automatically sanitizes untrusted HTML to prevent security vulnerabilities. This ensures that embedded HTML is safe for viewing.
 *   **Markdown within HTML:** Markdown syntax is generally not parsed within raw HTML blocks. If you need Markdown formatting, ensure it's outside the HTML tags.
 
 ## Headings
@@ -349,7 +349,7 @@ You can specify the programming language immediately after the opening fence (e.
 
 ## 📐 Math Equations
 
-`flrbin` now supports mathematical expressions using **KaTeX**, allowing you to render beautiful mathematical notation in your pastes. This is perfect for academic content, scientific documentation, or any content that requires mathematical expressions.
+`ShareBin` now supports mathematical expressions using **KaTeX**, allowing you to render beautiful mathematical notation in your pastes. This is perfect for academic content, scientific documentation, or any content that requires mathematical expressions.
 
 ### Inline Math
 
@@ -454,7 +454,7 @@ You can create a horizontal rule using three or more hyphens (`---`), asterisks 
 
 ## Links
 
-Links are fundamental for connecting information within and outside your `flrbin` pastes. Markdown provides several ways to create hyperlinks.
+Links are fundamental for connecting information within and outside your `ShareBin` pastes. Markdown provides several ways to create hyperlinks.
 
 ### Inline Links
 
@@ -468,7 +468,7 @@ Inline links are the most common type. Enclose the link text in square brackets 
 
 ### Relative Paths
 
-You can also use relative paths for links within the same project or website, which is useful for navigation between `flrbin` pastes or other internal resources.
+You can also use relative paths for links within the same project or website, which is useful for navigation between `ShareBin` pastes or other internal resources.
 
 ```md
 Relative paths work too:
@@ -510,7 +510,7 @@ You can manually create a table of contents by linking to your headings. Markdow
 
 ### Automatic Table of Contents
 
-`flrbin` offers a convenient way to automatically generate a table of contents using the `[ [[TOC]] ]`(added space because it'll generate toc here) token. This feature dynamically creates a TOC based on all headings in your document, simplifying the process for you.
+`ShareBin` offers a convenient way to automatically generate a table of contents using the `[ [[TOC]] ]`(added space because it'll generate toc here) token. This feature dynamically creates a TOC based on all headings in your document, simplifying the process for you.
 
 For example, by simply typing this:
 
@@ -520,7 +520,7 @@ Here is the table of contents:
 `[/[[TOC]]]` <- remove '/', this will generate toc
 ```
 
-`flrbin` will automatically generate a comprehensive table of contents containing all headings found within your document.
+`ShareBin` will automatically generate a comprehensive table of contents containing all headings found within your document.
 
 **Best Practices for Table of Contents:**
 *   Place the TOC near the beginning of your document for easy access.
@@ -596,4 +596,4 @@ Ugh this is so ugly|make it|stop
 *   **Consistency:** Be consistent with your chosen alignment for similar data types.
 *   **Content within Cells:** Avoid complex Markdown (like blockquotes or multiple paragraphs) within table cells, as rendering can be inconsistent across different Markdown processors.
 
-This concludes the `flrbin` guide. We hope this comprehensive overview helps you create effective and well-structured Markdown pastes. Happy pasting!
+This concludes the `ShareBin` guide. We hope this comprehensive overview helps you create effective and well-structured Markdown pastes. Happy pasting!

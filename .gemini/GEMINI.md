@@ -1,8 +1,8 @@
-# flrbin Project
+# ShareBin Project
 
 ## Project Overview
 
-**flrbin** is a modern, self-hostable Markdown pastebin service built for Cloudflare Workers. It allows users to create, share, and manage Markdown documents with advanced features like custom URLs, edit protection, and automatic cleanup in demo mode.
+**ShareBin** is a modern, self-hostable Markdown pastebin service built for Cloudflare Workers. It allows users to create, share, and manage Markdown documents with advanced features like custom URLs, edit protection, and automatic cleanup in demo mode.
 
 ### Key Characteristics
 - **Technology Stack**: Cloudflare Workers, KV Storage
@@ -141,7 +141,7 @@ directory = "./static"           # Static file serving
 ## File Structure
 
 ```
-flrbin/
+ShareBin/
 ├── src/
 │   ├── index.ts        # Main worker handler
 │   ├── router.ts       # HTTP routing

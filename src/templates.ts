@@ -22,7 +22,7 @@ const Navbar = (currentPage = '') => `
     <div class="navbar-container">
       <a href="/" class="navbar-brand">
         <div class="navbar-brand-icon">F</div>
-        <span>flrbin</span>
+        <span>ShareBin</span>
       </a>
       
       <ul class="navbar-nav">
@@ -276,7 +276,7 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
     <link rel="stylesheet" href="/highlight-dark.min.css" media="not all and (prefers-color-scheme: light)" data-theme-dark>
     <link rel="stylesheet" href="/main.css">
     <title>
-      ${title || 'flrbin'}
+      ${title || 'ShareBin'}
     </title>
   </head>
   <body${showNavbar ? '' : ' class="no-navbar"'}>
@@ -299,7 +299,7 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
           <a href="/">new</a>
           <a href="/guide">guide</a>
           <a href="/about">about</a>
-          <a href="https://github.com/kvnlabs/flrbin">source</a>
+          <a href="https://github.com/kvnlabs/ShareBin">source</a>
         </div>
         ${_if(showKeyboardHint, `
           <div class="shortcuts-hint">
@@ -436,7 +436,7 @@ export const homePage = ({
   url = '',
   errors = { url: '' },
   mode = '',
-} = {}) => layout('flrbin', `
+} = {}) => layout('ShareBin', `
   <main>
     ${Tabs()}
 
@@ -1208,14 +1208,14 @@ export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => l
   </style>
 `, mode, false, 'decrypt');
 
-export const aboutPage = ({ mode = '' } = {}) => layout('About - flrbin', `
+export const aboutPage = ({ mode = '' } = {}) => layout('About - ShareBin', `
   <main>
     <div class="content-wrapper">
-      <h1>About flrbin</h1>
+      <h1>About ShareBin</h1>
       
       <div class="about-section">
-        <h2>What is flrbin?</h2>
-        <p>flrbin is a modern, minimalist pastebin service built for sharing text and code snippets quickly and securely. It features a clean, responsive design with dark and light themes to match your preference.</p>
+        <h2>What is ShareBin?</h2>
+        <p>ShareBin is a modern, minimalist pastebin service built for sharing text and code snippets quickly and securely. It features a clean, responsive design with dark and light themes to match your preference.</p>
       </div>
 
       <div class="about-section">
@@ -1233,12 +1233,12 @@ export const aboutPage = ({ mode = '' } = {}) => layout('About - flrbin', `
 
       <div class="about-section">
         <h2>Privacy & Security</h2>
-        <p>Your privacy matters to us. flrbin offers client-side encryption for sensitive pastes, ensuring that only you and those you share the password with can access your content. Regular pastes are stored securely and can be deleted at any time.</p>
+        <p>Your privacy matters to us. ShareBin offers client-side encryption for sensitive pastes, ensuring that only you and those you share the password with can access your content. Regular pastes are stored securely and can be deleted at any time.</p>
       </div>
 
       <div class="about-section">
         <h2>Open Source</h2>
-        <p>flrbin is built with modern web technologies and runs on Cloudflare Workers for global performance and reliability. The project is designed to be fast, secure, and user-friendly.</p>
+        <p>ShareBin is built with modern web technologies and runs on Cloudflare Workers for global performance and reliability. The project is designed to be fast, secure, and user-friendly.</p>
       </div>
 
       <div class="about-actions">

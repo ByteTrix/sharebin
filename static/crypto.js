@@ -1,7 +1,7 @@
 // Client-side encryption module using TweetNaCl
 // Provides password-based encryption for sensitive pastes
 
-class FlrbinCrypto {
+class ShareBinCrypto {
   constructor() {
     this.nacl = window.nacl;
     this.naclUtil = window.nacl.util;
@@ -138,14 +138,14 @@ class FlrbinCrypto {
 }
 
 // Initialize crypto when libraries are loaded
-window.flrbinCrypto = null;
+window.ShareBinCrypto = null;
 
 function initializeCrypto() {
   try {
-    window.flrbinCrypto = new FlrbinCrypto();
-    console.log('FlrbinCrypto initialized successfully');
+    window.ShareBinCrypto = new ShareBinCrypto();
+    console.log('ShareBinCrypto initialized successfully');
   } catch (error) {
-    console.error('Failed to initialize FlrbinCrypto:', error);
+    console.error('Failed to initialize ShareBinCrypto:', error);
   }
 }
 

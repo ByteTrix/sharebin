@@ -1,4 +1,4 @@
-# flrbin 🔥
+# ShareBin 🔥
 
 **A secure, self-hostable pastebin for Markdown content with enterprise-grade encryption.**
 
@@ -48,8 +48,8 @@ Mission accomplished. Friend properly scolded. Relief achieved. 🎯
 
 1. **Clone this masterpiece:**
    ```bash
-   git clone https://github.com/kvnlab/flrbin.git
-   cd flrbin
+   git clone https://github.com/kvnlab/ShareBin.git
+   cd ShareBin
    ```
 
 2. **Install dependencies:**
