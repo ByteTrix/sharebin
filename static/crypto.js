@@ -211,7 +211,7 @@ window.ShareBinCrypto = null;
 function initializeCrypto() {
   try {
     window.ShareBinCrypto = new ShareBinCrypto();
-    console.log('ShareBinCrypto initialized successfully');
+    // console.log('ShareBinCrypto initialized successfully');
   } catch (error) {
     console.error('Failed to initialize ShareBinCrypto:', error);
   }

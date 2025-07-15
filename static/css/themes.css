@@ -18,6 +18,17 @@
     --light-theme-border-color: #d0d0d0;
     --light-theme-focus-color: #5b4e96;
     --light-theme-editor-bg-color: #f5f5f5;
+    
+    /* Light theme notification colors */
+    --light-theme-success-bg: #f0f9ff;
+    --light-theme-success-color: #0369a1;
+    --light-theme-success-border: #7dd3fc;
+    --light-theme-error-bg: #fef2f2;
+    --light-theme-error-color: #dc2626;
+    --light-theme-error-border: #fca5a5;
+    --light-theme-warning-bg: #fffbeb;
+    --light-theme-warning-color: #d97706;
+    --light-theme-warning-border: #fbbf24;
 }
 
 /* Light Theme - Auto Detection */
@@ -36,6 +47,17 @@
         --border-color: var(--light-theme-border-color);
         --focus-color: var(--light-theme-focus-color);
         --editor-bg-color: var(--light-theme-editor-bg-color);
+        
+        /* Light theme notification colors */
+        --success-bg: var(--light-theme-success-bg);
+        --success-color: var(--light-theme-success-color);
+        --success-border: var(--light-theme-success-border);
+        --error-bg: var(--light-theme-error-bg);
+        --error-color: var(--light-theme-error-color);
+        --error-border: var(--light-theme-error-border);
+        --warning-bg: var(--light-theme-warning-bg);
+        --warning-color: var(--light-theme-warning-color);
+        --warning-border: var(--light-theme-warning-border);
     }
 }
 
@@ -54,6 +76,17 @@
     --border-color: var(--light-theme-border-color);
     --focus-color: var(--light-theme-focus-color);
     --editor-bg-color: var(--light-theme-editor-bg-color);
+    
+    /* Light theme notification colors */
+    --success-bg: var(--light-theme-success-bg);
+    --success-color: var(--light-theme-success-color);
+    --success-border: var(--light-theme-success-border);
+    --error-bg: var(--light-theme-error-bg);
+    --error-color: var(--light-theme-error-color);
+    --error-border: var(--light-theme-error-border);
+    --warning-bg: var(--light-theme-warning-bg);
+    --warning-color: var(--light-theme-warning-color);
+    --warning-border: var(--light-theme-warning-border);
 }
 
 /* Theme Toggle Icon Filters */
@@ -137,19 +170,6 @@ body:not([data-theme]) .theme-dark {
 [data-theme="d"] .copy-code-btn:hover {
     background: rgba(255, 255, 255, 0.12);
     border-color: var(--focus-color);
-}
-
-/* Dark theme notification styles */
-[data-theme="d"] .notification.success {
-    background: #0c4a6e;
-    color: #7dd3fc;
-    border-color: #0369a1;
-}
-
-[data-theme="d"] .notification.error {
-    background: #7f1d1d;
-    color: #fca5a5;
-    border-color: #dc2626;
 }
 
 /* Dark theme menu item styles */

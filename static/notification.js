@@ -45,38 +45,22 @@
       word-wrap: break-word;
     `;
 
-    // Type-specific styling
+    // Type-specific styling using CSS variables that follow the theme
     if (type === 'success') {
-      notification.style.background = '#f0f9ff';
-      notification.style.color = '#0369a1';
-      notification.style.borderColor = '#7dd3fc';
+      notification.style.background = 'var(--success-bg, #f0f9ff)';
+      notification.style.color = 'var(--success-color, #0369a1)';
+      notification.style.borderColor = 'var(--success-border, #7dd3fc)';
     } else if (type === 'error') {
-      notification.style.background = '#fef2f2';
-      notification.style.color = '#dc2626';
-      notification.style.borderColor = '#fca5a5';
+      notification.style.background = 'var(--error-bg, #fef2f2)';
+      notification.style.color = 'var(--error-color, #dc2626)';
+      notification.style.borderColor = 'var(--error-border, #fca5a5)';
     } else if (type === 'warning') {
-      notification.style.background = '#fffbeb';
-      notification.style.color = '#d97706';
-      notification.style.borderColor = '#fbbf24';
+      notification.style.background = 'var(--warning-bg, #fffbeb)';
+      notification.style.color = 'var(--warning-color, #d97706)';
+      notification.style.borderColor = 'var(--warning-border, #fbbf24)';
     }
 
-    // Dark mode adjustments
-    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'd';
-    if (isDarkMode) {
-      if (type === 'success') {
-        notification.style.background = '#0c4a6e';
-        notification.style.color = '#7dd3fc';
-        notification.style.borderColor = '#0369a1';
-      } else if (type === 'error') {
-        notification.style.background = '#7f1d1d';
-        notification.style.color = '#fca5a5';
-        notification.style.borderColor = '#dc2626';
-      } else if (type === 'warning') {
-        notification.style.background = '#78350f';
-        notification.style.color = '#fbbf24';
-        notification.style.borderColor = '#d97706';
-      }
-    }
+    // No need for manual dark mode detection - CSS variables handle theming
 
     // Add to container
     container.appendChild(notification);

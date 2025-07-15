@@ -32,6 +32,7 @@
     /* For mobile screens */
     body:has(.paste-document) main {
         padding: 0;
+        margin-top: 10rem;
     }
     
     .notion-container,

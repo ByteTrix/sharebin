@@ -759,6 +759,43 @@
     });
   }
 
+  // Handle shortcuts hint visibility based on editor focus
+  function updateShortcutsHintVisibility() {
+    if (shortcutsHint) {
+      // Check if window width is at least 1024px (desktop)
+      const isDesktop = window.innerWidth >= 1024;
+      
+      if (isDesktop) {
+        // Show hint when editor is focused
+        shortcutsHint.classList.add('editor-focused');
+      } else {
+        // Hide hint on mobile/tablet
+        shortcutsHint.classList.remove('editor-focused');
+      }
+    }
+  }
+
+  // Editor focus/blur events
+  if (editor) {
+    editor.on('focus', function() {
+      updateShortcutsHintVisibility();
+    });
+    
+    editor.on('blur', function() {
+      if (shortcutsHint) {
+        shortcutsHint.classList.remove('editor-focused');
+      }
+    });
+  }
+
+  // Handle window resize
+  window.addEventListener('resize', function() {
+    updateShortcutsHintVisibility();
+  });
+
+  // Initial visibility check
+  updateShortcutsHintVisibility();
+
   function debounce(cb, wait) {
     let timer;
 

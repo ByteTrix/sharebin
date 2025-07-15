@@ -199,7 +199,7 @@ const Editor = (paste = '', url = '', errors: any = { url: '' }) => `
             </button>
             <button type="button" id="generatePassword" class="input-action-btn" title="Generate secure password">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12,2A2,2 0 0,1 14,4C14,5.11 13.1,6 12,6C10.89,6 10,5.1 10,4A2,2 0 0,1 12,2M21,9V7L19,8L21,9M23,13V11L21,12L23,13M20,2V4L22,3L20,2M17,3L15,5L16.5,6.5L18.5,4.5L17,3M7,14A3,3 0 0,1 10,17A3,3 0 0,1 7,20A3,3 0 0,1 4,17A3,3 0 0,1 7,14M7,16A1,1 0 0,0 6,17A1,1 0 0,0 7,18A1,1 0 0,0 8,17A1,1 0 0,0 7,16Z"/>
+                <path d="M6,2L8,4H16L18,2H20V4H18L16,6H8L6,4V2M4,6V8H6L8,6H16L18,8H20V6H22V8H20V16H22V18H20V20H18V18H16L14,20H10L8,18H6V20H4V18H2V16H4V8H2V6H4M6,8V16H8L10,18H14L16,16H18V8H16L14,6H10L8,8H6Z"/>
               </svg>
             </button>
           </div>
@@ -242,7 +242,7 @@ const Editor = (paste = '', url = '', errors: any = { url: '' }) => `
             <span class="toggle-switch-small">
               <span class="toggle-slider-small"></span>
             </span>
-            <span class="toggle-text">Delete the note after reading</span>
+            <span class="toggle-text">Delete the note after reading (One-Time View)</span>
           </label>
         </div>
       </div>
@@ -842,14 +842,6 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
                   <path d="M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z"/>
                 </svg>
                 History (${revisions.length})
-              </button>
-            `)}
-            ${_if(isEncrypted, `
-              <button class="menu-item" onclick="showDecryptPrompt('${id}')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7A2,2 0 0,1 14,9V10H15A1,1 0 0,1 16,11V16A1,1 0 0,1 15,17H9A1,1 0 0,1 8,16V11A1,1 0 0,1 9,10H10V9A2,2 0 0,1 12,7M12,8A1,1 0 0,0 11,9V10H13V9A1,1 0 0,0 12,8Z"/>
-                </svg>
-                Decrypt
               </button>
             `)}
             <div class="menu-divider"></div>
@@ -2241,210 +2233,68 @@ export const errorPage = (mode = '') => layout('404', `
       margin: 0 auto 2rem;
       color: white;
     }
-    
-    .action-buttons {
-      display: flex;
-      gap: 0.75rem;
-      margin-top: 2rem;
-    }
-    
-    .action-buttons .btn-primary {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 0.875rem 1.5rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: 500;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    .action-buttons .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    }
-    
-    .action-buttons .btn-secondary {
-      padding: 0.875rem 1.5rem;
-      background: var(--bg-color);
-      color: var(--color);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      transition: all 0.2s ease;
-    }
-    
-    .action-buttons .btn-secondary:hover {
-      background: var(--light-bg-color);
-      border-color: var(--focus-color);
-    }
   </style>
-`, mode, false);
+`, mode, false); // showNavbar = false for error page
 
 export const oneTimeViewWarningPage = ({ id = '', mode = '' } = {}) => layout(`⚠️ One-Time View Warning - ${id}`, `
-  <main>
-    <div class="warning-prompt">
-      <div class="warning-prompt-content">
-        <div class="warning-icon">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12,2L13.09,8.26L22,9L13.09,9.74L12,16L10.91,9.74L2,9L10.91,8.26L12,2M12,21L10.91,15.74L2,15L10.91,14.26L12,8L13.09,14.26L22,15L13.09,15.74L12,21Z"/>
+  <main class="confirmation-main">
+    <div class="confirmation-panel">
+      <!-- Warning Icon -->
+      <div class="warning-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12,2L13.09,8.26L22,9L13.09,9.74L12,16L10.91,9.74L2,9L10.91,8.26L12,2M12,21L10.91,15.74L2,15L10.91,14.26L12,8L13.09,14.26L22,15L13.09,15.74L12,21Z"/>
+        </svg>
+      </div>
+      
+      <!-- Heading -->
+      <h1 class="confirmation-heading">One-Time View Warning</h1>
+      
+      <!-- Sub-text -->
+      <p class="confirmation-subtext">
+        <strong>This paste will be deleted after you view it once.</strong><br>
+        After clicking "View Content", you will not be able to access this paste again. Make sure you're ready to view and process the content.
+      </p>
+      
+      <!-- Actions -->
+      <div class="action-buttons">
+        <button onclick="proceedToView()" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
           </svg>
-        </div>
+          View Content (One Time Only)
+        </button>
         
-        <h2>⚠️ One-Time View Warning</h2>
-        
-        <div class="warning-message">
-          <p><strong>This paste will be deleted after you view it once.</strong></p>
-          <p>After clicking "View Content", you will not be able to access this paste again. Make sure you're ready to view and process the content.</p>
-        </div>
-        
-        <div class="warning-actions">
-          <button onclick="proceedToView()" class="warning-btn primary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
-            </svg>
-            View Content (One Time Only)
-          </button>
-          
-          <a href="/" class="warning-btn secondary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-            </svg>
-            Go Back to Home
-          </a>
-        </div>
-        
-        <div class="warning-info">
-          <small>
-            <strong>💡 Tip:</strong> If you need to share content that can be viewed multiple times, create a new paste without the "Delete after reading" option.
-          </small>
+        <a href="/" class="btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/>
+          </svg>
+          Go Home
+        </a>
+      </div>
+      
+      <!-- Info Box -->
+      <div class="info-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,17A1.5,1.5 0 0,1 10.5,15.5A1.5,1.5 0 0,1 12,14A1.5,1.5 0 0,1 13.5,15.5A1.5,1.5 0 0,1 12,17M12,13A1,1 0 0,1 11,12V8A1,1 0 0,1 12,7A1,1 0 0,1 13,8V12A1,1 0 0,1 12,13Z"/>
+        </svg>
+        <div>
+          <strong>Tip:</strong> If you need to share content that can be viewed multiple times, create a new paste without the "Delete after reading" option.
         </div>
       </div>
     </div>
   </main>
   
   <style>
-    .warning-prompt {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 70vh;
-      padding: 1rem;
-    }
-    
-    .warning-prompt-content {
-      max-width: 500px;
-      padding: 2rem;
-      border: 2px solid #f59e0b;
-      border-radius: 12px;
-      background: var(--bg-color);
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.2);
-    }
-    
     .warning-icon {
-      color: #f59e0b;
-      margin-bottom: 1rem;
-    }
-    
-    .warning-prompt h2 {
-      margin-bottom: 1.5rem;
-      color: #f59e0b;
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-    
-    .warning-message {
-      margin-bottom: 2rem;
-      text-align: left;
-    }
-    
-    .warning-message p {
-      margin-bottom: 1rem;
-      color: var(--color);
-      line-height: 1.6;
-    }
-    
-    .warning-message strong {
-      color: #dc2626;
-    }
-    
-    .warning-actions {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-    
-    .warning-btn {
-      flex: 1;
-      min-width: 200px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 6px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    .warning-btn.primary {
-      background: #dc2626;
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      border-radius: 50%;
+      margin: 0 auto 2rem;
       color: white;
-    }
-    
-    .warning-btn.primary:hover {
-      background: #b91c1c;
-      transform: translateY(-1px);
-    }
-    
-    .warning-btn.secondary {
-      background: var(--faint-bg-color);
-      color: var(--color);
-      border: 1px solid var(--border-color);
-    }
-    
-    .warning-btn.secondary:hover {
-      background: var(--light-bg-color);
-      border-color: var(--link-color);
-    }
-    
-    .warning-info {
-      padding: 1rem;
-      background: var(--faint-bg-color);
-      border-radius: 6px;
-      border-left: 4px solid #f59e0b;
-    }
-    
-    .warning-info small {
-      color: var(--faint-color);
-      line-height: 1.4;
-    }
-    
-    @media (max-width: 640px) {
-      .warning-actions {
-        flex-direction: column;
-      }
-      
-      .warning-btn {
-        min-width: auto;
-      }
     }
   </style>
   
@@ -2457,7 +2307,7 @@ export const oneTimeViewWarningPage = ({ id = '', mode = '' } = {}) => layout(`�
       }
     }
   </script>
-`, mode, false);
+`, mode, false); // showNavbar = false for one-time view
 
 export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => layout(`🔒 Encrypted Paste - ${id}`, `
   <main class="confirmation-main">

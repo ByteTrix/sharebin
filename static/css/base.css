@@ -71,6 +71,17 @@ p, h1, h2, h3, h4, h5, h6 {
     --border-color: #404040;
     --focus-color: #8b7ec8;
     --editor-bg-color: #1f1f1f;
+    
+    /* Dark theme notification colors */
+    --success-bg: #0c4a6e;
+    --success-color: #7dd3fc;
+    --success-border: #0369a1;
+    --error-bg: #7f1d1d;
+    --error-color: #fca5a5;
+    --error-border: #dc2626;
+    --warning-bg: #78350f;
+    --warning-color: #fbbf24;
+    --warning-border: #d97706;
 }
 
 /* Base Body Styles */

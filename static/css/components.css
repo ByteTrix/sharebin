@@ -1446,16 +1446,23 @@ pre:hover .copy-code-btn {
     transform: translateX(0);
 }
 
+/* Theme-aware notification styles using CSS variables */
 .notification.success {
-    background: #f0f9ff;
-    color: #0369a1;
-    border-color: #7dd3fc;
+    background: var(--success-bg);
+    color: var(--success-color);
+    border-color: var(--success-border);
 }
 
 .notification.error {
-    background: #fef2f2;
-    color: #dc2626;
-    border-color: #fca5a5;
+    background: var(--error-bg);
+    color: var(--error-color);
+    border-color: var(--error-border);
+}
+
+.notification.warning {
+    background: var(--warning-bg);
+    color: var(--warning-color);
+    border-color: var(--warning-border);
 }
 
 /* Edit Code Overlay */
@@ -1490,7 +1497,7 @@ pre:hover .copy-code-btn {
 
 /* Shortcuts Hint */
 .shortcuts-hint {
-    display: flex;
+    display: none; /* Hidden by default */
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, var(--faint-bg-color) 0%, var(--bg-color) 100%);
@@ -1506,6 +1513,13 @@ pre:hover .copy-code-btn {
     margin: var(--spacing-3) auto var(--spacing-2) auto;
     max-width: 1200px;
     width: fit-content;
+}
+
+/* Show shortcuts hint only on desktop screens (1024px+) when editor is focused */
+@media (min-width: 1024px) {
+    .shortcuts-hint.editor-focused {
+        display: flex;
+    }
 }
 
 .shortcuts-hint:hover {
