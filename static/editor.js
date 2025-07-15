@@ -271,13 +271,289 @@
     }
   }, 500);
 
+  // Enhanced form validation
+  function validateForm() {
+    const content = editor.getValue().trim();
+    const customUrl = document.getElementById('url')?.value?.trim() || '';
+    const encryptionPassword = document.getElementById('encryptionPassword')?.value || '';
+    const isPasswordProtected = document.getElementById('passwordProtected')?.checked || false;
+    
+    const errors = [];
+    
+    // Validate content
+    if (!content) {
+      errors.push('Please enter some content for your paste');
+    }
+    
+    // Validate custom URL
+    if (customUrl) {
+      if (customUrl.length > 40) {
+        errors.push('Custom URL must be 40 characters or less');
+      }
+      if (!/^[a-zA-Z0-9\-_]+$/.test(customUrl)) {
+        errors.push('Custom URL can only contain letters, numbers, hyphens, and underscores');
+      }
+      if (customUrl === 'guide') {
+        errors.push('The URL "guide" is reserved');
+      }
+    }
+    
+    // Validate encryption password
+    if (isPasswordProtected && encryptionPassword.length < 8) {
+      errors.push('Password must be at least 8 characters long');
+    }
+    
+    return errors;
+  }
+
+  // Enhanced notification system
+  function showNotification(message, type = 'info', duration = 4000) {
+    // Remove existing notifications
+    const existing = document.querySelectorAll('.notification');
+    existing.forEach(n => n.remove());
+
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    
+    // Add icon based on type
+    const icon = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+    notification.innerHTML = `<span class="notification-icon">${icon}</span><span class="notification-message">${message}</span>`;
+
+    document.body.appendChild(notification);
+    
+    // Trigger animation
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
+
+    // Auto-remove
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 300);
+    }, duration);
+  }
+
+  // Real-time validation feedback
+  function setupRealTimeValidation() {
+    const urlInput = document.getElementById('url');
+    const passwordInput = document.getElementById('encryptionPassword');
+    const passwordCheckbox = document.getElementById('passwordProtected');
+    
+    if (urlInput) {
+      urlInput.addEventListener('input', function() {
+        const value = this.value.trim();
+        const errorDiv = document.getElementById('url-error') || createErrorDiv('url-error');
+        
+        if (value) {
+          if (value.length > 40) {
+            showInputError(errorDiv, 'URL must be 40 characters or less');
+          } else if (!/^[a-zA-Z0-9\-_]+$/.test(value)) {
+            showInputError(errorDiv, 'Only letters, numbers, hyphens, and underscores allowed');
+          } else if (value === 'guide') {
+            showInputError(errorDiv, 'The URL "guide" is reserved');
+          } else {
+            hideInputError(errorDiv);
+          }
+        } else {
+          hideInputError(errorDiv);
+        }
+      });
+    }
+    
+    if (passwordInput && passwordCheckbox) {
+      const validatePassword = () => {
+        const isProtected = passwordCheckbox.checked;
+        const password = passwordInput.value;
+        const errorDiv = document.getElementById('password-error') || createErrorDiv('password-error');
+        
+        if (isProtected && password.length > 0 && password.length < 8) {
+          showInputError(errorDiv, 'Password must be at least 8 characters long');
+        } else {
+          hideInputError(errorDiv);
+        }
+      };
+      
+      passwordInput.addEventListener('input', validatePassword);
+      passwordCheckbox.addEventListener('change', validatePassword);
+    }
+  }
+  
+  function createErrorDiv(id) {
+    const errorDiv = document.createElement('div');
+    errorDiv.id = id;
+    errorDiv.className = 'input-error';
+    errorDiv.style.display = 'none';
+    return errorDiv;
+  }
+  
+  function showInputError(errorDiv, message) {
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    errorDiv.classList.add('show');
+    
+    // Position error div if it's not already in the DOM
+    if (!errorDiv.parentNode) {
+      const input = document.getElementById(errorDiv.id.replace('-error', ''));
+      if (input) {
+        input.parentNode.appendChild(errorDiv);
+      }
+    }
+  }
+  
+  function hideInputError(errorDiv) {
+    errorDiv.style.display = 'none';
+    errorDiv.classList.remove('show');
+  }
+
+  // Character count with warning
+  function setupCharacterCount() {
+    const characterCount = document.getElementById('characterCount');
+    if (characterCount) {
+      const updateCount = () => {
+        const content = editor.getValue();
+        const length = content.length;
+        characterCount.textContent = `${length.toLocaleString()} characters`;
+        
+        // Add warning for very long content
+        if (length > 100000) {
+          characterCount.style.color = 'var(--error-color)';
+          characterCount.title = 'Very long content may affect performance';
+        } else if (length > 50000) {
+          characterCount.style.color = 'var(--warning-color)';
+          characterCount.title = 'Large content size';
+        } else {
+          characterCount.style.color = 'var(--faint-color)';
+          characterCount.title = '';
+        }
+      };
+      
+      editor.on('change', updateCount);
+      updateCount(); // Initial count
+    }
+  }
+
   // override form submit
   if (editorForm) {
-    editorForm.addEventListener('submit', (ev) => {
+    editorForm.addEventListener('submit', async (ev) => {
       ev.preventDefault();
 
-      // set textarea to ensure it is up to date
-      textArea.value = editor.getValue();
+      // Validate form before submission
+      const errors = validateForm();
+      if (errors.length > 0) {
+        showNotification(errors[0], 'error');
+        return;
+      }
+
+      // Add loading state to submit button
+      const submitBtn = editorForm.querySelector('.sidebar-btn.primary[type="submit"]');
+      if (submitBtn) {
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Creating...';
+        
+        // Reset button state function
+        const resetButton = () => {
+          submitBtn.classList.remove('loading');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        };
+        
+        // Reset button after 10 seconds as fallback
+        setTimeout(resetButton, 10000);
+      }
+
+      // Get all form data
+      let content = editor.getValue();
+      const encryptionPasswordInput = document.getElementById('encryptionPassword');
+      const editCodeInput = document.getElementById('editcode');
+      const customUrlInput = document.getElementById('url');
+      
+      const hasPassword = encryptionPasswordInput && encryptionPasswordInput.value.trim();
+      const password = hasPassword ? encryptionPasswordInput.value.trim() : null;
+      
+      try {
+        if (!window.ShareBinCrypto) {
+          throw new Error('Encryption system not available');
+        }
+        
+        // Always encrypt content
+        let encryptedContent;
+        let isPasswordProtected = false;
+        
+        if (password) {
+          // Password-protected encryption
+          encryptedContent = await window.ShareBinCrypto.encrypt(content, password);
+          isPasswordProtected = true;
+        } else {
+          // Default encryption (auto-decrypt for viewers)
+          encryptedContent = await window.ShareBinCrypto.encryptDefault(content);
+        }
+        
+        // Encrypt edit code if provided
+        let encryptedEditCode = null;
+        if (editCodeInput && editCodeInput.value.trim()) {
+          const editCode = editCodeInput.value.trim();
+          if (password) {
+            encryptedEditCode = await window.ShareBinCrypto.encrypt(editCode, password);
+          } else {
+            encryptedEditCode = await window.ShareBinCrypto.encryptDefault(editCode);
+          }
+        }
+        
+        // Set encrypted content
+        textArea.value = encryptedContent;
+        
+        // Update edit code field with encrypted version
+        if (encryptedEditCode && editCodeInput) {
+          editCodeInput.value = encryptedEditCode;
+        }
+        
+        // Clear the password field after encryption
+        if (encryptionPasswordInput) {
+          encryptionPasswordInput.value = '';
+        }
+        
+        // Add encrypted flag to form
+        let encryptedInput = document.getElementById('isEncrypted');
+        if (!encryptedInput) {
+          encryptedInput = document.createElement('input');
+          encryptedInput.type = 'hidden';
+          encryptedInput.id = 'isEncrypted';
+          encryptedInput.name = 'isEncrypted';
+          editorForm.appendChild(encryptedInput);
+        }
+        encryptedInput.value = 'true';
+        
+        // Add password protection flag
+        let passwordProtectedInput = document.getElementById('isPasswordProtected');
+        if (!passwordProtectedInput) {
+          passwordProtectedInput = document.createElement('input');
+          passwordProtectedInput.type = 'hidden';
+          passwordProtectedInput.id = 'isPasswordProtected';
+          passwordProtectedInput.name = 'isPasswordProtected';
+          editorForm.appendChild(passwordProtectedInput);
+        }
+        passwordProtectedInput.value = isPasswordProtected.toString();
+        
+        showNotification('Content encrypted successfully!', 'success');
+        
+      } catch (error) {
+        console.error('Encryption error:', error);
+        showNotification('Encryption failed: ' + error.message, 'error');
+        
+        // Reset button on error
+        if (submitBtn) {
+          submitBtn.classList.remove('loading');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+        return;
+      }
 
       // Ensure expiry timestamp is properly set if expiry is selected
       if (window.getSelectedExpiryDate && window.getSelectedExpiryDate()) {
@@ -355,6 +631,12 @@
             }
           }).catch(error => {
             console.error('Form submission error:', error);
+            // Reset button on error
+            if (submitBtn) {
+              submitBtn.classList.remove('loading');
+              submitBtn.disabled = false;
+              submitBtn.textContent = originalText;
+            }
           });
           
           return;
@@ -953,6 +1235,10 @@
 
   // Initialize modern interface
   initializeModernInterface();
+
+  // Initialize enhanced validation and feedback
+  setupRealTimeValidation();
+  setupCharacterCount();
 
   // Initialize everything
   console.log('Modern editor initialization complete');

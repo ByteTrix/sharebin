@@ -16,6 +16,12 @@ class ShareBinCrypto {
     return this.nacl.randomBytes(32);
   }
 
+  // Generate a default encryption key for anonymous pastes
+  generateDefaultKey() {
+    // Generate a random 32-byte key for anonymous pastes
+    return this.nacl.randomBytes(32);
+  }
+
   // Derive key from password using a simple PBKDF2-like approach
   async deriveKey(password, salt, iterations = 100000) {
     const encoder = new TextEncoder();
@@ -84,6 +90,37 @@ class ShareBinCrypto {
     }
   }
 
+  // Encrypt text with default key (for anonymous pastes)
+  async encryptDefault(plaintext) {
+    try {
+      const key = this.generateDefaultKey();
+      
+      // Generate nonce for encryption
+      const nonce = this.nacl.randomBytes(this.nacl.secretbox.nonceLength);
+      
+      // Convert plaintext to bytes
+      const plaintextBytes = this.naclUtil.decodeUTF8(plaintext);
+      
+      // Encrypt
+      const ciphertext = this.nacl.secretbox(plaintextBytes, nonce, key);
+      
+      if (!ciphertext) {
+        throw new Error('Encryption failed');
+      }
+
+      // Combine key + nonce + ciphertext for default encryption
+      const combined = new Uint8Array(key.length + nonce.length + ciphertext.length);
+      combined.set(key, 0);
+      combined.set(nonce, key.length);
+      combined.set(ciphertext, key.length + nonce.length);
+
+      // Return base64 encoded result with special marker
+      return 'SHAREBIN_DEFAULT:' + this.naclUtil.encodeBase64(combined);
+    } catch (error) {
+      throw new Error(`Default encryption failed: ${error.message}`);
+    }
+  }
+
   // Decrypt text with password
   async decrypt(encryptedData, password) {
     try {
@@ -109,6 +146,37 @@ class ShareBinCrypto {
       return this.naclUtil.encodeUTF8(plaintext);
     } catch (error) {
       throw new Error(`Decryption failed: ${error.message}`);
+    }
+  }
+
+  // Decrypt default encrypted content (for anonymous pastes)
+  async decryptDefault(encryptedData) {
+    try {
+      // Check if it's default encrypted
+      if (!encryptedData.startsWith('SHAREBIN_DEFAULT:')) {
+        throw new Error('Not default encrypted content');
+      }
+      
+      // Remove the marker and decode
+      const base64Data = encryptedData.substring('SHAREBIN_DEFAULT:'.length);
+      const combined = this.naclUtil.decodeBase64(base64Data);
+      
+      // Extract key, nonce, and ciphertext
+      const key = combined.slice(0, 32);
+      const nonce = combined.slice(32, 32 + this.nacl.secretbox.nonceLength);
+      const ciphertext = combined.slice(32 + this.nacl.secretbox.nonceLength);
+      
+      // Decrypt
+      const plaintext = this.nacl.secretbox.open(ciphertext, nonce, key);
+      
+      if (!plaintext) {
+        throw new Error('Default decryption failed - corrupted data');
+      }
+
+      // Convert back to string
+      return this.naclUtil.encodeUTF8(plaintext);
+    } catch (error) {
+      throw new Error(`Default decryption failed: ${error.message}`);
     }
   }
 

@@ -2,8 +2,6 @@
 
 **A secure, self-hostable pastebin for Markdown content with enterprise-grade encryption.**
 
-A modern pastebin built for developers and teams who need to share Markdown content securely. Features custom URLs, password protection with AES-256-GCM encryption, and seamless deployment on Cloudflare Workers.
-
 ## The Story 📖
 
 So there I was, needing to give my friend a proper telling-off. But WhatsApp? Instagram? Too mainstream. I wanted something with *class*. Something that says "I'm so mad at you that I encrypted my anger with military-grade security."
@@ -18,35 +16,29 @@ I found [mdbin](https://github.com/kevinfiol/mdbin) - a nice open-source pastebi
 
 Mission accomplished. Friend properly scolded. Relief achieved. 🎯
 
-## What Makes This Special ✨
+---
 
-### 🔒 Military-Grade Roasting
-- **AES-256-GCM encryption** - Your insults deserve enterprise security
-- **PBKDF2 with 100,000 iterations** - Because your anger should be computationally expensive
-- **Zero-knowledge architecture** - Even the server doesn't know how mean you are
-- **Custom URLs** - `yoursite.com/why-you-suck` hits different than a random ID
+## Features ✨
 
-### 📝 Advanced Markdown Support
-- **GitHub Flavored Markdown** - Complete GFM compatibility
-- **Live preview** - Real-time rendering as you type
-- **Syntax highlighting** - Code blocks with proper highlighting
-- **Rich formatting** - Tables, task lists, footnotes, and more
+- **AES-256-GCM encryption** – Your secrets are safer than your browser history.
+- **PBKDF2 password protection** – Because brute force is for gym, not for pastes.
+- **Zero-knowledge architecture** – Not even the server knows your drama.
+- **Custom URLs** – Make your roast memorable: `/why-you-suck`.
+- **GitHub Flavored Markdown** – Tables, code, lists, and more.
+- **Live preview & syntax highlighting** – See your masterpiece as you type.
+- **Revision history** – Undo your regrets, one version at a time.
+- **Edit protection** – Only those with the code can edit.
+- **Attachment support** – Share files, because sometimes words aren’t enough.
+- **One-time view option** – For messages that self-destruct like your patience.
+- **Dark/Light themes** – For every mood swing.
+- **Responsive design** – Looks good on any device, even your smart fridge.
+- **Keyboard shortcuts** – Because efficiency is next to roastiness.
 
-### ⚡ Modern Infrastructure
-- **Cloudflare Workers** - Global edge deployment for maximum performance
-- **KV storage** - Distributed, persistent storage across the globe
-- **Edit protection** - Secure edit codes to prevent unauthorized changes
-- **Revision history** - Track and restore previous versions
-
-### 🎨 Professional Interface
-- **Dark/Light themes** - Adaptive design for any environment
-- **Responsive design** - Works perfectly on desktop and mobile
-- **Keyboard shortcuts** - Efficient workflow for power users
-- **Clean typography** - Optimized for readability and focus
+---
 
 ## Quick Start 🚀
 
-1. **Clone this masterpiece:**
+1. **Clone the repo:**
    ```bash
    git clone https://github.com/kvnlab/ShareBin.git
    cd ShareBin
@@ -57,11 +49,10 @@ Mission accomplished. Friend properly scolded. Relief achieved. 🎯
    pnpm install
    ```
 
-3. **Set up Cloudflare:**
+3. **Configure Cloudflare:**
    ```bash
-   # Copy the config
    cp wrangler.example.toml wrangler.toml
-   # Edit with your details
+   # Edit wrangler.toml with your Cloudflare details
    ```
 
 4. **Create a KV namespace:**
@@ -69,81 +60,61 @@ Mission accomplished. Friend properly scolded. Relief achieved. 🎯
    pnpm wrangler kv:namespace create PASTE_BIN
    ```
 
-5. **Deploy your revenge platform:**
+5. **Deploy:**
    ```bash
    pnpm run deploy
    ```
 
-6. **Start roasting with style! 🔥**
-
-## Usage Examples 💡
-
-### Basic Angry Message
-```markdown
-# Dear [Friend's Name]
-
-You really messed up this time. Let me count the ways:
-
-1. That thing you did yesterday
-2. The way you ate my sandwich
-3. Your terrible taste in movies
-
-Sincerely,
-Your very disappointed friend
-```
-
-### Advanced Encrypted Roast
-1. Check "Encrypt this paste"
-2. Set password: `you-know-what-you-did`
-3. Write your encrypted fury
-4. Send them the link
-5. Watch them struggle with the password 😏
-
-### Professional Complaint
-```markdown
-## Performance Review: Your Life Choices
-
-### Areas for Improvement
-- [ ] Stop being wrong about everything
-- [ ] Learn to admit when you're wrong
-- [ ] Actually listen when people talk
-
-### Recommendations
-Please see attached 47-page analysis of your poor decisions.
-```
-
-## Tech Stack 🛠️
-
-- **Frontend**: Vanilla JS (because sometimes simple is better)
-- **Backend**: Cloudflare Workers (serverless scolding)
-- **Storage**: Cloudflare KV (persistent grudges)
-- **Encryption**: Web Crypto API with AES-256-GCM
-- **Markdown**: Unified/Remark ecosystem
-- **Styling**: Custom CSS (rage-themed)
-
-## Contributing 🤝
-
-Found a bug? Want to add more ways to roast people? PRs welcome!
-
-Just remember: this started as a way to properly scold someone. Keep that energy.
-
-## License 📄
-
-MIT - Because anger should be free and open source.
-
-## Inspired By 💡
-
-- [mdbin](https://github.com/kevinfiol/mdbin) - The original genius
-- My friend's poor life choices - The motivation
-- Military-grade encryption - The overkill solution
-- Pure spite - The driving force
+6. **Paste, encrypt, and roast away!**
 
 ---
 
-*"Sometimes the best way to tell someone they messed up is with properly formatted Markdown and enterprise-level security."* - Ancient Wisdom (probably)
+## Usage Examples 💡
+
+- **Basic Paste:** Write Markdown, hit save, share the link.
+- **Encrypted Paste:** Check "Encrypt", set a password, send the link. Watch them struggle.
+- **One-Time View:** Enable self-destruct for maximum drama.
+- **Attachments:** Add files to your paste—because screenshots speak louder than words.
+
+---
+
+## Tech Stack 🛠️
+
+- **Frontend:** Vanilla JS, custom CSS
+- **Backend:** Cloudflare Workers
+- **Storage:** Cloudflare KV
+- **Encryption:** Web Crypto API (AES-256-GCM)
+- **Markdown:** Unified/Remark ecosystem
+
+---
+
+## Contributing 🤝
+
+Found a bug? Want to add more ways to roast people? PRs welcome! Just remember: this started as a way to properly scold someone. Keep that energy.
+
+---
+
+## License 📄
+
+MIT – free and open source.
+
+---
+
+## Inspired By 💡
+
+- [mdbin](https://github.com/kevinfiol/mdbin)
+- My friend's poor life choices
+- Military-grade encryption
+- Pure spite
+
+---
+
+*"Sometimes the best way to tell someone they messed up is with properly formatted Markdown and enterprise-level security."* – Ancient Wisdom (probably)
+
+---
 
 ## See Also 📚
 
-- [ROADMAP.md](./ROADMAP.md) - Future plans for even fancier roasting
-- [API Documentation](./docs/API.md) - For programmatic complaints
-- [Deployment Guide](./docs/DEPLOYMENT.md) - Host your own judgment platform
+- [`ROADMAP.md`](./ROADMAP.md)
+- API docs: (coming soon, or ask nicely)
+- Deployment guide: (coming soon, or bribe with snacks)

@@ -215,7 +215,7 @@ export default {
       const res = await storage.get(id, false);
 
       if (res.value !== null) {
-        const { paste, isEncrypted, oneTimeView } = res.value;
+        const { paste, isEncrypted, isPasswordProtected, oneTimeView } = res.value;
         
         // Show warning page for one-time view content unless confirmed
         if (oneTimeView && !confirmView) {
@@ -226,23 +226,9 @@ export default {
           });
         }
         
-        // Check if this is an encrypted paste that needs password BEFORE consuming it
-        if (isEncrypted) {
-          // Check if user has provided password in cookie
-          const cookies = req.headers.get('cookie') || '';
-          const sessionCookie = cookies
-            .split(';')
-            .find(c => c.trim().startsWith(`decrypt-session-${id}=`));
-          
-          if (!sessionCookie) {
-            // Show password prompt
-            contents = passwordPromptPage({ id, mode: MODE });
-            return new Response(contents, {
-              status: 200,
-              headers: { 'content-type': 'text/html' },
-            });
-          }
-        }
+        // For encrypted content, always show paste page
+        // Client will handle decryption
+        console.log('Paste encryption status:', { isEncrypted, isPasswordProtected });
         
         // Now consume the paste (for one-time view)
         const finalRes = await storage.get(id, true);
@@ -252,60 +238,29 @@ export default {
         } else {
           const finalPaste = finalRes.value;
           
-          // Check if this is an encrypted paste that needs password
+          // Pass encrypted content to client
+          const revisions = await storage.getRevisions(id);
+          const attachments = finalPaste.attachments || [];
+          
           if (finalPaste.isEncrypted) {
-            // Check if user has provided password in cookie
-            const cookies = req.headers.get('cookie') || '';
-            const sessionCookie = cookies
-              .split(';')
-              .find(c => c.trim().startsWith(`decrypt-session-${id}=`));
-            
-            if (!sessionCookie) {
-              // Show password prompt
-              contents = passwordPromptPage({ id, mode: MODE });
-              return new Response(contents, {
-                status: 200,
-                headers: { 'content-type': 'text/html' },
-              });
-            }
-            
-            const sessionPassword = decodeURIComponent(sessionCookie.split('=')[1]);
-            
-            // Try to decrypt with session password
-            try {
-              if (ServerEncryption.isEncryptedData(JSON.parse(finalPaste.paste))) {
-                const encryptedData = JSON.parse(finalPaste.paste) as EncryptedData;
-                const decryptedPaste = await ServerEncryption.decrypt(encryptedData, sessionPassword);
-                
-                const parse = createParser();
-                let { html, title } = await parse(decryptedPaste);
-                html = xss(html, XSS_OPTIONS);
-                if (!title) title = id;
-
-                const revisions = await storage.getRevisions(id);
-                const attachments = finalPaste.attachments || [];
-                console.log('Displaying encrypted paste with attachments:', attachments.length);
-                contents = pastePage({ id, html, title, mode: MODE, revisions, isEncrypted: true, attachments });
-              } else {
-                throw new Error('Invalid encrypted data format');
-              }
-            } catch (error) {
-              // Invalid password, show prompt again
-              contents = passwordPromptPage({ id, mode: MODE, error: 'Invalid password' });
-              return new Response(contents, {
-                status: 200,
-                headers: { 'content-type': 'text/html' },
-              });
-            }
+            console.log('Displaying encrypted paste for client-side decryption with attachments:', attachments.length);
+            contents = pastePage({ 
+              id, 
+              html: finalPaste.paste, // Raw encrypted content
+              title: id, 
+              mode: MODE, 
+              revisions, 
+              isEncrypted: true,
+              isPasswordProtected: finalPaste.isPasswordProtected || false,
+              attachments 
+            });
           } else {
-            // Regular unencrypted paste
+            // Fallback for old unencrypted content
             const parse = createParser();
             let { html, title } = await parse(finalPaste.paste);
             html = xss(html, XSS_OPTIONS);
             if (!title) title = id;
 
-            const revisions = await storage.getRevisions(id);
-            const attachments = finalPaste.attachments || [];
             console.log('Displaying unencrypted paste with attachments:', attachments.length);
             contents = pastePage({
               id,
@@ -314,6 +269,7 @@ export default {
               mode: MODE,
               revisions,
               isEncrypted: false,
+              isPasswordProtected: false,
               attachments
             });
           }
@@ -343,6 +299,7 @@ export default {
       let pasteContent = '';
       let hasEditCode = false;
       let isEncrypted = false;
+      let isPasswordProtected = false;
 
       if (revisionTimestamp) {
         const revisions = await storage.getRevisions(id);
@@ -354,6 +311,7 @@ export default {
           const currentPaste = await storage.get(id);
           hasEditCode = Boolean(currentPaste.value?.editCode);
           isEncrypted = Boolean(currentPaste.value?.isEncrypted);
+          isPasswordProtected = Boolean(currentPaste.value?.isPasswordProtected);
         } else {
           contents = errorPage(MODE);
           status = 404;
@@ -364,34 +322,11 @@ export default {
           pasteContent = res.value.paste;
           hasEditCode = Boolean(res.value.editCode);
           isEncrypted = Boolean(res.value.isEncrypted);
+          isPasswordProtected = Boolean(res.value.isPasswordProtected);
           
-          // If it's encrypted, we need to decrypt it for editing
-          if (isEncrypted) {
-            const cookies = req.headers.get('cookie') || '';
-            const sessionCookie = cookies
-              .split(';')
-              .find(c => c.trim().startsWith(`decrypt-session-${id}=`));
-            
-            if (sessionCookie) {
-              const sessionPassword = decodeURIComponent(sessionCookie.split('=')[1]);
-              try {
-                const encryptedData = JSON.parse(pasteContent) as EncryptedData;
-                pasteContent = await ServerEncryption.decrypt(encryptedData, sessionPassword);
-              } catch (error) {
-                // Can't decrypt, redirect to view page for password prompt
-                return new Response('', {
-                  status: 302,
-                  headers: { 'location': `/${id}` },
-                });
-              }
-            } else {
-              // No session, redirect to view page for password prompt
-              return new Response('', {
-                status: 302,
-                headers: { 'location': `/${id}` },
-              });
-            }
-          }
+          // For encrypted content, pass the raw encrypted content to the edit page
+          // The client will handle decryption for editing
+          console.log('Edit page encryption status:', { isEncrypted, isPasswordProtected });
         } else {
           contents = errorPage(MODE);
           status = 404;
@@ -401,7 +336,15 @@ export default {
       if (status !== 404) {
         const res = await storage.get(id);
         const existingAttachments = res.value?.attachments || [];
-        contents = editPage({ id, paste: pasteContent, hasEditCode, mode: MODE, existingAttachments });
+        contents = editPage({ 
+          id, 
+          paste: pasteContent, 
+          hasEditCode, 
+          isEncrypted,
+          isPasswordProtected,
+          mode: MODE, 
+          existingAttachments 
+        });
       }
 
       return new Response(contents, {
@@ -518,7 +461,8 @@ export default {
       let paste = form.get('paste') as string;
       const slug = createSlug(customUrl);
       const encryptionPassword = form.get('encryptionPassword') as string;
-      const enableEncryption = encryptionPassword && encryptionPassword.trim().length > 0;
+      const isEncrypted = form.get('isEncrypted') === 'true';
+      const isPasswordProtected = form.get('isPasswordProtected') === 'true';
       const enableOneTimeView = form.get('enableOneTimeView') === 'on';
       const expiryTimestamp = form.get('expiryTimestamp') as string;
       const customExpiryDate = form.get('customExpiryDate') as string;
@@ -585,35 +529,14 @@ export default {
         now: Date.now()
       });
 
-      // Handle encryption
-      let isEncrypted = false;
-      
-      console.log('Encryption check:', { enableEncryption, encryptionPassword: !!encryptionPassword });
-      
-      if (enableEncryption && encryptionPassword && encryptionPassword.trim()) {
-        // Always use server-side encryption
-        try {
-          const encryptedData = await ServerEncryption.encrypt(paste, encryptionPassword);
-          paste = JSON.stringify(encryptedData);
-          isEncrypted = true;
-          console.log('Encryption successful');
-        } catch (error) {
-          console.error('Encryption failed:', error);
-          status = 422;
-          contents = homePage({
-            paste,
-            url: customUrl,
-            errors: { url: 'Encryption failed. Please try again.' },
-            mode: MODE,
-          });
-          return new Response(contents, { status, headers });
-        }
-      }
+      // All content is now encrypted client-side
+      console.log('Client-side encryption:', { isEncrypted, isPasswordProtected });
 
       const pasteData: Paste = {
         paste,
         editCode,
         isEncrypted,
+        isPasswordProtected,
         oneTimeView: enableOneTimeView,
         expiryTime,
         viewCount: 0,
@@ -691,6 +614,8 @@ export default {
             id,
             paste,
             hasEditCode,
+            isEncrypted: existing.isEncrypted || false,
+            isPasswordProtected: existing.isPasswordProtected || false,
             errors: { editCode: validation.error || 'Invalid edit code' },
             mode: MODE,
           });
@@ -735,42 +660,15 @@ export default {
             }
           }
           
-          // If the original paste was encrypted, we need to re-encrypt the updated content
-          if (existing.isEncrypted) {
-            const cookies = req.headers.get('cookie') || '';
-            const sessionCookie = cookies
-              .split(';')
-              .find(c => c.trim().startsWith(`decrypt-session-${id}=`));
-            
-            if (sessionCookie) {
-              const sessionPassword = decodeURIComponent(sessionCookie.split('=')[1]);
-              try {
-                const encryptedData = await ServerEncryption.encrypt(paste, sessionPassword);
-                paste = JSON.stringify(encryptedData);
-              } catch (error) {
-                status = 400;
-                contents = editPage({
-                  id,
-                  paste,
-                  hasEditCode,
-                  errors: { editCode: 'Encryption failed. Please try again.' },
-                  mode: MODE,
-                });
-                return new Response(contents, { status, headers });
-              }
-            } else {
-              // No session, redirect to view for password prompt
-              headers.set('location', `/${id}`);
-              return new Response(contents, { status, headers });
-            }
-          }
+          // Client-side encryption - paste content is already encrypted when it arrives
+          // No need to re-encrypt here as it's handled on the client side
           
           // Combine existing and new attachments
           const allAttachments = [...existingAttachments, ...newAttachments];
           
           await storage.set(id, {
             ...existing,
-            paste,
+            paste, // Already encrypted by client if needed
             editCode: editCode || existing.editCode,
             attachments: allAttachments
           });

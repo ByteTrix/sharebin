@@ -5,7 +5,13 @@ const _if = (condition: unknown, template: string) => (
 );
 
 const ThemeToggle = () => `
-  <div class="theme-toggle-container">
+<div class="theme-toggle-container">
+    <a href="/" class="paste-btn" title="Create New Note">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+      </svg>
+      <span>New</span>
+    </a>
     <button id="themeToggle" class="theme-toggle" 
             title="Toggle theme (Auto/Light/Dark)" 
             aria-label="Toggle theme mode"
@@ -25,16 +31,15 @@ const NewNavbar = () => `
         <a href="/" class="brand-link">ShareBin</a>
       </div>
       
-      
       <!-- Icon Actions -->
       <div class="navbar-actions">
-      <!-- New Note Button (Professional) -->
-      <button class="new-note-btn" onclick="window.location.href='/'" title="New Note">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
-        </svg>
-        <span>New</span>
-      </button>
+        <!-- New Note Button -->
+        <button class="new-note-btn" onclick="window.location.href='/'" title="New Note">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+          </svg>
+          <span>New</span>
+        </button>
         <!-- GitHub Cat Icon -->
         <a href="https://github.com/kvnlabs/ShareBin" class="navbar-icon github-icon" title="GitHub" target="_blank" rel="noopener">
           <img src="/github-cat-static.png" alt="GitHub Cat" width="35" height="35">
@@ -800,20 +805,12 @@ export const homePage = ({
 
 import { PasteRevision, AttachmentInfo } from './storage';
 
-export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions = [], isEncrypted = false, attachments = [] }: { id?: string; html?: string; title?: string; mode?: string; revisions?: PasteRevision[]; isEncrypted?: boolean; attachments?: AttachmentInfo[] } = {}) => layout(title, `
+export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions = [], isEncrypted = false, isPasswordProtected = false, attachments = [] }: { id?: string; html?: string; title?: string; mode?: string; revisions?: PasteRevision[]; isEncrypted?: boolean; isPasswordProtected?: boolean; attachments?: AttachmentInfo[] } = {}) => layout(title, `
   <main class="paste-main">
     <div class="paste-document">
         
         <!-- Floating Action Menu -->
         <div class="floating-actions">
-          <!-- New Note Button -->
-          <a href="/" class="new-paste-btn" title="Create New Paste">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
-            </svg>
-            <span>New Note</span>
-          </a>
-          
           <button class="action-menu-btn" onclick="toggleActionMenu()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z"/>
@@ -868,7 +865,21 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
       <!-- Document Content -->
       <div class="notion-container">
         <div class="document-content">
-          ${html}
+          ${isEncrypted ? `
+            <div class="encrypted-content" data-encrypted-content="${html}" data-paste-id="${id}" data-password-protected="${isPasswordProtected}">
+              ${isPasswordProtected ? `
+                <div class="encryption-notice">
+                  <h2>🔒 Password Protected Content</h2>
+                  <p>This content is password protected and requires a password to decrypt.</p>
+                  <div class="decrypt-form">
+                    <input type="password" id="decryptPassword" placeholder="Enter password to decrypt..." />
+                    <button onclick="decryptContent()" class="decrypt-btn">Decrypt</button>
+                  </div>
+                  <small>The password is not sent to the server. All decryption happens locally.</small>
+                </div>
+              ` : ''}
+            </div>
+          ` : html}
         </div>
         
         <!-- Attachments Section -->
@@ -910,49 +921,31 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
               </svg>
             </button>
           </div>
-          <div class="revision-controls">
-            <button class="revision-filter active" data-filter="all">All Changes</button>
-            <button class="revision-filter" data-filter="recent">Recent</button>
-            <button class="revision-filter" data-filter="major">Major</button>
-          </div>
           <div class="revision-list">
             ${revisions.map((rev, index) => `
               <div class="revision-entry" data-revision-index="${index}">
-                <div class="revision-timeline">
-                  <div class="revision-dot"></div>
-                  ${index < revisions.length - 1 ? '<div class="revision-line"></div>' : ''}
-                </div>
                 <div class="revision-content">
                   <div class="revision-header">
                     <div class="revision-info">
-                      <span class="revision-title" data-user-version="${revisions.length - index}">Loading...</span>
+                      <span class="revision-title" data-user-version="${revisions.length - index}">Revision ${revisions.length - index}</span>
                       <span class="revision-date" data-timestamp="${rev.timestamp}">
                         <span class="date-relative">Loading...</span>
                         <span class="date-absolute">Loading...</span>
                       </span>
                     </div>
                     <div class="revision-actions">
-                      <button class="revision-action-btn" onclick="viewRevision('${rev.timestamp}')" title="View this revision">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
-                        </svg>
-                      </button>
-                      <button class="revision-action-btn" onclick="restoreRevision('${rev.timestamp}')" title="Restore this revision">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z"/>
-                        </svg>
-                      </button>
                       <a href="/${id}/edit?revision=${rev.timestamp}" class="revision-action-btn" title="Edit this revision">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
                         </svg>
+                        Edit
                       </a>
-                    </div>
-                  </div>
-                  <div class="revision-preview">
-                    <div class="revision-changes">
-                      <span class="change-indicator">Modified content</span>
-                      <span class="change-size" data-size="${rev.timestamp}">Loading...</span>
+                      <button class="revision-action-btn primary" onclick="restoreRevision('${rev.timestamp}')" title="Restore this revision">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z"/>
+                        </svg>
+                        Restore
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -989,9 +982,6 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
           </div>
         </form>
         <div id="decrypt-error" class="error" style="display: none;"></div>
-        <div id="decrypt-loading" class="loading" style="display: none;">
-          <span>Decrypting...</span>
-        </div>
       </div>
     </div>
   </div>
@@ -1092,6 +1082,10 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
     }
 
     // Add copy buttons to code blocks
+    function addCopyButtons() {
+      addCopyButtonsToCodeBlocks();
+    }
+    
     function addCopyButtonsToCodeBlocks() {
       const codeBlocks = document.querySelectorAll('pre code');
       codeBlocks.forEach((codeBlock, index) => {
@@ -1139,7 +1133,6 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
     function hideDecryptPrompt() {
       document.getElementById('decryption-modal').style.display = 'none';
       document.getElementById('decrypt-error').style.display = 'none';
-      document.getElementById('decrypt-loading').style.display = 'none';
       document.getElementById('decrypt-password').value = '';
     }
 
@@ -1149,19 +1142,160 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
       errorDiv.style.display = 'block';
     }
 
-    function showDecryptLoading(show = true) {
-      const loadingDiv = document.getElementById('decrypt-loading');
-      const submitBtn = document.getElementById('decrypt-submit-btn');
+    // Decryption function for client-side encrypted content
+    async function decryptContent() {
+      const encryptedContainer = document.querySelector('.encrypted-content');
+      const passwordInput = document.getElementById('decryptPassword');
+      const decryptBtn = document.querySelector('.decrypt-btn');
       
-      if (show) {
-        loadingDiv.style.display = 'block';
-        submitBtn.disabled = true;
-        submitBtn.textContent = '⏳ Decrypting...';
-      } else {
-        loadingDiv.style.display = 'none';
-        submitBtn.disabled = false;
-        submitBtn.textContent = '🔓 Decrypt';
+      if (!encryptedContainer) return;
+      
+      const encryptedContent = encryptedContainer.getAttribute('data-encrypted-content');
+      const pasteId = encryptedContainer.getAttribute('data-paste-id');
+      const isPasswordProtected = encryptedContainer.getAttribute('data-password-protected') === 'true';
+      
+      if (!encryptedContent) {
+        showNotification('No encrypted content found', 'error');
+        return;
       }
+      
+      let password = null;
+      
+      if (isPasswordProtected) {
+        if (!passwordInput) return;
+        password = passwordInput.value;
+        if (!password) {
+          showNotification('Please enter a password', 'error');
+          return;
+        }
+        
+        // Show loading state
+        decryptBtn.disabled = true;
+        decryptBtn.textContent = 'Decrypting...';
+      }
+      
+      try {
+        if (!window.ShareBinCrypto) {
+          throw new Error('Encryption system not available');
+        }
+        
+        let decryptedText;
+        
+        if (isPasswordProtected) {
+          // Password-protected decryption
+          decryptedText = await window.ShareBinCrypto.decrypt(encryptedContent, password);
+        } else {
+          // Default decryption (auto-decrypt)
+          decryptedText = await window.ShareBinCrypto.decryptDefault(encryptedContent);
+        }
+        
+        // Process the decrypted markdown
+        const response = await fetch('/preview', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ content: decryptedText })
+        });
+        
+        if (response.ok) {
+          const html = await response.text();
+          
+          // Replace the encrypted content with decrypted content
+          const documentContent = document.querySelector('.document-content');
+          documentContent.innerHTML = html;
+          
+          // Add copy buttons to code blocks
+          addCopyButtons();
+          
+          // Only show success notification for password-protected content
+          if (isPasswordProtected) {
+            showNotification('Content decrypted successfully!', 'success');
+          }
+        } else {
+          throw new Error('Failed to process decrypted content');
+        }
+        
+      } catch (error) {
+        console.error('Decryption error:', error);
+        showNotification('Decryption failed: ' + error.message, 'error');
+        if (passwordInput) {
+          passwordInput.select();
+        }
+      } finally {
+        if (decryptBtn) {
+          decryptBtn.disabled = false;
+          decryptBtn.textContent = 'Decrypt';
+        }
+      }
+    }
+    
+    // Function to wait for crypto system to be available
+    async function waitForCryptoSystem() {
+      return new Promise((resolve) => {
+        if (window.ShareBinCrypto) {
+          resolve(window.ShareBinCrypto);
+          return;
+        }
+        
+        const checkCrypto = () => {
+          if (window.ShareBinCrypto) {
+            resolve(window.ShareBinCrypto);
+          } else {
+            setTimeout(checkCrypto, 50);
+          }
+        };
+        
+        checkCrypto();
+      });
+    }
+    
+    // Auto-decrypt non-password-protected content silently
+    document.addEventListener('DOMContentLoaded', async function() {
+      const encryptedContainer = document.querySelector('.encrypted-content');
+      if (encryptedContainer) {
+        const isPasswordProtected = encryptedContainer.getAttribute('data-password-protected') === 'true';
+        if (!isPasswordProtected) {
+          // Wait for crypto system to be available before auto-decrypting
+          await waitForCryptoSystem();
+          decryptContent();
+        }
+      }
+    });
+    
+    // Allow Enter key to decrypt
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && e.target.id === 'decryptPassword') {
+        decryptContent();
+      }
+    });
+    
+    // Show notification function
+    function showNotification(message, type = 'info') {
+      // Remove existing notifications
+      const existing = document.querySelectorAll('.notification');
+      existing.forEach(n => n.remove());
+
+      const notification = document.createElement('div');
+      notification.className = \`notification notification-\${type}\`;
+      notification.textContent = message;
+
+      document.body.appendChild(notification);
+      
+      // Trigger animation
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+
+      // Auto-remove after 4 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 4000);
     }
 
     // Initialize attachments
@@ -1580,7 +1714,6 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
         return;
       }
 
-      showDecryptLoading(true);
       document.getElementById('decrypt-error').style.display = 'none';
       
       try {
@@ -1600,10 +1733,9 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
       } catch (error) {
         console.error('Decryption error:', error);
         showDecryptError('Decryption failed: ' + error.message);
-      } finally {
-        showDecryptLoading(false);
       }
     });
+  </script>
   </script>
 `, mode, false);
 
@@ -1615,7 +1747,7 @@ export const guidePage = ({ html = '', title = '', mode = '' } = {}) => layout(t
   </main>
 `, mode, false);
 
-const EditEditor = (paste = '', id = '', hasEditCode = false, errors: any = { editCode: '' }, existingAttachments: any[] = []) => `
+const EditEditor = (paste = '', id = '', hasEditCode = false, isEncrypted = false, isPasswordProtected = false, errors: any = { editCode: '' }, existingAttachments: any[] = []) => `
   <!-- Modern Edit Layout -->
   <div class="github-layout">
     <!-- Main Content Area -->
@@ -1781,20 +1913,146 @@ const EditEditor = (paste = '', id = '', hasEditCode = false, errors: any = { ed
 `;
 
 export const editPage = (
-  { id = '', paste = '', hasEditCode = false, errors = { editCode: '' }, mode = '', existingAttachments = [] as any[] } = {},
+  { id = '', paste = '', hasEditCode = false, isEncrypted = false, isPasswordProtected = false, errors = { editCode: '' }, mode = '', existingAttachments = [] as any[] } = {},
 ) => layout(`edit ${id}`, `
   <main>
     <form id="editor-form" method="post" action="/${id}/save" enctype="multipart/form-data">
-      ${EditEditor(paste, id, hasEditCode, errors, existingAttachments)}
+      ${EditEditor(paste, id, hasEditCode, isEncrypted, isPasswordProtected, errors, existingAttachments)}
       <input type="hidden" name="url" value="${id}" />
     </form>
   </main>
   <script src="/codemirror.min.js"></script>
   <script src="/cm-markdown.min.js"></script>
   <script src="/cm-sublime.min.js"></script>
+  <script src="/nacl.min.js"></script>
+  <script src="/nacl-util.min.js"></script>
+  <script src="/crypto.js"></script>
   <script src="/editor.js"></script>
   <script src="/encryption-ui.js"></script>
   <script>
+    // Decryption function for edit page
+    async function decryptForEdit() {
+      const encryptedContainer = document.querySelector('.encrypted-edit-content');
+      const passwordInput = document.getElementById('editDecryptPassword');
+      const decryptBtn = document.querySelector('.decrypt-btn');
+      
+      if (!encryptedContainer) return;
+      
+      const encryptedContent = encryptedContainer.getAttribute('data-encrypted-content');
+      const pasteId = encryptedContainer.getAttribute('data-paste-id');
+      const isPasswordProtected = encryptedContainer.getAttribute('data-password-protected') === 'true';
+      
+      if (!encryptedContent) {
+        showNotification('No encrypted content found', 'error');
+        return;
+      }
+      
+      let password = null;
+      
+      if (isPasswordProtected) {
+        if (!passwordInput) return;
+        password = passwordInput.value;
+        if (!password) {
+          showNotification('Please enter a password', 'error');
+          return;
+        }
+        
+        // Show loading state
+        decryptBtn.disabled = true;
+        decryptBtn.textContent = 'Decrypting...';
+      }
+      
+      try {
+        if (!window.ShareBinCrypto) {
+          throw new Error('Encryption system not available');
+        }
+        
+        let decryptedText;
+        
+        if (isPasswordProtected) {
+          // Password-protected decryption
+          decryptedText = await window.ShareBinCrypto.decrypt(encryptedContent, password);
+        } else {
+          // Default decryption (auto-decrypt)
+          decryptedText = await window.ShareBinCrypto.decryptDefault(encryptedContent);
+        }
+        
+        // Replace the encrypted content with the editor
+        const editorContent = document.querySelector('.editor-content');
+        editorContent.innerHTML = \`
+          <!-- Editor View -->
+          <div id="editor-container" class="tab-content active" data-content="edit">
+            <textarea id="pasteTextArea" name="paste" required>\${decryptedText}</textarea>
+            <div id="editor"></div>
+          </div>
+          
+          <!-- Preview View -->
+          <div id="preview-container" class="tab-content" data-content="preview">
+            <div class="preview-placeholder">Preview will appear here...</div>
+          </div>
+        \`;
+        
+        // Reinitialize the editor
+        if (typeof initializeEditor === 'function') {
+          initializeEditor();
+        }
+        
+        showNotification('Content decrypted successfully!', 'success');
+        
+      } catch (error) {
+        console.error('Decryption error:', error);
+        showNotification('Decryption failed: ' + error.message, 'error');
+        if (passwordInput) {
+          passwordInput.select();
+        }
+      } finally {
+        if (decryptBtn) {
+          decryptBtn.disabled = false;
+          decryptBtn.textContent = 'Decrypt & Edit';
+        }
+      }
+    }
+    
+    // Auto-decrypt non-password-protected content
+    document.addEventListener('DOMContentLoaded', function() {
+      const encryptedContainer = document.querySelector('.encrypted-edit-content');
+      if (encryptedContainer) {
+        const isPasswordProtected = encryptedContainer.getAttribute('data-password-protected') === 'true';
+        if (!isPasswordProtected) {
+          // Auto-decrypt default encrypted content
+          setTimeout(decryptForEdit, 100);
+        }
+      }
+    });
+    
+    // Show notification function
+    function showNotification(message, type = 'info') {
+      // Remove existing notifications
+      const existing = document.querySelectorAll('.notification');
+      existing.forEach(n => n.remove());
+
+      const notification = document.createElement('div');
+      notification.className = \`notification notification-\${type}\`;
+      notification.textContent = message;
+
+      document.body.appendChild(notification);
+      
+      // Trigger animation
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+
+      // Auto-remove after 4 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 4000);
+    }
+    
     // Edit page attachment functions
     function downloadEditAttachment(attachmentId, filename) {
       const url = \`/attachment/\${attachmentId}?paste=\${encodeURIComponent('${id}')}&action=download\`;

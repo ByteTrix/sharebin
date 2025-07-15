@@ -48,6 +48,7 @@
     background-color: var(--bg-color);
     color: var(--color);
     box-shadow: none;
+    overflow: hidden;
 }
 
 .CodeMirror-focused {
@@ -61,7 +62,7 @@
     padding: var(--spacing-3);
     background-color: var(--bg-color);
     max-height: 500px;
-    overflow-y: auto !important;
+    overflow: hidden !important;
 }
 
 .CodeMirror-gutters {

@@ -1968,7 +1968,7 @@ dd {
 .attachment-name {
     font-weight: 500;
     color: var(--color);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2142,4 +2142,77 @@ dd {
 
 .close-button:hover {
     opacity: 1;
+}
+
+/* Loading States */
+.sidebar-btn.loading {
+    opacity: 0.7;
+    pointer-events: none;
+    position: relative;
+}
+
+.sidebar-btn.loading svg {
+    opacity: 0;
+}
+
+.sidebar-btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    margin-left: -8px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Spinner animation */
+.spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-left: 0.5rem;
+}
+
+/* Error Color Variables */
+:root {
+  --error-bg: rgba(239, 68, 68, 0.1);
+  --error-color: #ef4444;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+}
+
+[data-theme="dark"] {
+  --error-bg: rgba(239, 68, 68, 0.15);
+  --error-color: #f87171;
+  --success-color: #34d399;
+  --warning-color: #fbbf24;
+}
+
+/* Mobile Responsiveness for Notifications */
+@media (max-width: 768px) {
+  .notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    transform: translateY(-100px);
+  }
+  
+  .notification.show {
+    transform: translateY(0);
+  }
 }

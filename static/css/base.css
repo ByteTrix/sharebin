@@ -44,9 +44,9 @@ p, h1, h2, h3, h4, h5, h6 {
     /* Font Sizes */
     --font-1-size: 12px;
     --font-2-size: 14px;
-    --font-3-size: 16px;
-    --font-4-size: 18px;
-    --font-5-size: 20px;
+    --font-3-size: 18px;
+    --font-4-size: 20px;
+    --font-5-size: 22px;
     --font-6-size: 28px;
 
     /* Spacing Scale */

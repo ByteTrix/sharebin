@@ -29,6 +29,7 @@ body:has(.paste-document) main {
     padding: 0 2rem;
     width: 100%;
     box-sizing: border-box;
+    margin-top: 10rem;
 }
 
 /* New Layout - Tabs + Content + Sidebar */
@@ -91,6 +92,7 @@ body:has(.paste-document) main {
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     min-height: 800px; /* Increased minimum height */
+    position: relative;
 }
 
 /* Content Container - Fixed Large Heights */
@@ -132,7 +134,7 @@ body:has(.new-navbar) .github-layout {
     opacity: 0;
     visibility: hidden;
     transition: all 0.2s ease;
-    overflow: auto;
+    overflow: hidden;
     background: var(--bg-color);
     z-index: 1;
 }
@@ -466,7 +468,6 @@ body.revision-panel-open .paste-main {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
-    margin-top: 10rem;
 }
 
 /* Preserve newlines in document content */

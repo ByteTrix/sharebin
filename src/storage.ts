@@ -4,6 +4,7 @@ export interface Paste {
   paste: string;
   editCode?: string;
   isEncrypted?: boolean;
+  isPasswordProtected?: boolean;
   oneTimeView?: boolean;
   expiryTime?: number; // Unix timestamp
   viewCount?: number;

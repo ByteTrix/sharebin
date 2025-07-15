@@ -36,7 +36,7 @@
     
     .notion-container,
     .paste-document {
-        padding: 1rem;
+        margin-top: 1rem;
     }
     
     /* New Layout */
@@ -321,6 +321,10 @@
     .new-layout {
         gap: var(--spacing-2);
         min-height: auto;
+    }
+    
+    .paste-document {
+        margin-top: 1rem;
     }
     
     .compact-expiry-buttons {
