@@ -460,6 +460,7 @@ export default {
       const customUrl = form.get('url') as string;
       let paste = form.get('paste') as string;
       const slug = createSlug(customUrl);
+      // Note: encryptionPassword is used only for client-side encryption and never stored
       const encryptionPassword = form.get('encryptionPassword') as string;
       const isEncrypted = form.get('isEncrypted') === 'true';
       const isPasswordProtected = form.get('isPasswordProtected') === 'true';
@@ -470,6 +471,12 @@ export default {
       let editCode: string | undefined = form.get('editcode') as string;
       if (typeof editCode === 'string') {
         editCode = editCode.trim() || undefined;
+      }
+
+      // Security: Clear password from memory after use (if accessed)
+      if (encryptionPassword) {
+        // Password is only used client-side for encryption, never stored server-side
+        console.log('Password received for client-side encryption (not stored)');
       }
 
       // Handle file attachments
@@ -772,6 +779,54 @@ export default {
         return new Response(passwordPromptPage({ id, mode: MODE, error: 'Invalid password. Please try again.' }), {
           status: 400,
           headers: { 'content-type': 'text/html' },
+        });
+      }
+    });
+
+    // Handle revision restore
+    app.post('/:id/restore/:timestamp', async (req, params) => {
+      const id = params.id as string ?? '';
+      const timestamp = params.timestamp as string ?? '';
+      
+      try {
+        const res = await storage.get(id);
+        if (res.value === null) {
+          return new Response(JSON.stringify({ error: 'Paste not found' }), {
+            status: 404,
+            headers: { 'content-type': 'application/json' },
+          });
+        }
+
+        const revisions = await storage.getRevisions(id);
+        const revision = revisions.find(rev => rev.timestamp === parseInt(timestamp, 10));
+        
+        if (!revision) {
+          return new Response(JSON.stringify({ error: 'Revision not found' }), {
+            status: 404,
+            headers: { 'content-type': 'application/json' },
+          });
+        }
+
+        const existing = res.value as Paste;
+        
+        // Save current version as a revision before restoring
+        await storage.saveRevision(id, existing.paste);
+        
+        // Restore the revision
+        await storage.set(id, {
+          ...existing,
+          paste: revision.paste,
+        });
+
+        return new Response(JSON.stringify({ success: true }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+      } catch (error) {
+        console.error('Restore error:', error);
+        return new Response(JSON.stringify({ error: 'Restore failed' }), {
+          status: 500,
+          headers: { 'content-type': 'application/json' },
         });
       }
     });

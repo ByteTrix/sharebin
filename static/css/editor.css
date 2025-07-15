@@ -3,6 +3,11 @@
    CodeMirror, Preview, Editor Components
    ==================================== */
 
+/* Hide the textarea when CodeMirror takes over */
+#pasteTextArea {
+    display: none !important;
+}
+
 /* Tab Logic for Editor/Preview Toggle */
 #tab1:checked ~ .main-content #editor-container,
 #tab1:checked ~ #editor-container {

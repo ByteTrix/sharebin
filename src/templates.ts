@@ -1004,7 +1004,7 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
       if (!container) {
         container = document.createElement('div');
         container.id = 'notification-container';
-        container.style.cssText = 'position: fixed; top: 7.5rem; right: 1rem; z-index: 1050; pointer-events: none;';
+        container.style.cssText = 'position: fixed; top: 5rem; right: 1rem; z-index: 1050; pointer-events: none;';
         document.body.appendChild(container);
       }
       
@@ -1012,6 +1012,7 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
       notification.className = \`notification notification-\${type}\`;
       notification.textContent = message;
       notification.style.marginBottom = '0.5rem';
+      notification.style.pointerEvents = 'auto';
       container.appendChild(notification);
       
       // Show notification
@@ -1208,6 +1209,12 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
           // Add copy buttons to code blocks
           addCopyButtons();
           
+          // Show attachments after successful decryption
+          const attachmentData = ${JSON.stringify(attachments)};
+          if (attachmentData.length > 0) {
+            displayAttachments(attachmentData);
+          }
+          
           // Only show success notification for password-protected content
           if (isPasswordProtected) {
             showNotification('Content decrypted successfully!', 'success');
@@ -1272,15 +1279,21 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
     
     // Show notification function
     function showNotification(message, type = 'info') {
-      // Remove existing notifications
-      const existing = document.querySelectorAll('.notification');
-      existing.forEach(n => n.remove());
+      // Create notification container if it doesn't exist
+      let container = document.getElementById('notification-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'notification-container';
+        container.style.cssText = 'position: fixed; top: 5rem; right: 1rem; z-index: 1050; pointer-events: none;';
+        document.body.appendChild(container);
+      }
 
       const notification = document.createElement('div');
       notification.className = \`notification notification-\${type}\`;
       notification.textContent = message;
-
-      document.body.appendChild(notification);
+      notification.style.marginBottom = '0.5rem';
+      notification.style.pointerEvents = 'auto';
+      container.appendChild(notification);
       
       // Trigger animation
       setTimeout(() => {
@@ -1300,11 +1313,32 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
 
     // Initialize attachments
     function initializeAttachments() {
+      // Only show attachments if content is not encrypted or already decrypted
+      const encryptedContainer = document.querySelector('.encrypted-content');
+      const isEncrypted = ${isEncrypted};
+      
+      // Don't show attachments if content is still encrypted
+      if (isEncrypted && encryptedContainer) {
+        return; // Skip attachment display for encrypted content
+      }
+      
       // Use real attachments passed from server
       const attachmentData = ${JSON.stringify(attachments)};
       
       if (attachmentData.length > 0) {
-        displayAttachments(attachmentData);
+        const attachmentsSection = document.getElementById('attachmentsSection');
+        if (attachmentsSection) {
+          attachmentsSection.classList.add('loading');
+        }
+        
+        // Small delay to ensure proper positioning
+        setTimeout(() => {
+          displayAttachments(attachmentData);
+          if (attachmentsSection) {
+            attachmentsSection.classList.remove('loading');
+            attachmentsSection.classList.add('loaded');
+          }
+        }, 100);
       }
     }
     
@@ -1635,18 +1669,20 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
         fetch('/${id}/restore/' + timestamp, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
           }
         })
-        .then(response => {
-          if (response.ok) {
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
             showNotification('Revision restored successfully!', 'success');
             setTimeout(() => window.location.reload(), 1000);
           } else {
-            showNotification('Failed to restore revision', 'error');
+            showNotification(data.error || 'Failed to restore revision', 'error');
           }
         })
         .catch(error => {
+          console.error('Restore error:', error);
           showNotification('Error restoring revision: ' + error.message, 'error');
         });
       }
@@ -1781,8 +1817,40 @@ const EditEditor = (paste = '', id = '', hasEditCode = false, isEncrypted = fals
       <div class="editor-content">
         <!-- Editor View -->
         <div id="editor-container" class="tab-content active" data-content="edit">
-          <textarea id="pasteTextArea" name="paste" required>${paste}</textarea>
-          <div id="editor"></div>
+          ${_if(isEncrypted && isPasswordProtected, `
+            <div class="encrypted-edit-content" data-encrypted-content="${paste}" data-paste-id="${id}" data-password-protected="${isPasswordProtected}">
+              <div class="encryption-notice">
+                <div class="lock-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/>
+                  </svg>
+                </div>
+                <h3>🔒 Password Protected Content</h3>
+                <p>This content is password protected and needs to be decrypted before editing.</p>
+                <div class="password-input-group">
+                  <label for="editDecryptPassword">Enter password to decrypt:</label>
+                  <input type="password" id="editDecryptPassword" placeholder="Enter password" />
+                </div>
+                <button class="decrypt-btn" onclick="decryptForEdit()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/>
+                  </svg>
+                  Decrypt & Edit
+                </button>
+              </div>
+            </div>
+          `)}
+          ${_if(isEncrypted && !isPasswordProtected, `
+            <div class="encrypted-edit-content" data-encrypted-content="${paste}" data-paste-id="${id}" data-password-protected="${isPasswordProtected}" style="display: none;">
+              <!-- Auto-decrypt for default encrypted content -->
+            </div>
+            <textarea id="pasteTextArea" name="paste" required style="display: none;">${paste}</textarea>
+            <div id="editor"></div>
+          `)}
+          ${_if(!isEncrypted, `
+            <textarea id="pasteTextArea" name="paste" required style="display: none;">${paste}</textarea>
+            <div id="editor"></div>
+          `)}
         </div>
         
         <!-- Preview View -->
@@ -1924,9 +1992,6 @@ export const editPage = (
   <script src="/codemirror.min.js"></script>
   <script src="/cm-markdown.min.js"></script>
   <script src="/cm-sublime.min.js"></script>
-  <script src="/nacl.min.js"></script>
-  <script src="/nacl-util.min.js"></script>
-  <script src="/crypto.js"></script>
   <script src="/editor.js"></script>
   <script src="/encryption-ui.js"></script>
   <script>
@@ -1974,7 +2039,13 @@ export const editPage = (
           decryptedText = await window.ShareBinCrypto.decrypt(encryptedContent, password);
         } else {
           // Default decryption (auto-decrypt)
-          decryptedText = await window.ShareBinCrypto.decryptDefault(encryptedContent);
+          try {
+            decryptedText = await window.ShareBinCrypto.decryptDefault(encryptedContent);
+          } catch (defaultDecryptError) {
+            // If default decryption fails, content might be plain text or use different encryption
+            console.log('Default decryption failed, treating as plain text:', defaultDecryptError.message);
+            decryptedText = encryptedContent; // Use as-is if not encrypted
+          }
         }
         
         // Replace the encrypted content with the editor
@@ -2018,9 +2089,84 @@ export const editPage = (
       const encryptedContainer = document.querySelector('.encrypted-edit-content');
       if (encryptedContainer) {
         const isPasswordProtected = encryptedContainer.getAttribute('data-password-protected') === 'true';
-        if (!isPasswordProtected) {
-          // Auto-decrypt default encrypted content
-          setTimeout(decryptForEdit, 100);
+        const encryptedContent = encryptedContainer.getAttribute('data-encrypted-content');
+        
+        if (!isPasswordProtected && encryptedContent) {
+          // Check if content looks like it's actually encrypted before trying to decrypt
+          if (encryptedContent.startsWith('SHAREBIN_DEFAULT:')) {
+            // This is default encrypted content, auto-decrypt it
+            console.log('Found default encrypted content, auto-decrypting...');
+            
+            // Decrypt immediately without relying on decryptForEdit
+            setTimeout(async () => {
+              try {
+                if (!window.ShareBinCrypto) {
+                  throw new Error('ShareBinCrypto not available');
+                }
+                
+                const decryptedText = await window.ShareBinCrypto.decryptDefault(encryptedContent);
+                console.log('Auto-decryption successful, setting up editor...');
+                
+                // Set the decrypted content directly to the textarea
+                const textarea = document.getElementById('pasteTextArea');
+                if (textarea) {
+                  textarea.value = decryptedText;
+                  console.log('Textarea updated with decrypted content');
+                  
+                  // Update CodeMirror if it exists
+                  if (window.cmEditor) {
+                    window.cmEditor.setValue(decryptedText);
+                    console.log('CodeMirror updated with decrypted content');
+                  } else {
+                    // Initialize the editor if it doesn't exist yet
+                    if (typeof initializeEditor === 'function') {
+                      initializeEditor();
+                      console.log('Editor initialized');
+                    }
+                  }
+                }
+              } catch (error) {
+                console.error('Auto-decryption failed:', error);
+                // Fall back to showing raw content
+                const textarea = document.getElementById('pasteTextArea');
+                if (textarea) {
+                  textarea.value = encryptedContent;
+                  if (typeof initializeEditor === 'function') {
+                    initializeEditor();
+                  }
+                }
+              }
+            }, 100);
+          } else {
+            // Check if it's JSON encrypted content
+            try {
+              const parsedContent = JSON.parse(encryptedContent);
+              if (parsedContent && typeof parsedContent === 'object' && parsedContent.ciphertext) {
+                // This looks like encrypted content, auto-decrypt it
+                setTimeout(decryptForEdit, 100);
+              } else {
+                // Not encrypted JSON, treat as plain text
+                console.log('Content is not encrypted, treating as plain text');
+                const textarea = document.getElementById('pasteTextArea');
+                if (textarea) {
+                  textarea.value = encryptedContent;
+                  if (typeof initializeEditor === 'function') {
+                    initializeEditor();
+                  }
+                }
+              }
+            } catch (e) {
+              // Not JSON, treat as plain text
+              console.log('Content is not JSON, treating as plain text');
+              const textarea = document.getElementById('pasteTextArea');
+              if (textarea) {
+                textarea.value = encryptedContent;
+                if (typeof initializeEditor === 'function') {
+                  initializeEditor();
+                }
+              }
+            }
+          }
         }
       }
     });
@@ -2124,10 +2270,100 @@ export const deletePage = (
 `, mode, false);
 
 export const errorPage = (mode = '') => layout('404', `
-  <main>
-    <h1>404</h1>
-    <p>That paste doesn't exist! Maybe it was deleted?</p>
+  <main class="confirmation-main">
+    <div class="confirmation-panel">
+      <!-- Error Icon -->
+      <div class="error-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/>
+        </svg>
+      </div>
+      
+      <!-- Heading -->
+      <h1 class="confirmation-heading">Page Not Found</h1>
+      
+      <!-- Sub-text -->
+      <p class="confirmation-subtext">The paste you're looking for doesn't exist. It may have been deleted or expired.</p>
+      
+      <!-- Actions -->
+      <div class="action-buttons">
+        <a href="/" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/>
+          </svg>
+          Go Home
+        </a>
+        <a href="javascript:history.back()" class="btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+          </svg>
+          Go Back
+        </a>
+      </div>
+    </div>
   </main>
+  
+  <style>
+    .error-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      border-radius: 50%;
+      margin: 0 auto 2rem;
+      color: white;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+    
+    .action-buttons .btn-primary {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .action-buttons .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .action-buttons .btn-secondary {
+      padding: 0.875rem 1.5rem;
+      background: var(--bg-color);
+      color: var(--color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    
+    .action-buttons .btn-secondary:hover {
+      background: var(--light-bg-color);
+      border-color: var(--focus-color);
+    }
+  </style>
 `, mode, false);
 
 export const oneTimeViewWarningPage = ({ id = '', mode = '' } = {}) => layout(`⚠️ One-Time View Warning - ${id}`, `
@@ -2298,85 +2534,246 @@ export const oneTimeViewWarningPage = ({ id = '', mode = '' } = {}) => layout(`�
 `, mode, false);
 
 export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => layout(`🔒 Encrypted Paste - ${id}`, `
-  <main>
-    <div class="encryption-prompt">
-      <div class="encryption-prompt-content">
-        <h2>🔒 This paste is encrypted</h2>
-        <p>Enter the password to decrypt and view this paste:</p>
-        
-        <form id="decrypt-form" method="post" action="/${id}/decrypt">
-          <div class="input-group">
-            <div>
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter password"
-                required
-                minlength="1"
-                autofocus
-                aria-invalid="${Boolean(error)}"
-                ${_if(error, 'aria-describedby="password-error"')}
-              />
-              ${_if(error, `
-                <small class="error" id="password-error">${error}</small>
-              `)}
-            </div>
-          </div>
-          
-          <div class="button-group">
-            <button type="submit">🔓 Decrypt</button>
-            <a class="btn" href="/">Cancel</a>
-          </div>
-        </form>
-        
-        <div class="encryption-info">
-          <small>
-            <strong>🔒 Security Notice:</strong> Your password is processed securely and never stored on our servers.
-            <br>If you've forgotten the password, the paste cannot be recovered.
-          </small>
+  <main class="confirmation-main">
+    <div class="confirmation-panel">
+      <!-- Lock Icon -->
+      <div class="lock-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/>
+        </svg>
+      </div>
+      
+      <!-- Heading -->
+      <h1 class="confirmation-heading">Protected Content</h1>
+      
+      <!-- Sub-text -->
+      <p class="confirmation-subtext">This paste is password protected. Enter the password to view the content.</p>
+      
+      <!-- Password Form -->
+      <form id="decrypt-form" method="post" action="/${id}/decrypt" class="password-form">
+        <div class="input-group">
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter password"
+            required
+            minlength="1"
+            autofocus
+            aria-invalid="${Boolean(error)}"
+            ${_if(error, 'aria-describedby="password-error"')}
+          />
+          ${_if(error, `
+            <small class="error-message" id="password-error">${error}</small>
+          `)}
         </div>
+        
+        <div class="action-buttons">
+          <button type="submit" class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/>
+            </svg>
+            Decrypt & View
+          </button>
+          <a class="btn-secondary" href="/">Cancel</a>
+        </div>
+      </form>
+      
+      <!-- Security Notice -->
+      <div class="security-notice">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
+        </svg>
+        <span>Your password is processed securely and never stored on our servers.</span>
       </div>
     </div>
   </main>
   
   <style>
-    .encryption-prompt {
+    .confirmation-main {
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 60vh;
+      min-height: 50vh;
+      padding: 2rem 1rem;
+      margin-top: -2rem;
     }
-    
-    .encryption-prompt-content {
-      max-width: 400px;
-      padding: 2rem;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
+
+    .confirmation-panel {
       background: var(--bg-color);
+      padding: 2.5rem;
+      max-width: 450px;
+      width: 100%;
       text-align: center;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border: 1px solid var(--border-color);
     }
-    
-    .encryption-prompt h2 {
-      margin-bottom: 1rem;
-      color: var(--text-color);
+
+    .confirmation-heading {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--color);
+      margin-bottom: 0.5rem;
     }
-    
-    .encryption-prompt p {
+
+    .confirmation-subtext {
+      color: var(--faint-color);
+      font-size: 0.95rem;
       margin-bottom: 1.5rem;
-      color: var(--text-secondary);
+      line-height: 1.4;
     }
     
-    .encryption-info {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      background: var(--code-bg);
-      border-radius: 4px;
+    .lock-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      margin: 0 auto 1.5rem;
+      color: white;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    }
+    
+    .password-form {
+      width: 100%;
+      margin: 1.5rem 0;
+    }
+    
+    .input-group {
+      margin-bottom: 1.25rem;
+    }
+    
+    .input-group input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: var(--bg-color);
+      color: var(--color);
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+      font-family: var(--sans-serif);
+    }
+    
+    .input-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+      transform: translateY(-1px);
+    }
+    
+    .input-group input::placeholder {
+      color: var(--faint-color);
+      opacity: 0.7;
+    }
+    
+    .error-message {
+      display: block;
+      margin-top: 0.75rem;
+      color: #ef4444;
+      font-size: 0.875rem;
+      font-weight: 500;
       text-align: left;
     }
     
-    .encryption-info small {
-      color: var(--text-secondary);
-      line-height: 1.4;
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .action-buttons .btn-primary {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    }
+    
+    .action-buttons .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .action-buttons .btn-primary:active {
+      transform: translateY(0);
+    }
+    
+    .action-buttons .btn-secondary {
+      padding: 1rem 1.5rem;
+      background: var(--bg-color);
+      color: var(--color);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .action-buttons .btn-secondary:hover {
+      background: var(--light-bg-color);
+      border-color: #667eea;
+      transform: translateY(-1px);
+    }
+    
+    .security-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-top: 2rem;
+      padding: 1.25rem;
+      background: var(--faint-bg-color);
+      border-radius: 8px;
+      color: var(--faint-color);
+      font-size: 0.875rem;
+      text-align: left;
+      border: 1px solid var(--border-color);
+    }
+    
+    .security-notice svg {
+      flex-shrink: 0;
+      opacity: 0.8;
+      margin-top: 0.125rem;
+    }
+    
+    @media (max-width: 640px) {
+      .confirmation-main {
+        min-height: 40vh;
+        padding: 1rem;
+        margin-top: -1rem;
+      }
+      
+      .confirmation-panel {
+        padding: 2rem;
+        max-width: 100%;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      
+      .action-buttons .btn-secondary {
+        order: 1;
+      }
     }
   </style>
 `, mode, false);
@@ -2651,7 +3048,11 @@ export const noteCreatedPage = ({ id = '', url = '', mode = '' } = {}) => layout
   <!-- QR Code Generation Script -->
   <script>
     // Simple QR Code generation using a public API
+    let qrCodeGenerated = false;
+    
     function generateQRCode(text, canvas) {
+      if (qrCodeGenerated) return; // Prevent multiple generations
+      
       const ctx = canvas.getContext('2d');
       const size = 200;
       
@@ -2663,6 +3064,7 @@ export const noteCreatedPage = ({ id = '', url = '', mode = '' } = {}) => layout
       img.onload = function() {
         ctx.clearRect(0, 0, size, size);
         ctx.drawImage(img, 0, 0, size, size);
+        qrCodeGenerated = true; // Mark as generated
       };
       img.onerror = function() {
         // Fallback: draw a simple placeholder
