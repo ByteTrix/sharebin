@@ -59,9 +59,9 @@
     
     // Copy to clipboard
     navigator.clipboard.writeText(password).then(() => {
-      showNotification('✅ Secure password generated and copied to clipboard!', 'success');
+      showNotification('🔒 Secure password generated and copied to clipboard!', 'success');
     }).catch(() => {
-      showNotification('✅ Secure password generated! Please copy it manually.', 'success');
+      showNotification('🔒 Secure password generated! Please copy it manually.', 'success');
     });
     
     // Hide password after 3 seconds

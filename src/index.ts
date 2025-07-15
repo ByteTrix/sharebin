@@ -252,7 +252,8 @@ export default {
               revisions, 
               isEncrypted: true,
               isPasswordProtected: finalPaste.isPasswordProtected || false,
-              attachments 
+              attachments,
+              showNavbar: !oneTimeView // Hide navbar for one-time view
             });
           } else {
             // Fallback for old unencrypted content
@@ -270,7 +271,8 @@ export default {
               revisions,
               isEncrypted: false,
               isPasswordProtected: false,
-              attachments
+              attachments,
+              showNavbar: !oneTimeView // Hide navbar for one-time view
             });
           }
           
@@ -402,8 +404,15 @@ export default {
         const res = await storage.get(id);
 
         if (res.value !== null) {
-          const { paste } = res.value;
-          contents = paste;
+          const { paste, isEncrypted } = res.value;
+          
+          // If content is encrypted, show a message instead of raw encrypted text
+          if (isEncrypted) {
+            contents = 'This content is encrypted and cannot be viewed in raw format. Please view it through the regular paste page for decryption.';
+          } else {
+            contents = paste;
+          }
+          
           status = 200;
         } else {
           contents = errorPage(MODE);
@@ -601,6 +610,12 @@ export default {
         editCode = editCode.trim() || undefined;
       }
 
+      // Read encryption flags from form data (client-side encryption)
+      const isEncrypted = form.get('isEncrypted') === 'true';
+      const isPasswordProtected = form.get('isPasswordProtected') === 'true';
+      
+      console.log('Edit save - encryption flags:', { isEncrypted, isPasswordProtected });
+
       const headers = new Headers({
         'content-type': 'text/html',
       });
@@ -668,7 +683,7 @@ export default {
           }
           
           // Client-side encryption - paste content is already encrypted when it arrives
-          // No need to re-encrypt here as it's handled on the client side
+          // Use the updated encryption flags from the form data
           
           // Combine existing and new attachments
           const allAttachments = [...existingAttachments, ...newAttachments];
@@ -677,6 +692,8 @@ export default {
             ...existing,
             paste, // Already encrypted by client if needed
             editCode: editCode || existing.editCode,
+            isEncrypted, // Update with form data
+            isPasswordProtected, // Update with form data
             attachments: allAttachments
           });
           headers.set('location', '/' + id);

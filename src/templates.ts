@@ -242,7 +242,7 @@ const Editor = (paste = '', url = '', errors: any = { url: '' }) => `
             <span class="toggle-switch-small">
               <span class="toggle-slider-small"></span>
             </span>
-            <span class="toggle-text">Delete the note after reading (One-Time View)</span>
+            <span class="toggle-text">Delete the note after reading (One-Time)</span>
           </label>
         </div>
       </div>
@@ -806,7 +806,7 @@ export const homePage = ({
 
 import { PasteRevision, AttachmentInfo } from './storage';
 
-export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions = [], isEncrypted = false, isPasswordProtected = false, attachments = [] }: { id?: string; html?: string; title?: string; mode?: string; revisions?: PasteRevision[]; isEncrypted?: boolean; isPasswordProtected?: boolean; attachments?: AttachmentInfo[] } = {}) => layout(title, `
+export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions = [], isEncrypted = false, isPasswordProtected = false, attachments = [], showNavbar = true }: { id?: string; html?: string; title?: string; mode?: string; revisions?: PasteRevision[]; isEncrypted?: boolean; isPasswordProtected?: boolean; attachments?: AttachmentInfo[]; showNavbar?: boolean } = {}) => layout(title, `
   <main class="paste-main">
     <div class="paste-document">
         
@@ -1908,6 +1908,10 @@ export const editPage = (
     <form id="editor-form" method="post" action="/${id}/save" enctype="multipart/form-data">
       ${EditEditor(paste, id, hasEditCode, isEncrypted, isPasswordProtected, errors, existingAttachments)}
       <input type="hidden" name="url" value="${id}" />
+      <input type="hidden" name="isEncrypted" value="${isEncrypted}" />
+      <input type="hidden" name="isPasswordProtected" value="${isPasswordProtected}" />
+      <!-- Hidden password field for re-encryption -->
+      <input type="hidden" id="encryptionPassword" name="encryptionPassword" value="" />
     </form>
   </main>
   <script src="/codemirror.min.js"></script>
@@ -1984,6 +1988,14 @@ export const editPage = (
               <div class="preview-placeholder">Preview will appear here...</div>
             </div>
           \`;
+        }
+        
+        // Store the password for re-encryption during save
+        if (isPasswordProtected && password) {
+          const hiddenPasswordField = document.getElementById('encryptionPassword');
+          if (hiddenPasswordField) {
+            hiddenPasswordField.value = password;
+          }
         }
         
         // Clear any existing editor
@@ -2064,6 +2076,12 @@ export const editPage = (
                       }
                     }, 100);
                   }
+                }
+                
+                // For default encryption, clear the password field since it's not password protected
+                const hiddenPasswordField = document.getElementById('encryptionPassword');
+                if (hiddenPasswordField) {
+                  hiddenPasswordField.value = '';
                 }
               } catch (error) {
                 console.error('Auto-decryption failed:', error);
@@ -2187,21 +2205,21 @@ export const deletePage = (
   </main>
 `, mode, false);
 
-export const errorPage = (mode = '') => layout('404', `
+export const errorPage = (mode = '') => layout('404 - Not Found', `
   <main class="confirmation-main">
     <div class="confirmation-panel">
       <!-- Error Icon -->
       <div class="error-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/>
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12,2L13.09,8.26L22,9L13.09,9.74L12,16L10.91,9.74L2,9L10.91,8.26L12,2M12,21L10.91,15.74L2,15L10.91,14.26L12,8L13.09,14.26L22,15L13.09,15.74L12,21Z"/>
         </svg>
       </div>
       
       <!-- Heading -->
-      <h1 class="confirmation-heading">Page Not Found</h1>
+      <h1 class="confirmation-heading">404 - Page Not Found</h1>
       
       <!-- Sub-text -->
-      <p class="confirmation-subtext">The paste you're looking for doesn't exist. It may have been deleted or expired.</p>
+      <p class="confirmation-subtext">The paste you're looking for doesn't exist. It may have been deleted, expired, or you may have mistyped the URL.</p>
       
       <!-- Actions -->
       <div class="action-buttons">
@@ -2218,20 +2236,179 @@ export const errorPage = (mode = '') => layout('404', `
           Go Back
         </a>
       </div>
+      
+      <!-- Info Section -->
+      <div class="info-section">
+        <p class="info-text">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,17A1.5,1.5 0 0,1 10.5,15.5A1.5,1.5 0 0,1 12,14A1.5,1.5 0 0,1 13.5,15.5A1.5,1.5 0 0,1 12,17M12,13A1,1 0 0,1 11,12V8A1,1 0 0,1 12,7A1,1 0 0,1 13,8V12A1,1 0 0,1 12,13Z"/>
+          </svg>
+          <strong>Tip:</strong> If you're looking for a specific paste, make sure the URL is correct and the paste hasn't expired.
+        </p>
+      </div>
     </div>
   </main>
   
   <style>
+    .confirmation-main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 60vh;
+      padding: 2rem 1rem;
+    }
+    
+    .confirmation-panel {
+      background: var(--bg-color);
+      padding: 3rem 2.5rem;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+    
     .error-icon {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 80px;
-      height: 80px;
+      width: 96px;
+      height: 96px;
       background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
       border-radius: 50%;
       margin: 0 auto 2rem;
       color: white;
+    }
+    
+    .confirmation-heading {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--color);
+      margin-bottom: 1rem;
+      letter-spacing: -0.025em;
+    }
+    
+    .confirmation-subtext {
+      color: var(--faint-color);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      background: var(--link-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      min-width: 140px;
+      justify-content: center;
+    }
+    
+    .btn-primary:hover {
+      background: var(--link-hover-color);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      background: var(--faint-bg-color);
+      color: var(--color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      min-width: 140px;
+      justify-content: center;
+    }
+    
+    .btn-secondary:hover {
+      background: var(--light-bg-color);
+      border-color: var(--link-color);
+      transform: translateY(-1px);
+    }
+    
+    .info-section {
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .info-text {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      color: var(--faint-color);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      text-align: left;
+    }
+    
+    .info-text svg {
+      flex-shrink: 0;
+      margin-top: 0.125rem;
+      opacity: 0.7;
+    }
+    
+    .info-text strong {
+      color: var(--color);
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .confirmation-main {
+        padding: 1rem;
+        min-height: 50vh;
+      }
+      
+      .confirmation-panel {
+        padding: 2rem 1.5rem;
+      }
+      
+      .confirmation-heading {
+        font-size: 1.75rem;
+      }
+      
+      .error-icon {
+        width: 80px;
+        height: 80px;
+      }
+      
+      .error-icon svg {
+        width: 48px;
+        height: 48px;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+        max-width: 280px;
+      }
     }
   </style>
 `, mode, false); // showNavbar = false for error page
@@ -2241,7 +2418,7 @@ export const oneTimeViewWarningPage = ({ id = '', mode = '' } = {}) => layout(`‚
     <div class="confirmation-panel">
       <!-- Warning Icon -->
       <div class="warning-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12,2L13.09,8.26L22,9L13.09,9.74L12,16L10.91,9.74L2,9L10.91,8.26L12,2M12,21L10.91,15.74L2,15L10.91,14.26L12,8L13.09,14.26L22,15L13.09,15.74L12,21Z"/>
         </svg>
       </div>
@@ -2272,29 +2449,183 @@ export const oneTimeViewWarningPage = ({ id = '', mode = '' } = {}) => layout(`‚
         </a>
       </div>
       
-      <!-- Info Box -->
-      <div class="info-box">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,17A1.5,1.5 0 0,1 10.5,15.5A1.5,1.5 0 0,1 12,14A1.5,1.5 0 0,1 13.5,15.5A1.5,1.5 0 0,1 12,17M12,13A1,1 0 0,1 11,12V8A1,1 0 0,1 12,7A1,1 0 0,1 13,8V12A1,1 0 0,1 12,13Z"/>
-        </svg>
-        <div>
+      <!-- Info Section -->
+      <div class="info-section">
+        <p class="info-text">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,17A1.5,1.5 0 0,1 10.5,15.5A1.5,1.5 0 0,1 12,14A1.5,1.5 0 0,1 13.5,15.5A1.5,1.5 0 0,1 12,17M12,13A1,1 0 0,1 11,12V8A1,1 0 0,1 12,7A1,1 0 0,1 13,8V12A1,1 0 0,1 12,13Z"/>
+          </svg>
           <strong>Tip:</strong> If you need to share content that can be viewed multiple times, create a new paste without the "Delete after reading" option.
-        </div>
+        </p>
       </div>
     </div>
   </main>
   
   <style>
+    .confirmation-main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 60vh;
+      padding: 2rem 1rem;
+    }
+    
+    .confirmation-panel {
+      background: var(--bg-color);
+      padding: 3rem 2.5rem;
+      max-width: 550px;
+      width: 100%;
+      text-align: center;
+    }
+    
     .warning-icon {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 80px;
-      height: 80px;
+      width: 96px;
+      height: 96px;
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       border-radius: 50%;
       margin: 0 auto 2rem;
       color: white;
+    }
+    
+    .confirmation-heading {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--color);
+      margin-bottom: 1rem;
+      letter-spacing: -0.025em;
+    }
+    
+    .confirmation-subtext {
+      color: var(--faint-color);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+    }
+    
+    .confirmation-subtext strong {
+      color: var(--color);
+      font-weight: 600;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      background: var(--link-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      min-width: 180px;
+      justify-content: center;
+    }
+    
+    .btn-primary:hover {
+      background: var(--link-hover-color);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      background: var(--faint-bg-color);
+      color: var(--color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      min-width: 140px;
+      justify-content: center;
+    }
+    
+    .btn-secondary:hover {
+      background: var(--light-bg-color);
+      border-color: var(--link-color);
+      transform: translateY(-1px);
+    }
+    
+    .info-section {
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .info-text {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      color: var(--faint-color);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      text-align: left;
+    }
+    
+    .info-text svg {
+      flex-shrink: 0;
+      margin-top: 0.125rem;
+      opacity: 0.7;
+    }
+    
+    .info-text strong {
+      color: var(--color);
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .confirmation-main {
+        padding: 1rem;
+        min-height: 50vh;
+      }
+      
+      .confirmation-panel {
+        padding: 2rem 1.5rem;
+      }
+      
+      .confirmation-heading {
+        font-size: 1.75rem;
+      }
+      
+      .warning-icon {
+        width: 80px;
+        height: 80px;
+      }
+      
+      .warning-icon svg {
+        width: 48px;
+        height: 48px;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+        max-width: 280px;
+      }
     }
   </style>
   
@@ -2314,16 +2645,19 @@ export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => l
     <div class="confirmation-panel">
       <!-- Lock Icon -->
       <div class="lock-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/>
         </svg>
       </div>
       
       <!-- Heading -->
-      <h1 class="confirmation-heading">Protected Content</h1>
+      <h1 class="confirmation-heading">Password Required</h1>
       
       <!-- Sub-text -->
-      <p class="confirmation-subtext">This paste is password protected. Enter the password to view the content.</p>
+      <p class="confirmation-subtext">
+        This paste is password-protected.<br>
+        Enter the correct password to view the content.
+      </p>
       
       <!-- Password Form -->
       <form id="decrypt-form" method="post" action="/${id}/decrypt" class="password-form">
@@ -2332,6 +2666,7 @@ export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => l
             type="password"
             name="password"
             placeholder="Enter password"
+            class="password-input"
             required
             minlength="1"
             autofocus
@@ -2339,7 +2674,7 @@ export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => l
             ${_if(error, 'aria-describedby="password-error"')}
           />
           ${_if(error, `
-            <small class="error-message" id="password-error">${error}</small>
+            <small class="error-message" id="password-error">‚ùå ${error}</small>
           `)}
         </div>
         
@@ -2348,18 +2683,26 @@ export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => l
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/>
             </svg>
-            Decrypt & View
+            Decrypt Content
           </button>
-          <a class="btn-secondary" href="/">Cancel</a>
+          
+          <a href="/" class="btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/>
+            </svg>
+            Go Home
+          </a>
         </div>
       </form>
-      
-      <!-- Security Notice -->
-      <div class="security-notice">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
-        </svg>
-        <span>Your password is processed securely and never stored on our servers.</span>
+
+      <!-- Info Section -->
+      <div class="info-section">
+        <p class="info-text">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,17A1.5,1.5 0 0,1 10.5,15.5A1.5,1.5 0 0,1 12,14A1.5,1.5 0 0,1 13.5,15.5A1.5,1.5 0 0,1 12,17M12,13A1,1 0 0,1 11,12V8A1,1 0 0,1 12,7A1,1 0 0,1 13,8V12A1,1 0 0,1 12,13Z"/>
+          </svg>
+          <strong>Security:</strong> Your password is processed securely and never stored on our servers.
+        </p>
       </div>
     </div>
   </main>
@@ -2369,81 +2712,69 @@ export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => l
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 50vh;
+      min-height: 60vh;
       padding: 2rem 1rem;
-      margin-top: -2rem;
     }
-
+    
     .confirmation-panel {
       background: var(--bg-color);
-      padding: 2.5rem;
-      max-width: 450px;
+      padding: 3rem 2.5rem;
+      max-width: 550px;
       width: 100%;
       text-align: center;
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-      border: 1px solid var(--border-color);
-    }
-
-    .confirmation-heading {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--color);
-      margin-bottom: 0.5rem;
-    }
-
-    .confirmation-subtext {
-      color: var(--faint-color);
-      font-size: 0.95rem;
-      margin-bottom: 1.5rem;
-      line-height: 1.4;
     }
     
     .lock-icon {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 70px;
-      height: 70px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      width: 96px;
+      height: 96px;
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
       border-radius: 50%;
-      margin: 0 auto 1.5rem;
+      margin: 0 auto 2rem;
       color: white;
-      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    }
+    
+    .confirmation-heading {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--color);
+      margin-bottom: 1rem;
+      letter-spacing: -0.025em;
+    }
+    
+    .confirmation-subtext {
+      color: var(--faint-color);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
     }
     
     .password-form {
-      width: 100%;
-      margin: 1.5rem 0;
+      margin-bottom: 2rem;
     }
     
     .input-group {
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
     }
     
-    .input-group input {
+    .password-input {
       width: 100%;
-      padding: 1rem 1.25rem;
+      padding: 0.875rem 1rem;
       border: 2px solid var(--border-color);
       border-radius: 8px;
       font-size: 1rem;
       background: var(--bg-color);
       color: var(--color);
-      transition: all 0.3s ease;
+      transition: border-color 0.2s ease;
       box-sizing: border-box;
-      font-family: var(--sans-serif);
     }
     
-    .input-group input:focus {
+    .password-input:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
-      transform: translateY(-1px);
-    }
-    
-    .input-group input::placeholder {
-      color: var(--faint-color);
-      opacity: 0.7;
+      border-color: var(--link-color);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
     
     .error-message {
@@ -2458,97 +2789,118 @@ export const passwordPromptPage = ({ id = '', mode = '', error = '' } = {}) => l
     .action-buttons {
       display: flex;
       gap: 1rem;
-      margin-top: 2rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
     }
     
-    .action-buttons .btn-primary {
-      flex: 1;
-      display: flex;
+    .btn-primary {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 0.5rem;
-      padding: 1rem 1.5rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 0.875rem 1.75rem;
+      background: var(--link-color);
       color: white;
       border: none;
       border-radius: 8px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-    }
-    
-    .action-buttons .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-    }
-    
-    .action-buttons .btn-primary:active {
-      transform: translateY(0);
-    }
-    
-    .action-buttons .btn-secondary {
-      padding: 1rem 1.5rem;
-      background: var(--bg-color);
-      color: var(--color);
-      border: 2px solid var(--border-color);
-      border-radius: 8px;
-      text-decoration: none;
+      font-size: 0.9rem;
       font-weight: 500;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      min-width: 160px;
       justify-content: center;
-      gap: 0.5rem;
-      transition: all 0.3s ease;
     }
     
-    .action-buttons .btn-secondary:hover {
+    .btn-primary:hover {
+      background: var(--link-hover-color);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      background: var(--faint-bg-color);
+      color: var(--color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      min-width: 140px;
+      justify-content: center;
+    }
+    
+    .btn-secondary:hover {
       background: var(--light-bg-color);
-      border-color: #667eea;
+      border-color: var(--link-color);
       transform: translateY(-1px);
     }
     
-    .security-notice {
+    .info-section {
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .info-text {
       display: flex;
       align-items: flex-start;
       gap: 0.75rem;
-      margin-top: 2rem;
-      padding: 1.25rem;
-      background: var(--faint-bg-color);
-      border-radius: 8px;
       color: var(--faint-color);
-      font-size: 0.875rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
       text-align: left;
-      border: 1px solid var(--border-color);
     }
     
-    .security-notice svg {
+    .info-text svg {
       flex-shrink: 0;
-      opacity: 0.8;
       margin-top: 0.125rem;
+      opacity: 0.7;
     }
     
-    @media (max-width: 640px) {
+    .info-text strong {
+      color: var(--color);
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
       .confirmation-main {
-        min-height: 40vh;
         padding: 1rem;
-        margin-top: -1rem;
+        min-height: 50vh;
       }
       
       .confirmation-panel {
-        padding: 2rem;
-        max-width: 100%;
+        padding: 2rem 1.5rem;
+      }
+      
+      .confirmation-heading {
+        font-size: 1.75rem;
+      }
+      
+      .lock-icon {
+        width: 80px;
+        height: 80px;
+      }
+      
+      .lock-icon svg {
+        width: 48px;
+        height: 48px;
       }
       
       .action-buttons {
         flex-direction: column;
-        gap: 0.75rem;
+        align-items: center;
       }
       
-      .action-buttons .btn-secondary {
-        order: 1;
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+        max-width: 280px;
       }
     }
   </style>

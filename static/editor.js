@@ -9,14 +9,23 @@
     const tabContents = document.querySelectorAll('.tab-content');
 
     // Check if required elements exist
-    if (!cmEl || !textArea || !previewContainer || !editorTabs.length) {
-      console.error('Required editor elements not found:', {
+    if (!cmEl || !textArea) {
+      console.warn('Core editor elements not found:', {
         cmEl: !!cmEl,
         textArea: !!textArea,
         previewContainer: !!previewContainer,
         editorTabs: editorTabs.length
       });
       return false;
+    }
+
+    // Preview container and tabs are optional for some pages
+    if (!previewContainer) {
+      console.info('Preview container not found - this is normal for some pages');
+    }
+
+    if (!editorTabs.length) {
+      console.info('Editor tabs not found - this is normal for some pages');
     }
 
     // All required elements found, initializing modern editor...
@@ -83,7 +92,11 @@
           insertTable(cm);
         },
         'Ctrl-/': function(cm) {
-          toggleShortcutsModal();
+          if (window.toggleShortcutsModal) {
+            window.toggleShortcutsModal();
+          } else {
+            console.warn('toggleShortcutsModal not available');
+          }
         }
       }
     });
@@ -707,7 +720,9 @@
       
       if (isVisible) {
         shortcutsModal.style.display = 'none';
-        editor.focus();
+        if (editor) {
+          editor.focus();
+        }
       } else {
         shortcutsModal.style.display = 'flex';
         // Focus the modal for accessibility
@@ -718,15 +733,22 @@
           }
         }, 100);
       }
+    } else {
+      console.warn('Shortcuts modal not found');
     }
   }
 
   function closeShortcutsModal() {
     if (shortcutsModal) {
       shortcutsModal.style.display = 'none';
-      editor.focus();
+      if (editor) {
+        editor.focus();
+      }
     }
   }
+
+  // Make toggleShortcutsModal available globally
+  window.toggleShortcutsModal = toggleShortcutsModal;
 
   // Event listeners for modal
   if (closeShortcutsBtn) {
@@ -765,11 +787,11 @@
       // Check if window width is at least 1024px (desktop)
       const isDesktop = window.innerWidth >= 1024;
       
-      if (isDesktop) {
-        // Show hint when editor is focused
+      if (isDesktop && editor && editor.hasFocus()) {
+        // Show hint only when editor is focused on desktop
         shortcutsHint.classList.add('editor-focused');
       } else {
-        // Hide hint on mobile/tablet
+        // Hide hint on mobile/tablet or when editor is not focused
         shortcutsHint.classList.remove('editor-focused');
       }
     }
@@ -793,8 +815,7 @@
     updateShortcutsHintVisibility();
   });
 
-  // Initial visibility check
-  updateShortcutsHintVisibility();
+  // Don't show shortcuts hint on initial page load - only when editor is focused
 
   function debounce(cb, wait) {
     let timer;

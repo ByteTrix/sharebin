@@ -45,22 +45,32 @@
       word-wrap: break-word;
     `;
 
-    // Type-specific styling using CSS variables that follow the theme
+    // Type-specific styling - simple black and white with emojis
+    let emoji = '';
     if (type === 'success') {
-      notification.style.background = 'var(--success-bg, #f0f9ff)';
-      notification.style.color = 'var(--success-color, #0369a1)';
-      notification.style.borderColor = 'var(--success-border, #7dd3fc)';
+      emoji = '✅ ';
+      notification.style.background = 'var(--bg-color)';
+      notification.style.color = 'var(--color)';
+      notification.style.borderColor = 'var(--border-color)';
     } else if (type === 'error') {
-      notification.style.background = 'var(--error-bg, #fef2f2)';
-      notification.style.color = 'var(--error-color, #dc2626)';
-      notification.style.borderColor = 'var(--error-border, #fca5a5)';
+      emoji = '❌ ';
+      notification.style.background = 'var(--bg-color)';
+      notification.style.color = 'var(--color)';
+      notification.style.borderColor = 'var(--border-color)';
     } else if (type === 'warning') {
-      notification.style.background = 'var(--warning-bg, #fffbeb)';
-      notification.style.color = 'var(--warning-color, #d97706)';
-      notification.style.borderColor = 'var(--warning-border, #fbbf24)';
+      emoji = '⚠️ ';
+      notification.style.background = 'var(--bg-color)';
+      notification.style.color = 'var(--color)';
+      notification.style.borderColor = 'var(--border-color)';
+    } else if (type === 'info') {
+      emoji = 'ℹ️ ';
+      notification.style.background = 'var(--bg-color)';
+      notification.style.color = 'var(--color)';
+      notification.style.borderColor = 'var(--border-color)';
     }
-
-    // No need for manual dark mode detection - CSS variables handle theming
+    
+    // Add emoji to message
+    notification.textContent = emoji + message;
 
     // Add to container
     container.appendChild(notification);

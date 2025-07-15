@@ -220,21 +220,41 @@ body:has(.new-navbar) .github-layout {
     align-items: center;
 }
 
-.dark-mode-container,
-.theme-switcher {
-    position: relative;
-    top: auto;
-    right: auto;
-    padding: 0;
-    z-index: auto;
+.theme-toggle-container .paste-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-color);
+    color: var(--color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    order: 1; /* New note button on the left */
 }
 
-/* New Paste Button in Theme Container */
-.theme-toggle-container .new-paste-btn {
-    position: relative;
-    top: auto;
-    right: auto;
-    order: 1; /* New note button on the left */
+.theme-toggle-container .paste-btn:hover {
+    background: var(--faint-bg-color);
+    border-color: var(--link-color);
+    color: var(--link-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.theme-toggle-container .paste-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--link-color);
+}
+
+.theme-toggle-container .paste-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
 }
 
 .theme-toggle-container .theme-toggle {

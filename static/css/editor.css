@@ -86,8 +86,62 @@
 }
 
 .CodeMirror-selected {
-    background-color: var(--focus-color);
-    opacity: 0.3;
+    background-color: rgba(139, 126, 200, 0.3);
+}
+
+/* Light theme selection color */
+[data-theme="l"] .CodeMirror-selected {
+    background-color: rgba(91, 78, 150, 0.3);
+}
+
+/* Dark theme selection color */
+[data-theme="d"] .CodeMirror-selected {
+    background-color: rgba(139, 126, 200, 0.3);
+}
+
+/* Auto theme - follows system preference */
+@media (prefers-color-scheme: light) {
+    body:not([data-theme="d"]) .CodeMirror-selected {
+        background-color: rgba(91, 78, 150, 0.3);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="l"]) .CodeMirror-selected {
+        background-color: rgba(139, 126, 200, 0.3);
+    }
+}
+
+/* Additional selection styles for better visibility */
+.CodeMirror-selectedtext {
+    background-color: inherit;
+}
+
+.CodeMirror-focused .CodeMirror-selected {
+    background-color: rgba(139, 126, 200, 0.4);
+}
+
+/* Light theme focused selection */
+[data-theme="l"] .CodeMirror-focused .CodeMirror-selected {
+    background-color: rgba(91, 78, 150, 0.4);
+}
+
+/* Dark theme focused selection */
+[data-theme="d"] .CodeMirror-focused .CodeMirror-selected {
+    background-color: rgba(139, 126, 200, 0.4);
+}
+
+/* Auto theme focused selection */
+@media (prefers-color-scheme: light) {
+    body:not([data-theme="d"]) .CodeMirror-focused .CodeMirror-selected {
+        background-color: rgba(91, 78, 150, 0.4);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="l"]) .CodeMirror-focused .CodeMirror-selected {
+        background-color: rgba(139, 126, 200, 0.4);
+    }
 }
 
 /* CodeMirror Syntax Highlighting */
