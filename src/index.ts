@@ -228,7 +228,7 @@ export default {
         
         // For encrypted content, always show paste page
         // Client will handle decryption
-        console.log('Paste encryption status:', { isEncrypted, isPasswordProtected });
+        // Paste encryption status check
         
         // Now consume the paste (for one-time view)
         const finalRes = await storage.get(id, true);

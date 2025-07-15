@@ -41,13 +41,13 @@ p, h1, h2, h3, h4, h5, h6 {
     --sans-serif: 'PT Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     --serif: 'PT Serif', 'Georgia', 'Times New Roman', serif;
     
-    /* Font Sizes */
+    /* Font Sizes - Increased for better readability */
     --font-1-size: 12px;
     --font-2-size: 14px;
-    --font-3-size: 18px;
-    --font-4-size: 20px;
-    --font-5-size: 22px;
-    --font-6-size: 28px;
+    --font-3-size: 20px;
+    --font-4-size: 22px;
+    --font-5-size: 24px;
+    --font-6-size: 30px;
 
     /* Spacing Scale */
     --spacing-1: 0.25rem;

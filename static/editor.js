@@ -1,102 +1,110 @@
 (function() {
-  const cmEl = document.getElementById('editor');
-  const textArea = document.getElementById('pasteTextArea');
-  const editorForm = document.getElementById('editor-form');
-  const previewContainer = document.getElementById('preview-container');
-  const editorTabs = document.querySelectorAll('.editor-tab');
-  const tabContents = document.querySelectorAll('.tab-content');
+  // Initialize editor function that can be called multiple times
+  function initializeEditor() {
+    const cmEl = document.getElementById('editor');
+    const textArea = document.getElementById('pasteTextArea');
+    const editorForm = document.getElementById('editor-form');
+    const previewContainer = document.getElementById('preview-container');
+    const editorTabs = document.querySelectorAll('.editor-tab');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-  // Check if required elements exist
-  if (!cmEl || !textArea || !previewContainer || !editorTabs.length) {
-    console.error('Required editor elements not found:', {
-      cmEl: !!cmEl,
-      textArea: !!textArea,
-      previewContainer: !!previewContainer,
-      editorTabs: editorTabs.length
-    });
-    return;
-  }
+    // Check if required elements exist
+    if (!cmEl || !textArea || !previewContainer || !editorTabs.length) {
+      console.error('Required editor elements not found:', {
+        cmEl: !!cmEl,
+        textArea: !!textArea,
+        previewContainer: !!previewContainer,
+        editorTabs: editorTabs.length
+      });
+      return false;
+    }
 
-  console.log('All required elements found, initializing modern editor...');
+    // All required elements found, initializing modern editor...
 
-  // Check if CodeMirror is available
-  if (typeof CodeMirror === 'undefined') {
-    console.error('CodeMirror not loaded');
-    return;
-  }
+    // Check if CodeMirror is available
+    if (typeof CodeMirror === 'undefined') {
+      console.error('CodeMirror not loaded');
+      return false;
+    }
 
-  console.log('CodeMirror available, proceeding with initialization...');
+    // CodeMirror available, proceeding with initialization...
 
-  // hide paste textarea
-  textArea.style.display = 'none';
+    // If editor already exists, don't reinitialize
+    if (window.cmEditor) {
+      // Editor already exists, skipping initialization
+      return true;
+    }
 
-  const editor = new CodeMirror(cmEl, {
-    mode: 'markdown',
-    value: textArea.value,
-    keymap: 'sublime',
-    theme: 'default',
-    viewportMargin: Infinity,
-    lineNumbers: false,
-    lineWrapping: true,
-    autoCloseBrackets: true,
-    matchBrackets: true,
-    extraKeys: {
-      'Ctrl-B': function(cm) {
-        wrapSelection(cm, '**', '**');
-      },
-      'Ctrl-I': function(cm) {
-        wrapSelection(cm, '*', '*');
-      },
-      'Ctrl-K': function(cm) {
-        insertLink(cm);
-      },
-      'Ctrl-`': function(cm) {
-        wrapSelection(cm, '`', '`');
-      },
-      'Ctrl-Shift-L': function(cm) {
-        insertListItem(cm);
-      },
-      'Ctrl-Shift-O': function(cm) {
-        insertNumberedList(cm);
-      },
-      'Ctrl-Shift-.': function(cm) {
-        insertQuote(cm);
-      },
-      'Ctrl-Shift-H': function(cm) {
-        insertHeading(cm);
-      },
-      'Ctrl-S': function(cm) {
-        // Save the form
-        if (editorForm) {
-          editorForm.submit();
+    // hide paste textarea
+    textArea.style.display = 'none';
+
+    const editor = new CodeMirror(cmEl, {
+      mode: 'markdown',
+      value: textArea.value,
+      keymap: 'sublime',
+      theme: 'default',
+      viewportMargin: Infinity,
+      lineNumbers: false,
+      lineWrapping: true,
+      autoCloseBrackets: true,
+      matchBrackets: true,
+      extraKeys: {
+        'Ctrl-B': function(cm) {
+          wrapSelection(cm, '**', '**');
+        },
+        'Ctrl-I': function(cm) {
+          wrapSelection(cm, '*', '*');
+        },
+        'Ctrl-K': function(cm) {
+          insertLink(cm);
+        },
+        'Ctrl-`': function(cm) {
+          wrapSelection(cm, '`', '`');
+        },
+        'Ctrl-Shift-L': function(cm) {
+          insertListItem(cm);
+        },
+        'Ctrl-Shift-O': function(cm) {
+          insertNumberedList(cm);
+        },
+        'Ctrl-Shift-.': function(cm) {
+          insertQuote(cm);
+        },
+        'Ctrl-Shift-H': function(cm) {
+          insertHeading(cm);
+        },
+        'Ctrl-S': function(cm) {
+          // Save the form
+          if (editorForm) {
+            editorForm.submit();
+          }
+        },
+        'Ctrl-Shift-T': function(cm) {
+          insertTable(cm);
+        },
+        'Ctrl-/': function(cm) {
+          toggleShortcutsModal();
         }
-      },
-      'Ctrl-Shift-T': function(cm) {
-        insertTable(cm);
-      },
-      'Ctrl-/': function(cm) {
-        toggleShortcutsModal();
+      }
+    });
+
+    // CodeMirror editor created successfully
+
+    // attach editor to window
+    window.cmEditor = editor;
+
+    // Editor attached to window.cmEditor
+
+    // Helper functions for editor shortcuts
+    function wrapSelection(cm, before, after) {
+      if (cm.getSelection()) {
+        cm.replaceSelection(before + cm.getSelection() + after);
+      } else {
+        const cursor = cm.getCursor();
+        cm.replaceRange(before + after, cursor);
+        cm.setCursor(cursor.line, cursor.ch + before.length);
       }
     }
-  });
-
-  console.log('CodeMirror editor created successfully');
-
-  // attach editor to window
-  window.cmEditor = editor;
-
-  console.log('Editor attached to window.cmEditor');
-
-  // Helper functions for editor shortcuts
-  function wrapSelection(cm, before, after) {
-    if (cm.getSelection()) {
-      cm.replaceSelection(before + cm.getSelection() + after);
-    } else {
-      const cursor = cm.getCursor();
-      cm.replaceRange(before + after, cursor);
-      cm.setCursor(cursor.line, cursor.ch + before.length);
-    }
-  }
 
   function insertLink(cm) {
     const selection = cm.getSelection();
@@ -304,37 +312,6 @@
     }
     
     return errors;
-  }
-
-  // Enhanced notification system
-  function showNotification(message, type = 'info', duration = 4000) {
-    // Remove existing notifications
-    const existing = document.querySelectorAll('.notification');
-    existing.forEach(n => n.remove());
-
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    
-    // Add icon based on type
-    const icon = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
-    notification.innerHTML = `<span class="notification-icon">${icon}</span><span class="notification-message">${message}</span>`;
-
-    document.body.appendChild(notification);
-    
-    // Trigger animation
-    setTimeout(() => {
-      notification.classList.add('show');
-    }, 10);
-
-    // Auto-remove
-    setTimeout(() => {
-      notification.classList.remove('show');
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.remove();
-        }
-      }, 300);
-    }, duration);
   }
 
   // Real-time validation feedback
@@ -801,7 +778,7 @@
     const attachFilesBtn = document.getElementById('attachFiles');
 
     if (!fileInput) {
-      console.log('File attachment elements not found, skipping initialization');
+      // File attachment elements not found, skipping initialization
       return;
     }
 
@@ -955,7 +932,7 @@
     const clearExpiryBtn = document.getElementById('clearExpiry');
 
     if (!quickExpiryButtons.length) {
-      console.log('Expiry date elements not found, skipping initialization');
+      // Expiry date elements not found, skipping initialization
       return;
     }
 
@@ -983,7 +960,7 @@
         }
       });
     } else {
-      console.log('Expiry checkbox or options not found, skipping expiry toggle initialization');
+      // Expiry checkbox or options not found, skipping expiry toggle initialization
     }
 
     // Handle quick expiry button clicks
@@ -1218,7 +1195,7 @@
     if (createNoteBtn) {
       createNoteBtn.addEventListener('click', function(e) {
         // Let the form submission handle the note creation
-        console.log('Create note button clicked');
+        // Create note button clicked
       });
       
       // Add visual feedback
@@ -1241,5 +1218,28 @@
   setupCharacterCount();
 
   // Initialize everything
-  console.log('Modern editor initialization complete');
+  // Modern editor initialization complete
+
+  // Return true to indicate successful initialization
+  return true;
+}
+
+// Make initializeEditor available globally
+window.initializeEditor = initializeEditor;
+
+// Try to initialize editor on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // DOM loaded, attempting to initialize editor...
+  initializeEditor();
+});
+
+// Also try to initialize immediately if DOM is already loaded
+if (document.readyState === 'loading') {
+  // DOM is still loading, wait for DOMContentLoaded
+} else {
+  // DOM is already loaded, initialize immediately
+  // DOM already loaded, initializing editor immediately...
+  initializeEditor();
+}
+
 })();

@@ -777,6 +777,7 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
         }
       });
     </script>
+    <script src="/notification.js"></script>
     <script src="/nacl.min.js"></script>
     <script src="/nacl-util.min.js"></script>
     <script src="/crypto.js"></script>
@@ -995,44 +996,6 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
         console.error('Failed to copy: ', err);
         showNotification('Failed to copy', 'error');
       });
-    }
-
-    // Show notification
-    function showNotification(message, type = 'info') {
-      // Create notification container if it doesn't exist
-      let container = document.getElementById('notification-container');
-      if (!container) {
-        container = document.createElement('div');
-        container.id = 'notification-container';
-        container.style.cssText = 'position: fixed; top: 5rem; right: 1rem; z-index: 1050; pointer-events: none;';
-        document.body.appendChild(container);
-      }
-      
-      const notification = document.createElement('div');
-      notification.className = \`notification notification-\${type}\`;
-      notification.textContent = message;
-      notification.style.marginBottom = '0.5rem';
-      notification.style.pointerEvents = 'auto';
-      container.appendChild(notification);
-      
-      // Show notification
-      setTimeout(() => {
-        notification.classList.add('show');
-      }, 10);
-      
-      // Hide and remove notification
-      setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-          if (container.contains(notification)) {
-            container.removeChild(notification);
-          }
-          // Remove container if empty
-          if (container.children.length === 0) {
-            document.body.removeChild(container);
-          }
-        }, 300);
-      }, 3000);
     }
 
     // Toggle action menu
@@ -1277,40 +1240,6 @@ export const pastePage = ({ id = '', html = '', title = '', mode = '', revisions
       }
     });
     
-    // Show notification function
-    function showNotification(message, type = 'info') {
-      // Create notification container if it doesn't exist
-      let container = document.getElementById('notification-container');
-      if (!container) {
-        container = document.createElement('div');
-        container.id = 'notification-container';
-        container.style.cssText = 'position: fixed; top: 5rem; right: 1rem; z-index: 1050; pointer-events: none;';
-        document.body.appendChild(container);
-      }
-
-      const notification = document.createElement('div');
-      notification.className = \`notification notification-\${type}\`;
-      notification.textContent = message;
-      notification.style.marginBottom = '0.5rem';
-      notification.style.pointerEvents = 'auto';
-      container.appendChild(notification);
-      
-      // Trigger animation
-      setTimeout(() => {
-        notification.classList.add('show');
-      }, 10);
-
-      // Auto-remove after 4 seconds
-      setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-          if (notification.parentNode) {
-            notification.remove();
-          }
-        }, 300);
-      }, 4000);
-    }
-
     // Initialize attachments
     function initializeAttachments() {
       // Only show attachments if content is not encrypted or already decrypted
@@ -2043,30 +1972,47 @@ export const editPage = (
             decryptedText = await window.ShareBinCrypto.decryptDefault(encryptedContent);
           } catch (defaultDecryptError) {
             // If default decryption fails, content might be plain text or use different encryption
-            console.log('Default decryption failed, treating as plain text:', defaultDecryptError.message);
+            // Default decryption failed, treating as plain text
             decryptedText = encryptedContent; // Use as-is if not encrypted
           }
         }
         
         // Replace the encrypted content with the editor
         const editorContent = document.querySelector('.editor-content');
-        editorContent.innerHTML = \`
-          <!-- Editor View -->
-          <div id="editor-container" class="tab-content active" data-content="edit">
-            <textarea id="pasteTextArea" name="paste" required>\${decryptedText}</textarea>
-            <div id="editor"></div>
-          </div>
-          
-          <!-- Preview View -->
-          <div id="preview-container" class="tab-content" data-content="preview">
-            <div class="preview-placeholder">Preview will appear here...</div>
-          </div>
-        \`;
+        if (editorContent) {
+          editorContent.innerHTML = \`
+            <!-- Editor View -->
+            <div id="editor-container" class="tab-content active" data-content="edit">
+              <textarea id="pasteTextArea" name="paste" required>\${decryptedText}</textarea>
+              <div id="editor"></div>
+            </div>
+            
+            <!-- Preview View -->
+            <div id="preview-container" class="tab-content" data-content="preview">
+              <div class="preview-placeholder">Preview will appear here...</div>
+            </div>
+          \`;
+        }
+        
+        // Clear any existing editor
+        if (window.cmEditor) {
+          window.cmEditor = null;
+        }
         
         // Reinitialize the editor
-        if (typeof initializeEditor === 'function') {
-          initializeEditor();
-        }
+        setTimeout(() => {
+          if (typeof window.initializeEditor === 'function') {
+            // Reinitializing editor after decryption...
+            const success = window.initializeEditor();
+            if (success) {
+              // Editor reinitialized successfully
+            } else {
+              console.error('Failed to reinitialize editor');
+            }
+          } else {
+            console.error('initializeEditor function not found');
+          }
+        }, 100);
         
         showNotification('Content decrypted successfully!', 'success');
         
@@ -2095,7 +2041,7 @@ export const editPage = (
           // Check if content looks like it's actually encrypted before trying to decrypt
           if (encryptedContent.startsWith('SHAREBIN_DEFAULT:')) {
             // This is default encrypted content, auto-decrypt it
-            console.log('Found default encrypted content, auto-decrypting...');
+            // Found default encrypted content, auto-decrypting...
             
             // Decrypt immediately without relying on decryptForEdit
             setTimeout(async () => {
@@ -2105,24 +2051,26 @@ export const editPage = (
                 }
                 
                 const decryptedText = await window.ShareBinCrypto.decryptDefault(encryptedContent);
-                console.log('Auto-decryption successful, setting up editor...');
+                // Auto-decryption successful, setting up editor...
                 
                 // Set the decrypted content directly to the textarea
                 const textarea = document.getElementById('pasteTextArea');
                 if (textarea) {
                   textarea.value = decryptedText;
-                  console.log('Textarea updated with decrypted content');
+                  // Textarea updated with decrypted content
                   
                   // Update CodeMirror if it exists
                   if (window.cmEditor) {
                     window.cmEditor.setValue(decryptedText);
-                    console.log('CodeMirror updated with decrypted content');
+                    // CodeMirror updated with decrypted content
                   } else {
                     // Initialize the editor if it doesn't exist yet
-                    if (typeof initializeEditor === 'function') {
-                      initializeEditor();
-                      console.log('Editor initialized');
-                    }
+                    setTimeout(() => {
+                      if (typeof window.initializeEditor === 'function') {
+                        window.initializeEditor();
+                        // Editor initialized
+                      }
+                    }, 100);
                   }
                 }
               } catch (error) {
@@ -2131,9 +2079,11 @@ export const editPage = (
                 const textarea = document.getElementById('pasteTextArea');
                 if (textarea) {
                   textarea.value = encryptedContent;
-                  if (typeof initializeEditor === 'function') {
-                    initializeEditor();
-                  }
+                  setTimeout(() => {
+                    if (typeof window.initializeEditor === 'function') {
+                      window.initializeEditor();
+                    }
+                  }, 100);
                 }
               }
             }, 100);
@@ -2146,58 +2096,34 @@ export const editPage = (
                 setTimeout(decryptForEdit, 100);
               } else {
                 // Not encrypted JSON, treat as plain text
-                console.log('Content is not encrypted, treating as plain text');
+                // Content is not encrypted, treating as plain text
                 const textarea = document.getElementById('pasteTextArea');
                 if (textarea) {
                   textarea.value = encryptedContent;
-                  if (typeof initializeEditor === 'function') {
-                    initializeEditor();
-                  }
+                  setTimeout(() => {
+                    if (typeof window.initializeEditor === 'function') {
+                      window.initializeEditor();
+                    }
+                  }, 100);
                 }
               }
             } catch (e) {
               // Not JSON, treat as plain text
-              console.log('Content is not JSON, treating as plain text');
+              // Content is not JSON, treating as plain text
               const textarea = document.getElementById('pasteTextArea');
               if (textarea) {
                 textarea.value = encryptedContent;
-                if (typeof initializeEditor === 'function') {
-                  initializeEditor();
-                }
+                setTimeout(() => {
+                  if (typeof window.initializeEditor === 'function') {
+                    window.initializeEditor();
+                  }
+                }, 100);
               }
             }
           }
         }
       }
     });
-    
-    // Show notification function
-    function showNotification(message, type = 'info') {
-      // Remove existing notifications
-      const existing = document.querySelectorAll('.notification');
-      existing.forEach(n => n.remove());
-
-      const notification = document.createElement('div');
-      notification.className = \`notification notification-\${type}\`;
-      notification.textContent = message;
-
-      document.body.appendChild(notification);
-      
-      // Trigger animation
-      setTimeout(() => {
-        notification.classList.add('show');
-      }, 10);
-
-      // Auto-remove after 4 seconds
-      setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-          if (notification.parentNode) {
-            notification.remove();
-          }
-        }, 300);
-      }, 4000);
-    }
     
     // Edit page attachment functions
     function downloadEditAttachment(attachmentId, filename) {
@@ -3124,70 +3050,6 @@ export const noteCreatedPage = ({ id = '', url = '', mode = '' } = {}) => layout
       link.href = canvas.toDataURL();
       link.click();
       showNotification('QR code downloaded!', 'success');
-    }
-
-    // Simple notification system
-    function showNotification(message, type = 'info') {
-      // Create notification container if it doesn't exist
-      let container = document.getElementById('notification-container');
-      if (!container) {
-        container = document.createElement('div');
-        container.id = 'notification-container';
-        container.style.cssText = 'position: fixed; top: 1rem; right: 1rem; z-index: 1050; pointer-events: none;';
-        document.body.appendChild(container);
-      }
-      
-      const notification = document.createElement('div');
-      notification.className = \`notification notification-\${type}\`;
-      notification.textContent = message;
-      notification.style.cssText = \`
-        background: var(--bg-color);
-        color: var(--color);
-        padding: 0.75rem 1rem;
-        border-radius: 6px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        font-size: 0.875rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        opacity: 0;
-        transform: translateX(100%);
-        transition: all 0.3s ease;
-        pointer-events: auto;
-        max-width: 300px;
-      \`;
-      
-      if (type === 'success') {
-        notification.style.background = '#f0f9ff';
-        notification.style.color = '#0369a1';
-        notification.style.borderColor = '#7dd3fc';
-      } else if (type === 'error') {
-        notification.style.background = '#fef2f2';
-        notification.style.color = '#dc2626';
-        notification.style.borderColor = '#fca5a5';
-      }
-      
-      container.appendChild(notification);
-      
-      // Show notification
-      setTimeout(() => {
-        notification.style.opacity = '1';
-        notification.style.transform = 'translateX(0)';
-      }, 10);
-      
-      // Hide and remove notification
-      setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-          if (container.contains(notification)) {
-            container.removeChild(notification);
-          }
-          if (container.children.length === 0) {
-            document.body.removeChild(container);
-          }
-        }, 300);
-      }, 3000);
     }
 
     // Initialize when page loads

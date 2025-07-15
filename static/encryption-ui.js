@@ -110,7 +110,7 @@
       if (password) {
         // For server-side encryption, let the form submit normally with the password
         // The server will handle the encryption
-        console.log('Form will be submitted with encryption enabled');
+        // Form will be submitted with encryption enabled
       }
       // If encryption is not enabled, form submits normally
     });
