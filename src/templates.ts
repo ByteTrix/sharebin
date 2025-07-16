@@ -479,6 +479,30 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
     <title>
       ${title || 'ShareBin'}
     </title>
+    <script>
+      // Pre-initialize theme to prevent flash of unstyled content
+      (function() {
+        const themeStorageKey = 'theme-preference';
+        let currentTheme = localStorage.getItem(themeStorageKey);
+        
+        // Check navbar-theme for backward compatibility
+        if (!currentTheme) {
+          const navbarTheme = localStorage.getItem('navbar-theme');
+          if (navbarTheme) {
+            currentTheme = navbarTheme === 'light' ? 'l' : navbarTheme === 'dark' ? 'd' : 'auto';
+          } else {
+            currentTheme = 'auto';
+          }
+        }
+        
+        // Apply theme immediately
+        if (currentTheme === 'auto') {
+          document.body.removeAttribute('data-theme');
+        } else {
+          document.body.setAttribute('data-theme', currentTheme);
+        }
+      })();
+    </script>
   </head>
   <body>
     ${_if(!showNavbar, ThemeToggle())}
@@ -507,11 +531,24 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
       </div>
     </footer>
     <script>
-      // Advanced theme switcher for navbar
+      // Advanced theme switcher for navbar - unified with theme-switch.js
       const themes = ['auto', 'light', 'dark'];
       const themeLabels = { auto: 'Auto', light: 'Light', dark: 'Dark' };
-      const themeStorageKey = 'navbar-theme';
-      let currentTheme = localStorage.getItem(themeStorageKey) || 'auto';
+      const themeStorageKey = 'theme-preference'; // Use same key as theme-switch.js
+      
+      // Get current theme - check both storage keys for compatibility
+      let currentTheme = localStorage.getItem(themeStorageKey);
+      if (!currentTheme) {
+        const navbarTheme = localStorage.getItem('navbar-theme');
+        if (navbarTheme) {
+          currentTheme = navbarTheme;
+        } else {
+          currentTheme = 'auto';
+        }
+      } else {
+        // Convert from theme-switch.js format to navbar format
+        currentTheme = currentTheme === 'l' ? 'light' : currentTheme === 'd' ? 'dark' : 'auto';
+      }
 
       function applyTheme(theme) {
         if (theme === 'auto') {
@@ -544,9 +581,21 @@ const layout = (title: string, content: string, mode?: string, showKeyboardHint?
 
       function setTheme(theme) {
         currentTheme = theme;
-        localStorage.setItem(themeStorageKey, currentTheme);
-        applyTheme(currentTheme);
+        
+        // Store in unified format
+        const unifiedTheme = theme === 'light' ? 'l' : theme === 'dark' ? 'd' : 'auto';
+        localStorage.setItem(themeStorageKey, unifiedTheme);
+        
+        // Keep navbar-theme for backward compatibility
+        localStorage.setItem('navbar-theme', theme);
+        
+        applyTheme(theme);
         updateThemeUI();
+        
+        // Update global theme if window.setThemeMode is available
+        if (window.setThemeMode) {
+          window.setThemeMode(unifiedTheme);
+        }
         
         // Close theme dropdown
         const themeDropdown = document.getElementById('themeDropdown');
@@ -2163,45 +2212,92 @@ export const editPage = (
 `, mode, true, '', true);
 
 export const deletePage = (
-  { id = '', hasEditCode = false, errors = { editCode: '' }, mode = '' } = {}
+  { id = '', hasEditCode = false, isPasswordProtected = false, errors = { editCode: '', password: '' }, mode = '' } = {}
 ) => layout(`delete ${id}`, `
-  <main>
-    <div>
-      <em>are you sure you want to delete this paste?</em>
-      <strong>${id}</strong>
-    </div>
-    <form method="post" action="/${id}/delete">
-      <div class="input-group">
-        ${_if(hasEditCode, `
-          <div>
+  <main class="confirmation-main">
+    <div class="confirmation-panel">
+      <!-- Delete Icon -->
+      <div class="error-icon">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+        </svg>
+      </div>
+      
+      <!-- Heading -->
+      <h1 class="confirmation-heading">Delete Paste</h1>
+      
+      <!-- Description -->
+      <p class="confirmation-description">
+        Are you sure you want to permanently delete this paste?
+      </p>
+      
+      <!-- Paste ID -->
+      <div class="paste-id-display">
+        <code>${id}</code>
+      </div>
+      
+      <!-- Warning -->
+      <div class="warning-message">
+        <strong>⚠️ This action cannot be undone.</strong>
+      </div>
+      
+      <!-- Delete Form -->
+      <form method="post" action="/${id}/delete" class="confirmation-form">
+        ${_if(isPasswordProtected, `
+          <div class="form-group">
+            <label for="password">Password Required</label>
             <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Enter password to confirm deletion"
+              required
+              aria-invalid="${Boolean(errors.password)}"
+              ${_if(errors.password, 'aria-describedby="password-error"')}
+            />
+            ${_if(errors.password, `
+              <small class="field-error" id="password-error">${errors.password}</small>
+            `)}
+          </div>
+        `)}
+        
+        ${_if(hasEditCode, `
+          <div class="form-group">
+            <label for="editcode">Edit Code Required</label>
+            <input
+              id="editcode"
               name="editcode"
               type="text"
-              placeholder="edit code"
+              placeholder="Enter edit code to confirm deletion"
               minlength="3"
               maxlength="40"
               required
               aria-invalid="${Boolean(errors.editCode)}"
               ${_if(errors.editCode, 'aria-describedby="editcode-error"')}
             />
-
             ${_if(errors.editCode, `
-              <small class="error" id="editcode-error">${errors.editCode}</small>
+              <small class="field-error" id="editcode-error">${errors.editCode}</small>
             `)}
           </div>
         `)}
-      </div>
 
-      <div class="button-group">
-        <button type="submit">
-          delete
-        </button>
+        <div class="button-group">
+          <button type="submit" class="btn-danger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+            </svg>
+            Delete Forever
+          </button>
 
-        <a class="btn" href="/${id}">
-          cancel
-        </a>
-      </div>
-    </form>
+          <a class="btn-secondary" href="/${id}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+            </svg>
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
   </main>
 `, mode, false);
 

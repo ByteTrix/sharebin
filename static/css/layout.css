@@ -239,11 +239,35 @@ body:has(.new-navbar) .github-layout {
 }
 
 .theme-toggle-container .paste-btn:hover {
-    background: var(--faint-bg-color);
-    border-color: var(--link-color);
-    color: var(--link-color);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background: #ffffff;
+    border-color: #ffffff;
+    color: #000000;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Light theme hover for new button */
+[data-theme="l"] .theme-toggle-container .paste-btn:hover {
+    background: #000000;
+    border-color: #000000;
+    color: #ffffff;
+}
+
+/* Auto theme follows system preference */
+@media (prefers-color-scheme: light) {
+    body:not([data-theme="d"]) .theme-toggle-container .paste-btn:hover {
+        background: #000000;
+        border-color: #000000;
+        color: #ffffff;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="l"]) .theme-toggle-container .paste-btn:hover {
+        background: #ffffff;
+        border-color: #ffffff;
+        color: #000000;
+    }
 }
 
 .theme-toggle-container .paste-btn:focus {
@@ -371,7 +395,7 @@ body.revision-panel-open .paste-main {
     position: fixed;
     top: 1rem;
     right: 1rem;
-    z-index: 11000; /* Highest z-index to ensure always on top */
+    z-index: 99999 !important; /* Highest z-index to ensure always on top */
     pointer-events: none;
     max-width: 400px;
     width: auto;

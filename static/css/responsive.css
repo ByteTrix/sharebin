@@ -224,7 +224,7 @@
         top: 1rem;
         right: 1rem;
         left: 1rem;
-        z-index: 11000; /* Ensure high z-index on tablets too */
+        z-index: 99999 !important; /* Ensure high z-index on tablets too */
     }
     
     .notification {
@@ -504,7 +504,7 @@
         top: 1rem;
         right: 0.75rem;
         left: 0.75rem;
-        z-index: 11000; /* Ensure high z-index on mobile too */
+        z-index: 99999 !important; /* Ensure high z-index on mobile too */
     }
     
     /* Focus Mode */

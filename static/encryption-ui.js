@@ -59,9 +59,9 @@
     
     // Copy to clipboard
     navigator.clipboard.writeText(password).then(() => {
-      showNotification('🔒 Secure password generated and copied to clipboard!', 'success');
+      window.showNotification('🔒 Secure password generated and copied to clipboard!', 'success');
     }).catch(() => {
-      showNotification('🔒 Secure password generated! Please copy it manually.', 'success');
+      window.showNotification('🔒 Secure password generated! Please copy it manually.', 'success');
     });
     
     // Hide password after 3 seconds
@@ -161,7 +161,7 @@
     decryptBtn.addEventListener('click', async () => {
       const password = passwordInput.value;
       if (!password) {
-        showNotification('Please enter a password.', 'error');
+        window.showNotification('Please enter a password.', 'error');
         passwordInput.classList.add('shake');
         passwordInput.addEventListener('animationend', () => {
           passwordInput.classList.remove('shake');
@@ -188,7 +188,7 @@
           document.getElementById('pasteTextArea').value = decryptedContent;
         }
 
-        showNotification('Paste decrypted successfully!', 'success');
+        window.showNotification('Paste decrypted successfully!', 'success');
         // Trigger closing animation before removal
         modal.classList.add('closing');
         modal.addEventListener('animationend', () => {
@@ -197,7 +197,7 @@
 
       } catch (error) {
         console.error('Decryption error:', error);
-        showNotification('Decryption failed. Check your password.', 'error');
+        window.showNotification('Decryption failed. Check your password.', 'error');
         passwordInput.classList.add('shake');
         passwordInput.addEventListener('animationend', () => {
           passwordInput.classList.remove('shake');
@@ -226,33 +226,6 @@
         }, { once: true });
       }
     });
-  }
-
-  function showNotification(message, type = 'info') {
-    // Remove existing notifications
-    const existing = document.querySelectorAll('.notification');
-    existing.forEach(n => n.remove());
-
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
-
-    document.body.appendChild(notification);
-    
-    // Trigger animation
-    setTimeout(() => {
-      notification.classList.add('show');
-    }, 10);
-
-    // Auto-remove after 4 seconds
-    setTimeout(() => {
-      notification.classList.remove('show');
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.remove();
-        }
-      }, 300);
-    }, 4000);
   }
 
   // Check for encrypted content on page load

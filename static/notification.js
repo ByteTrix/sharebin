@@ -14,7 +14,7 @@
         position: fixed;
         top: 1rem;
         right: 1rem;
-        z-index: 11000;
+        z-index: 99999;
         pointer-events: none;
         max-width: 400px;
         width: auto;
@@ -43,6 +43,7 @@
       pointer-events: auto;
       position: relative;
       word-wrap: break-word;
+      z-index: 99999 !important;
     `;
 
     // Type-specific styling - simple black and white with emojis

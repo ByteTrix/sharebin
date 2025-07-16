@@ -138,9 +138,38 @@ button:active, .btn:active {
 }
 
 .sidebar-btn.primary:hover {
-    background: var(--bg-color);
-    border-color: var(--color);
-    color: var(--color);
+    /* Keep white background for dark theme, just add highlight */
+    background: #ffffff;
+    border-color: #ffffff;
+    color: #000000;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Light theme hover - keep black background */
+[data-theme="l"] .sidebar-btn.primary:hover {
+    background: #000000;
+    border-color: #000000;
+    color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Auto theme follows system preference */
+@media (prefers-color-scheme: light) {
+    body:not([data-theme="d"]) .sidebar-btn.primary:hover {
+        background: #000000;
+        border-color: #000000;
+        color: #ffffff;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="l"]) .sidebar-btn.primary:hover {
+        background: #ffffff;
+        border-color: #ffffff;
+        color: #000000;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+    }
 }
 
 .sidebar-btn svg {
@@ -490,9 +519,34 @@ input::placeholder, textarea::placeholder {
 }
 
 .new-note-btn:hover {
-    background: var(--link-hover-color);
-    
+    background: #ffffff;
+    border-color: #ffffff;
+    color: #000000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Light theme hover for new note button */
+[data-theme="l"] .new-note-btn:hover {
+    background: #000000;
+    border-color: #000000;
+    color: #ffffff;
+}
+
+/* Auto theme follows system preference */
+@media (prefers-color-scheme: light) {
+    body:not([data-theme="d"]) .new-note-btn:hover {
+        background: #000000;
+        border-color: #000000;
+        color: #ffffff;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="l"]) .new-note-btn:hover {
+        background: #ffffff;
+        border-color: #ffffff;
+        color: #000000;
+    }
 }
 
 .new-note-btn:active {
@@ -836,7 +890,25 @@ input::placeholder, textarea::placeholder {
 }
 
 .toggle-checkbox:checked + .toggle-switch-small {
-    background: var(--link-color);
+    background: #ffffff;
+}
+
+/* Light theme toggle */
+[data-theme="l"] .toggle-checkbox:checked + .toggle-switch-small {
+    background: #000000;
+}
+
+/* Auto theme follows system preference */
+@media (prefers-color-scheme: light) {
+    body:not([data-theme="d"]) .toggle-checkbox:checked + .toggle-switch-small {
+        background: #000000;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="l"]) .toggle-checkbox:checked + .toggle-switch-small {
+        background: #ffffff;
+    }
 }
 
 .toggle-checkbox:checked + .toggle-switch-small .toggle-slider-small {
@@ -889,11 +961,38 @@ input::placeholder, textarea::placeholder {
 }
 
 .compact-expiry-btn.selected {
-    background-color: var(--link-color) !important;
-    color: var(--bg-color) !important;
-    border-color: var(--link-color) !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ffffff !important;
     font-weight: 600;
-    box-shadow: 0 0 0 2px rgba(91, 78, 150, 0.3);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Light theme selected button */
+[data-theme="l"] .compact-expiry-btn.selected {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Auto theme follows system preference */
+@media (prefers-color-scheme: light) {
+    body:not([data-theme="d"]) .compact-expiry-btn.selected {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border-color: #000000 !important;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="l"]) .compact-expiry-btn.selected {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border-color: #ffffff !important;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+    }
 }
 
 /* Custom date button with icon */
@@ -1439,6 +1538,8 @@ pre:hover .copy-code-btn {
     transform: translateX(100%);
     transition: all 0.3s ease;
     pointer-events: auto;
+    position: relative;
+    z-index: 99999;
 }
 
 .notification.show {
@@ -2257,4 +2358,324 @@ dd {
   .notification.show {
     transform: translateY(0);
   }
+}
+
+/* Document Content Styles - Only for actual content, not UI elements */
+.document-content > p,
+.document-content > pre,
+.document-content > div:not(.encryption-notice):not(.decrypt-form) {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.document-content {
+    font-family: var(--sans-serif);
+    line-height: 1.6;
+    color: var(--color);
+}
+
+/* Ensure newlines are preserved in all document content */
+.document-content pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.document-content code {
+    white-space: pre-wrap;
+}
+
+/* Encrypted Content Styles - Only apply to decrypted content */
+.encrypted-content .decrypted-content {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: var(--sans-serif);
+    line-height: 1.6;
+    color: var(--color);
+    overflow-wrap: break-word;
+}
+
+.encrypted-content .decrypted-content pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.encrypted-content .decrypted-content code {
+    white-space: pre-wrap;
+}
+
+/* Ensure form elements maintain normal spacing */
+.encryption-notice,
+.decrypt-form {
+    white-space: normal;
+}
+
+.encryption-notice h2,
+.encryption-notice p,
+.decrypt-form input,
+.decrypt-form button {
+    white-space: normal;
+}
+
+/* ====================================
+   CONFIRMATION PAGES (404, DELETE, ETC.)
+   ==================================== */
+
+.confirmation-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 2rem 1rem;
+}
+
+.confirmation-panel {
+    background: transparent;
+    padding: 3rem 2.5rem;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+}
+
+.error-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    height: 96px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border-radius: 50%;
+    margin: 0 auto 2rem;
+    color: white;
+}
+
+.confirmation-heading {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color);
+    margin-bottom: 1rem;
+    letter-spacing: -0.025em;
+}
+
+.confirmation-description {
+    color: var(--faint-color);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.paste-id-display {
+    background: var(--faint-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--color);
+    word-break: break-all;
+}
+
+.warning-message {
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    color: var(--color);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.confirmation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.confirmation-form .form-group {
+    text-align: left;
+}
+
+.confirmation-form .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--color);
+}
+
+.confirmation-form .form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-color);
+    color: var(--color);
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease;
+}
+
+.confirmation-form .form-group input:focus {
+    outline: none;
+    border-color: var(--link-color);
+    box-shadow: 0 0 0 3px rgba(91, 78, 150, 0.1);
+}
+
+.confirmation-form .form-group .field-error {
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-danger {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+}
+
+.btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--faint-bg-color);
+    color: var(--color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.btn-secondary:hover {
+    background: var(--bg-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(91, 78, 150, 0.3);
+}
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--link-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.btn-primary:hover {
+    background: var(--link-hover-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(91, 78, 150, 0.3);
+}
+
+.btn-primary:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(91, 78, 150, 0.3);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.info-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.info-text {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    color: var(--faint-color);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.info-text svg {
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.info-text strong {
+    color: var(--color);
+}
+
+/* Responsive design for confirmation pages */
+@media (max-width: 768px) {
+    .confirmation-panel {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+    }
+    
+    .confirmation-heading {
+        font-size: 1.5rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-danger,
+    .btn-secondary,
+    .btn-primary {
+        width: 100%;
+        max-width: 280px;
+    }
 }

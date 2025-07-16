@@ -10,6 +10,9 @@
   const setMode = mode => {
     localStorage.setItem(themeStorageKey, mode);
     
+    // Also update the navbar theme storage for consistency
+    localStorage.setItem('navbar-theme', mode === 'l' ? 'light' : mode === 'd' ? 'dark' : 'auto');
+    
     // Update body attribute
     if (mode === 'auto') {
       document.body.removeAttribute('data-theme');
@@ -57,8 +60,19 @@
     return modes[(currentIndex + 1) % modes.length];
   };
 
-  // Initialize theme
-  let currentMode = localStorage.getItem(themeStorageKey) || 'auto';
+  // Initialize theme - check both storage keys for compatibility
+  let currentMode = localStorage.getItem(themeStorageKey);
+  
+  // If no preference stored, check the navbar theme storage
+  if (!currentMode) {
+    const navbarTheme = localStorage.getItem('navbar-theme');
+    if (navbarTheme) {
+      currentMode = navbarTheme === 'light' ? 'l' : navbarTheme === 'dark' ? 'd' : 'auto';
+    } else {
+      currentMode = 'auto';
+    }
+  }
+  
   setMode(currentMode);
 
   // Add click listeners to theme toggles

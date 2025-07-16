@@ -365,9 +365,9 @@ export default {
       const res = await storage.get(id);
 
       if (res.value !== null) {
-        const { editCode } = res.value;
+        const { editCode, isPasswordProtected } = res.value;
         const hasEditCode = Boolean(editCode);
-        contents = deletePage({ id, hasEditCode, mode: MODE });
+        contents = deletePage({ id, hasEditCode, isPasswordProtected: isPasswordProtected || false, mode: MODE });
       } else {
         contents = errorPage(MODE);
         status = 404;
@@ -716,6 +716,8 @@ export default {
       const id = params.id as string ?? '';
       const form = await req.formData();
       let editCode: string | undefined = form.get('editcode') as string;
+      const password: string | undefined = form.get('password') as string;
+      
       if (typeof editCode === 'string') {
         editCode = editCode.trim() || undefined;
       }
@@ -726,6 +728,7 @@ export default {
         const res = await storage.get(id);
         const existing = res.value as Paste;
         const hasEditCode = Boolean(existing.editCode);
+        const isPasswordProtected = existing.isPasswordProtected || false;
 
         // Use robust edit code validation
         const validation = await storage.validateEditCode(id, editCode || '');
@@ -735,9 +738,49 @@ export default {
           contents = deletePage({
             id,
             hasEditCode,
-            errors: { editCode: validation.error || 'Invalid edit code' },
+            isPasswordProtected,
+            errors: { editCode: validation.error || 'Invalid edit code', password: '' },
             mode: MODE,
           });
+        } else if (isPasswordProtected) {
+          // Validate password if required
+          if (!password) {
+            status = 400;
+            contents = deletePage({
+              id,
+              hasEditCode,
+              isPasswordProtected,
+              errors: { editCode: '', password: 'Password is required for deletion' },
+              mode: MODE,
+            });
+          } else {
+            try {
+              // Decrypt the data to verify password
+              const decrypted = await ServerEncryption.decrypt(JSON.parse(existing.paste), password);
+              if (!decrypted) {
+                status = 400;
+                contents = deletePage({
+                  id,
+                  hasEditCode,
+                  isPasswordProtected,
+                  errors: { editCode: '', password: 'Invalid password' },
+                  mode: MODE,
+                });
+              } else {
+                await storage.delete(id);
+                headers.set('location', '/');
+              }
+            } catch (error) {
+              status = 400;
+              contents = deletePage({
+                id,
+                hasEditCode,
+                isPasswordProtected,
+                errors: { editCode: '', password: 'Invalid password' },
+                mode: MODE,
+              });
+            }
+          }
         } else {
           await storage.delete(id);
           headers.set('location', '/');
