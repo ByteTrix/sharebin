@@ -1,0 +1,21 @@
+name = "sharebin"
+main = "src/index.ts"
+compatibility_date = "2024-01-15"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+MODE = "prod"
+DEMO_CLEAR_INTERVAL = "5"
+
+
+
+[[kv_namespaces]]
+binding = "KV"
+id = "f572e242ba264549bdacb3d89dc94623"
+preview_id = "f572e242ba264549bdacb3d89dc94623"
+
+[triggers]
+crons = ["* * * * *"]
+
+[assets]
+directory = "./static"
