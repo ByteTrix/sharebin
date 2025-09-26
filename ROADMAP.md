@@ -9,10 +9,10 @@
 - [x] Add Navbar
 - [x] Add Views count
 - [x] Customizable paste expiration
-- [ ] Add Share, raw copy, download buttons in menu
+- [x] Add Share, raw copy, download buttons in menu
 - [ ] show the language used in codeblock 
 - [ ] image render, embedded video preview
-- [ ] Proper Keyboard Shortcuts
+- [x] Proper Keyboard Shortcuts
 
 ## Future Roadmap (v2.0+)
 
