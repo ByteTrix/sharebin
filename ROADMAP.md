@@ -1,6 +1,5 @@
 # ShareBin Roadmap
-## Fix
-- [ ] history page 
+
 
 ## Core Features
 - [x] Cloudflare Worker and KV storage
