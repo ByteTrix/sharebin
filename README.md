@@ -2,6 +2,8 @@
 
 **A secure, self-hostable pastebin for Markdown content with enterprise-grade encryption.**
 
+<img width="2848" height="1768" alt="image" src="https://github.com/user-attachments/assets/48e4269d-54dd-4445-842e-4aef90eee8d7" />
+
 ## The Story 📖
 
 So there I was, needing to give my friend a proper telling-off. But WhatsApp? Instagram? Too mainstream. I wanted something with *class*. Something that says "I'm so mad at you that I encrypted my anger with military-grade security."
@@ -17,6 +19,7 @@ I found [mdbin](https://github.com/kevinfiol/mdbin) - a nice open-source pastebi
 Mission accomplished. Friend properly scolded. Relief achieved. 🎯
 
 ---
+
 
 ## Features ✨
 
